@@ -33,7 +33,7 @@
 <script>
 var mytext = {
     "payload": {
-      "summary": "DISK at 99% on machine prod-datapipe03.example.com",
+      "summary": "Sample Error for Automated Diagnostics Test",
       "timestamp": "2015-07-17T08:42:58.315+0000",
       "severity": "critical",
       "source": "prod-datapipe03.example.com",
@@ -66,13 +66,16 @@ var mytext = {
     ]
   }
   document.getElementById('payload').value=JSON.stringify(mytext, null, 4);
-  document.getElementById('routingkey').value=localStorage.getItem("routingkey");
+  name= location.search.split('routingkey=')[1]  
+  document.getElementById('routingkey').value=name;
+  
   document.addEventListener("keypress", function(event) {
   if (event.keyCode == 50) {
     eventfire()
   }
 });
 var name = localStorage.getItem("name");
+
 var button = document.querySelector('button');
 button.onclick = function() {eventfire()}
 function eventfire(){
