@@ -1,0 +1,435 @@
+<html><head><base href="https://regex-helper.pagerduty.com/" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Regex Helper</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+  :root {
+    --pd-green: #25c151;
+    --pd-dark-green: #1a8f3c;
+    --pd-blue: #0758ff;
+    --pd-dark-blue: #031633;
+    --pd-light-blue: #e5f5ff;
+    --pd-red: #ff4e4e;
+    --pd-yellow: #ffca28;
+    --pd-gray: #2c2c2c;
+    --pd-text: #ffffff;
+    --pd-background: #1a1a1a;
+    --highlight-start: rgba(255, 202, 40, 0.5);
+    --highlight-capture: rgba(37, 193, 81, 0.5);
+    --highlight-end: rgba(7, 88, 255, 0.5);
+  }
+  
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--pd-background);
+    color: var(--pd-text);
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  
+  h1 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-weight: 700;
+    color: var(--pd-green);
+  }
+  
+  .input-area, #highlightArea, #regexOutput, #testInput, #testResult {
+    width: 100%;
+    background-color: var(--pd-gray);
+    color: var(--pd-text);
+    border: 1px solid var(--pd-dark-green);
+    padding: 15px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+  }
+  
+  .input-area {
+    height: 200px;
+    resize: vertical;
+    margin-bottom: 10px;
+  }
+  
+  .input-area:focus, #testInput:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--pd-green);
+  }
+  
+  #highlightArea {
+    position: relative;
+    margin-bottom: 10px;
+    min-height: 100px;
+  }
+  
+  #highlightText {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+  
+  .highlight-start {
+    background-color: var(--highlight-start);
+  }
+  
+  .highlight-capture {
+    background-color: var(--highlight-capture);
+  }
+  
+  .highlight-end {
+    background-color: var(--highlight-end);
+  }
+  
+  #regexOutput {
+    font-size: 16px;
+    margin-bottom: 10px;
+    min-height: 30px;
+    cursor: pointer;
+  }
+  
+  .tab-container {
+    display: flex;
+    margin-bottom: 20px;
+  }
+  
+  .tab {
+    padding: 10px 20px;
+    background-color: var(--pd-gray);
+    border: 1px solid var(--pd-dark-green);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 4px 4px 0 0;
+    font-weight: 600;
+  }
+  
+  .tab.active {
+    background-color: var(--pd-green);
+    color: #ffffff;
+  }
+  
+  #testArea {
+    display: none;
+  }
+  
+  #testInput {
+    height: 100px;
+    resize: vertical;
+    margin-bottom: 10px;
+  }
+  
+  .btn-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  
+  .btn {
+    background-color: var(--pd-green);
+    border: none;
+    color: #ffffff;
+    padding: 12px 24px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 4px;
+    font-weight: 600;
+    flex: 1;
+    margin: 0 5px;
+  }
+  
+  .btn:hover {
+    background-color: var(--pd-dark-green);
+  }
+  
+  #resetBtn {
+    background-color: var(--pd-red);
+  }
+  
+  #resetBtn:hover {
+    background-color: #ff3030;
+  }
+  
+  #keyDisplay {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    background-color: var(--pd-gray);
+    padding: 10px;
+    border-radius: 4px;
+  }
+  
+  .key-item {
+    display: flex;
+    align-items: center;
+    width: 32%;
+  }
+  
+  .key-color {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  
+  .key-label {
+    flex-grow: 1;
+    text-align: left;
+  }
+  
+  .start-color {
+    background-color: var(--highlight-start);
+  }
+  
+  .capture-color {
+    background-color: var(--highlight-capture);
+  }
+  
+  .end-color {
+    background-color: var(--highlight-end);
+  }
+  
+  .tooltip {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+  }
+  
+  .tooltiptext {
+    visibility: hidden;
+    width: 200px;
+    background-color: var(--pd-dark-blue);
+    color: #ffffff;
+    text-align: center;
+    border-radius: 4px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -100px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  
+  .tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+  }
+  
+  #testButton {
+    background-color: var(--pd-blue);
+  }
+  
+  #testButton:hover {
+    background-color: var(--pd-dark-blue);
+  }
+  
+  .instructions {
+    font-size: 14px;
+    margin-bottom: 5px;
+    color: var(--pd-light-blue);
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1><i class="fas fa-code"></i> Regex Helper</h1>
+    <div id="keyDisplay">
+      <div class="key-item tooltip">
+        <div class="key-color start-color"></div>
+        <span class="key-label"><i class="fas fa-play"></i> Start Text</span>
+        <span class="tooltiptext">Select the text that precedes your desired capture</span>
+      </div>
+      <div class="key-item tooltip">
+        <div class="key-color capture-color"></div>
+        <span class="key-label"><i class="fas fa-grip-lines"></i> Capture Group</span>
+        <span class="tooltiptext">Select the text you want to capture</span>
+      </div>
+      <div class="key-item tooltip">
+        <div class="key-color end-color"></div>
+        <span class="key-label"><i class="fas fa-stop"></i> End Text</span>
+        <span class="tooltiptext">Select the text that follows your desired capture (optional)</span>
+      </div>
+    </div>
+    <div class="instructions"><i class="fas fa-paste"></i> Paste your multi-line text here:</div>
+    <textarea class="input-area" id="inputText" placeholder="Paste your multi-line text here..."></textarea>
+    <div class="instructions"><i class="fas fa-highlighter"></i> Select start text (yellow), capture group (green), and end text (blue) below:</div>
+    <div id="highlightArea">
+      <div id="highlightText"></div>
+    </div>
+    <div class="instructions"><i class="fas fa-magic"></i> Generated regex (click to copy):</div>
+    <div id="regexOutput" class="tooltip">
+      <span class="tooltiptext">Click to copy the generated regex</span>
+    </div>
+    <div class="btn-container">
+      <button id="resetBtn" class="btn"><i class="fas fa-undo"></i> Reset Selection</button>
+      <button id="testButton" class="btn"><i class="fas fa-vial"></i> Test Regex</button>
+    </div>
+    <div class="tab-container">
+      <div class="tab active" id="generatorTab"><i class="fas fa-wand-magic-sparkles"></i> Generator</div>
+      <div class="tab" id="testTab"><i class="fas fa-flask"></i> Test</div>
+    </div>
+    <div id="testArea">
+      <div class="instructions"><i class="fas fa-keyboard"></i> Enter text to test the generated regex:</div>
+      <textarea id="testInput" placeholder="Enter text to test against the generated regex..."></textarea>
+      <div class="instructions"><i class="fas fa-clipboard-check"></i> Test results:</div>
+      <div id="testResult"></div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/rangy/1.3.0/rangy-core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/rangy/1.3.0/rangy-classapplier.min.js"></script>
+  <script>
+    const inputText = document.getElementById('inputText');
+    const highlightText = document.getElementById('highlightText');
+    const regexOutput = document.getElementById('regexOutput');
+    const generatorTab = document.getElementById('generatorTab');
+    const testTab = document.getElementById('testTab');
+    const testArea = document.getElementById('testArea');
+    const testInput = document.getElementById('testInput');
+    const testButton = document.getElementById('testButton');
+    const testResult = document.getElementById('testResult');
+    const resetBtn = document.getElementById('resetBtn');
+
+    let startText = '';
+    let captureGroup = '';
+    let endText = '';
+
+    inputText.addEventListener('input', updateHighlightText);
+    inputText.addEventListener('paste', function(e) {
+      setTimeout(function() {
+        updateHighlightText();
+        testInput.value = inputText.value;
+      }, 0);
+    });
+
+    function updateHighlightText() {
+      highlightText.textContent = inputText.value;
+      resetSelection();
+    }
+
+    rangy.init();
+
+    const startApplier = rangy.createClassApplier('highlight-start', {normalize: false});
+    const captureApplier = rangy.createClassApplier('highlight-capture', {normalize: false});
+    const endApplier = rangy.createClassApplier('highlight-end', {normalize: false});
+
+    highlightText.addEventListener('mouseup', function() {
+      const selection = rangy.getSelection();
+      if (!selection.isCollapsed) {
+        if (!startText) {
+          startApplier.applyToSelection();
+          startText = selection.toString();
+        } else if (!captureGroup) {
+          captureApplier.applyToSelection();
+          captureGroup = selection.toString();
+        } else if (!endText) {
+          endApplier.applyToSelection();
+          endText = selection.toString();
+        }
+        updateRegexOutput();
+      }
+    });
+
+    function updateRegexOutput() {
+      if (startText && captureGroup) {
+        const escapedStart = escapeRegExp(startText);
+        const capturePattern = getCapturePattern(captureGroup);
+        const escapedEnd = endText ? escapeRegExp(endText) : '';
+        
+        let regex = `${escapedStart}(${capturePattern})`;
+        if (endText) {
+          regex += `${escapedEnd}`;
+        }
+        
+        regexOutput.textContent = regex;
+      } else {
+        regexOutput.textContent = 'Highlight start text and capture group to generate regex';
+      }
+    }
+
+    function escapeRegExp(string) {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+                   .replace(/\s/g, '\\s')
+                   .replace(/\//g, '\\/');
+    }
+
+    function getCapturePattern(str) {
+      if (/^\d+$/.test(str)) {
+        return '\\d+';
+      } else if (/^[A-Za-z]+$/.test(str)) {
+        return '[A-Za-z]+';
+      } else {
+        return '.+?';
+      }
+    }
+
+    generatorTab.addEventListener('click', function() {
+      generatorTab.classList.add('active');
+      testTab.classList.remove('active');
+      testArea.style.display = 'none';
+    });
+
+    testTab.addEventListener('click', function() {
+      testTab.classList.add('active');
+      generatorTab.classList.remove('active');
+      testArea.style.display = 'block';
+    });
+
+    testButton.addEventListener('click', function() {
+      const regex = new RegExp(regexOutput.textContent);
+      const testText = testInput.value;
+      const match = testText.match(regex);
+      
+      if (match) {
+        testResult.innerHTML = `<strong>Match found:</strong><br>Captured group: ${match[1]}`;
+      } else {
+        testResult.textContent = 'No match found';
+      }
+    });
+
+    resetBtn.addEventListener('click', resetSelection);
+
+    function resetSelection() {
+      startText = '';
+      captureGroup = '';
+      endText = '';
+      highlightText.innerHTML = inputText.value;
+      updateRegexOutput();
+    }
+
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(function() {
+        const originalTooltip = regexOutput.querySelector('.tooltiptext').textContent;
+        regexOutput.querySelector('.tooltiptext').textContent = 'Copied!';
+        setTimeout(() => {
+          regexOutput.querySelector('.tooltiptext').textContent = originalTooltip;
+        }, 2000);
+      }, function(err) {
+        console.error('Could not copy text: ', err);
+      });
+    }
+
+    regexOutput.addEventListener('click', function() {
+      copyToClipboard(regexOutput.textContent);
+    });
+  </script>
+</body>
+</html>
