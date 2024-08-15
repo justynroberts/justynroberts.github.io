@@ -1,0 +1,406 @@
+<html><head>
+<title>Cronbuddy</title>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root {
+    --bg-color: #2a2a2a;
+    --text-color: #e0e0e0;
+    --container-bg: #3a3a3a;
+    --input-bg: #4a4a4a;
+    --input-text: #ffffff;
+    --button-bg: #007bff;
+    --button-text: #ffffff;
+    --tab-bg: #4a4a4a;
+    --tab-active-bg: #007bff;
+    --tab-active-text: #ffffff;
+    --expression-bg: #4a4a4a;
+}
+
+body.light-mode {
+    --bg-color: #f0f0f0;
+    --text-color: #333333;
+    --container-bg: #ffffff;
+    --input-bg: #ffffff;
+    --input-text: #333333;
+    --button-bg: #007bff;
+    --button-text: #ffffff;
+    --tab-bg: #e0e0e0;
+    --tab-active-bg: #007bff;
+    --tab-active-text: #ffffff;
+    --expression-bg: #f8f9fa;
+}
+
+body {
+    font-family: 'Lexend', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 15px;
+    font-size: 14px;
+    transition: background-color 0.3s, color 0.3s;
+}
+.container {
+    background-color: var(--container-bg);
+    border-radius: 6px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    padding: 15px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+.tabs {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+}
+.tab {
+    padding: 8px 15px;
+    background-color: var(--tab-bg);
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 12px;
+    margin: 2px;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+}
+.tab i {
+    margin-right: 5px;
+}
+.tab:hover {
+    background-color: var(--button-bg);
+    color: var(--button-text);
+}
+.tab.active {
+    background-color: var(--tab-active-bg);
+    color: var(--tab-active-text);
+}
+.tab-content {
+    display: none;
+}
+.tab-content.active {
+    display: block;
+}
+select, input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 8px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 12px;
+    background-color: var(--input-bg);
+    color: var(--input-text);
+}
+#cronExpression {
+    font-size: 18px;
+    padding: 15px;
+    background-color: var(--expression-bg);
+    border: 1px solid #dee2e6;
+    border-radius: 3px;
+    margin-top: 15px;
+    word-break: break-all;
+}
+.instructions {
+    font-size: 12px;
+    color: var(--text-color);
+    margin-top: 10px;
+}
+.option-wrapper {
+    position: relative;
+}
+.option-tooltip {
+    visibility: hidden;
+    width: 200px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -100px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+.option-wrapper:hover .option-tooltip {
+    visibility: visible;
+    opacity: 1;
+}
+#theme-toggle {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background-color: var(--button-bg);
+    color: var(--button-text);
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+#theme-toggle:hover {
+    background-color: #0056b3;
+}
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+.logo i {
+    font-size: 36px;
+    margin-right: 10px;
+    color: var(--button-bg);
+}
+.logo h1 {
+    font-size: 36px;
+    margin: 0;
+}
+.expression-wrapper {
+    position: relative;
+}
+#copyButton {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    color: var(--text-color);
+    font-size: 18px;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+#copyButton:hover {
+    color: var(--button-bg);
+}
+#copyTooltip {
+    visibility: hidden;
+    width: 140px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 150%;
+    left: 50%;
+    margin-left: -70px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+#copyButton:hover #copyTooltip {
+    visibility: visible;
+    opacity: 1;
+}
+</style>
+</head>
+<body>
+<button id="theme-toggle"><i class="fas fa-sun"></i></button>
+<div class="container">
+    <div class="logo">
+        <i class="fas fa-clock"></i>
+        <h1>Cronbuddy</h1>
+    </div>
+    <div class="tabs">
+        <button class="tab active" data-tab="seconds"><i class="fas fa-stopwatch"></i> Seconds</button>
+        <button class="tab" data-tab="minutes"><i class="fas fa-hourglass-half"></i> Minutes</button>
+        <button class="tab" data-tab="hours"><i class="far fa-clock"></i> Hours</button>
+        <button class="tab" data-tab="dayOfMonth"><i class="far fa-calendar-alt"></i> Day of Month</button>
+        <button class="tab" data-tab="month"><i class="fas fa-calendar-day"></i> Month</button>
+        <button class="tab" data-tab="dayOfWeek"><i class="fas fa-calendar-week"></i> Day of Week</button>
+        <button class="tab" data-tab="year"><i class="fas fa-calendar"></i> Year</button>
+    </div>
+    <div id="seconds" class="tab-content active">
+        <div class="option-wrapper">
+            <select id="secondsSelect">
+                <option value="*">Every second</option>
+                <option value="*/5">Every 5 seconds</option>
+                <option value="*/10">Every 10 seconds</option>
+                <option value="*/15">Every 15 seconds</option>
+                <option value="*/30">Every 30 seconds</option>
+                <option value="0">At 0 seconds</option>
+                <option value="0,30">At 0 and 30 seconds</option>
+                <option value="0-29">First half of every minute</option>
+                <option value="30-59">Second half of every minute</option>
+            </select>
+            <span class="option-tooltip">Select the seconds pattern for your cron job</span>
+        </div>
+    </div>
+    <div id="minutes" class="tab-content">
+        <div class="option-wrapper">
+            <select id="minutesSelect">
+                <option value="*">Every minute</option>
+                <option value="*/5">Every 5 minutes</option>
+                <option value="*/10">Every 10 minutes</option>
+                <option value="*/15">Every 15 minutes</option>
+                <option value="*/30">Every 30 minutes</option>
+                <option value="0">At the top of every hour</option>
+                <option value="0,30">At 0 and 30 minutes past the hour</option>
+                <option value="1-29">First half of every hour</option>
+                <option value="31-59">Second half of every hour</option>
+            </select>
+            <span class="option-tooltip">Select the minutes pattern for your cron job</span>
+        </div>
+    </div>
+    <div id="hours" class="tab-content">
+        <div class="option-wrapper">
+            <select id="hoursSelect">
+                <option value="*">Every hour</option>
+                <option value="*/2">Every 2 hours</option>
+                <option value="*/3">Every 3 hours</option>
+                <option value="*/4">Every 4 hours</option>
+                <option value="*/6">Every 6 hours</option>
+                <option value="*/12">Every 12 hours</option>
+                <option value="0">At midnight</option>
+                <option value="9-17">During business hours (9 AM - 5 PM)</option>
+                <option value="0,12">At midnight and noon</option>
+            </select>
+            <span class="option-tooltip">Select the hours pattern for your cron job</span>
+        </div>
+    </div>
+    <div id="dayOfMonth" class="tab-content">
+        <div class="option-wrapper">
+            <select id="dayOfMonthSelect">
+                <option value="*">Every day</option>
+                <option value="1">On the 1st of the month</option>
+                <option value="15">On the 15th of the month</option>
+                <option value="L">On the last day of the month</option>
+                <option value="1W">On the nearest weekday to the 1st of the month</option>
+                <option value="LW">On the last weekday of the month</option>
+                <option value="1-7">First week of the month</option>
+                <option value="1,15,L">On the 1st, 15th, and last day of the month</option>
+            </select>
+            <span class="option-tooltip">Select the day of month pattern for your cron job</span>
+        </div>
+    </div>
+    <div id="month" class="tab-content">
+        <div class="option-wrapper">
+            <select id="monthSelect">
+                <option value="*">Every month</option>
+                <option value="1">January</option>
+                <option value="4">April</option>
+                <option value="7">July</option>
+                <option value="10">October</option>
+                <option value="1,7">January and July</option>
+                <option value="3-5">Spring months (Mar-May)</option>
+                <option value="6-8">Summer months (Jun-Aug)</option>
+                <option value="9-11">Fall months (Sep-Nov)</option>
+                <option value="12,1,2">Winter months (Dec-Feb)</option>
+            </select>
+            <span class="option-tooltip">Select the month pattern for your cron job</span>
+        </div>
+    </div>
+    <div id="dayOfWeek" class="tab-content">
+        <div class="option-wrapper">
+            <select id="dayOfWeekSelect">
+                <option value="?">Any day of the week</option>
+                <option value="MON">Monday</option>
+                <option value="WED">Wednesday</option>
+                <option value="FRI">Friday</option>
+                <option value="SAT,SUN">Saturday and Sunday</option>
+                <option value="MON-FRI">Weekdays</option>
+                <option value="1L">Last Sunday of the month</option>
+                <option value="6#3">Third Saturday of the month</option>
+            </select>
+            <span class="option-tooltip">Select the day of week pattern for your cron job</span>
+        </div>
+    </div>
+    <div id="year" class="tab-content">
+        <div class="option-wrapper">
+            <select id="yearSelect">
+                <option value="*">Every year</option>
+                <option value="2023">2023</option>
+                <option value="2024">2024</option>
+                <option value="2025">2025</option>
+                <option value="2023,2024,2025">2023, 2024, and 2025</option>
+                <option value="2023/2">Every 2 years starting from 2023</option>
+            </select>
+            <span class="option-tooltip">Select the year pattern for your cron job</span>
+        </div>
+    </div>
+    <div class="expression-wrapper">
+        <div id="cronExpression"></div>
+        <button id="copyButton">
+            <i class="far fa-copy"></i>
+            <span id="copyTooltip">Copy to clipboard</span>
+        </button>
+    </div>
+    <div class="instructions">
+        <h3><i class="fas fa-info-circle"></i> Instructions:</h3>
+        <p><i class="fas fa-mouse-pointer"></i> Select options from each tab to build your cron expression.</p>
+        <p><i class="fas fa-eye"></i> The resulting cron expression will be displayed in the box above.</p>
+        <p><i class="fas fa-question-circle"></i> Hover over each option for more information.</p>
+        <p><i class="fas fa-code"></i> The cron expression format is: Seconds Minutes Hours DayOfMonth Month DayOfWeek Year</p>
+        <p><i class="fas fa-adjust"></i> Use the sun/moon button in the top right to toggle between light and dark mode.</p>
+        <p><i class="far fa-copy"></i> Click the copy icon next to the cron expression to copy it to your clipboard.</p>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+    const tabs = document.querySelectorAll('.tab');
+    const tabContents = document.querySelectorAll('.tab-content');
+    const cronExpression = document.getElementById('cronExpression');
+    const selects = document.querySelectorAll('select');
+    const themeToggle = document.getElementById('theme-toggle');
+    const copyButton = document.getElementById('copyButton');
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+            tab.classList.add('active');
+            document.getElementById(tab.dataset.tab).classList.add('active');
+        });
+    });
+
+    function updateCronExpression() {
+        const seconds = document.getElementById('secondsSelect').value;
+        const minutes = document.getElementById('minutesSelect').value;
+        const hours = document.getElementById('hoursSelect').value;
+        const dayOfMonth = document.getElementById('dayOfMonthSelect').value;
+        const month = document.getElementById('monthSelect').value;
+        const dayOfWeek = document.getElementById('dayOfWeekSelect').value;
+        const year = document.getElementById('yearSelect').value;
+
+        const expression = `${seconds} ${minutes} ${hours} ${dayOfMonth} ${month} ${dayOfWeek} ${year}`;
+        cronExpression.textContent = expression;
+    }
+
+    selects.forEach(select => {
+        select.addEventListener('change', updateCronExpression);
+    });
+
+    updateCronExpression();
+
+    // Theme toggle functionality
+    themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('light-mode');
+        themeToggle.innerHTML = document.body.classList.contains('light-mode') ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
+    });
+
+    // Copy to clipboard functionality
+    copyButton.addEventListener('click', () => {
+        const textArea = document.createElement('textarea');
+        textArea.value = cronExpression.textContent;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+
+        const tooltip = document.getElementById('copyTooltip');
+        tooltip.innerHTML = 'Copied!';
+        setTimeout(() => {
+            tooltip.innerHTML = 'Copy to clipboard';
+        }, 2000);
+    });
+});
+</script>
+</body>
+</html>
