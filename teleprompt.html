@@ -1,0 +1,361 @@
+<html><head><base href="/" /><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>Pro Teleprompter with Key Controls</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+    :root {
+        --bg-color: #1a1a1a;
+        --text-color: #e0e0e0;
+        --accent-color: #4CAF50;
+        --secondary-color: #2196F3;
+        --toolbar-bg: #333333;
+        --toolbar-text: #ffffff;
+    }
+    body {
+        font-family: 'Roboto Mono', monospace;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        overflow: hidden;
+    }
+    #app {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+    }
+    #teleprompter {
+        flex-grow: 1;
+        overflow: hidden;
+        position: relative;
+        background-color: var(--bg-color);
+    }
+    #content {
+        position: absolute;
+        bottom: 100%;
+        left: 0;
+        width: 100%;
+        padding: 20px;
+        box-sizing: border-box;
+        transition: transform 0.1s linear;
+        text-align: center;
+    }
+    #toolbar {
+        background-color: var(--toolbar-bg);
+        color: var(--toolbar-text);
+        padding: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+    }
+    #toolbar.hidden {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    .toolbar-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    button, .file-input-label {
+        background-color: transparent;
+        color: var(--toolbar-text);
+        border: 1px solid var(--toolbar-text);
+        padding: 5px 10px;
+        border-radius: 3px;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    button:hover, .file-input-label:hover {
+        background-color: var(--accent-color);
+        border-color: var(--accent-color);
+    }
+    #file-input {
+        display: none;
+    }
+    #font-size {
+        width: 50px;
+        background-color: var(--toolbar-bg);
+        color: var(--toolbar-text);
+        border: 1px solid var(--toolbar-text);
+        padding: 5px;
+        border-radius: 3px;
+    }
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 40px;
+        height: 20px;
+    }
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: var(--toolbar-text);
+        transition: .4s;
+        border-radius: 20px;
+    }
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 16px;
+        width: 16px;
+        left: 2px;
+        bottom: 2px;
+        background-color: var(--toolbar-bg);
+        transition: .4s;
+        border-radius: 50%;
+    }
+    input:checked + .slider {
+        background-color: var(--accent-color);
+    }
+    input:checked + .slider:before {
+        transform: translateX(20px);
+    }
+    #speed-display {
+        font-size: 14px;
+        margin-left: 5px;
+    }
+    #key-controls {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        background-color: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 10px;
+        border-radius: 5px;
+        font-size: 12px;
+        z-index: 1000;
+        transition: opacity 0.3s ease-in-out;
+    }
+    #key-controls.hidden {
+        opacity: 0;
+    }
+</style>
+</head>
+<body>
+    <div id="app">
+        <div id="teleprompter">
+            <div id="content"></div>
+        </div>
+        <div id="toolbar" class="hidden">
+            <div class="toolbar-group">
+                <label for="file-input" class="file-input-label">
+                    <i class="fas fa-file-upload"></i> Upload
+                </label>
+                <input type="file" id="file-input" accept=".txt">
+                <button id="start-stop"><i class="fas fa-play"></i> Start</button>
+                <div>
+                    <i class="fas fa-font"></i>
+                    <input type="number" id="font-size" value="36" min="12" max="72">
+                </div>
+            </div>
+            <div class="toolbar-group">
+                <button id="speed-decrease"><i class="fas fa-minus"></i></button>
+                <span id="speed-display">1x</span>
+                <button id="speed-increase"><i class="fas fa-plus"></i></button>
+            </div>
+            <div class="toolbar-group">
+                <label class="switch">
+                    <input type="checkbox" id="theme-toggle">
+                    <span class="slider"></span>
+                </label>
+                <button id="fullscreen-toggle"><i class="fas fa-expand"></i></button>
+            </div>
+        </div>
+    </div>
+    <div id="key-controls">
+        <p>Space: Start/Stop</p>
+        <p>↑/↓: Adjust Speed</p>
+        <p>←/→: Adjust Position</p>
+        <p>+/-: Adjust Font Size</p>
+        <p>F: Fullscreen</p>
+        <p>T: Toggle Theme</p>
+        <p>H: Hide Controls</p>
+    </div>
+
+<script>
+const app = document.getElementById('app');
+const content = document.getElementById('content');
+const toolbar = document.getElementById('toolbar');
+const fileInput = document.getElementById('file-input');
+const startStopBtn = document.getElementById('start-stop');
+const fontSizeInput = document.getElementById('font-size');
+const themeToggle = document.getElementById('theme-toggle');
+const fullscreenToggle = document.getElementById('fullscreen-toggle');
+const speedDecreaseBtn = document.getElementById('speed-decrease');
+const speedIncreaseBtn = document.getElementById('speed-increase');
+const speedDisplay = document.getElementById('speed-display');
+const keyControls = document.getElementById('key-controls');
+
+let isScrolling = false;
+let scrollSpeed = 1;
+let text = '';
+let mouseTimer;
+
+function showToolbar() {
+    toolbar.classList.remove('hidden');
+    keyControls.classList.remove('hidden');
+    clearTimeout(mouseTimer);
+    mouseTimer = setTimeout(() => {
+        toolbar.classList.add('hidden');
+        keyControls.classList.add('hidden');
+    }, 3000);
+}
+
+document.addEventListener('mousemove', showToolbar);
+
+fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        text = e.target.result;
+        content.innerHTML = text;
+        content.style.transform = 'translateY(100%)';
+    };
+    reader.readAsText(file);
+});
+
+startStopBtn.addEventListener('click', toggleScrolling);
+
+fontSizeInput.addEventListener('input', () => {
+    content.style.fontSize = `${fontSizeInput.value}px`;
+});
+
+themeToggle.addEventListener('change', toggleTheme);
+
+fullscreenToggle.addEventListener('click', toggleFullscreen);
+
+speedDecreaseBtn.addEventListener('click', () => adjustSpeed(-0.1));
+
+speedIncreaseBtn.addEventListener('click', () => adjustSpeed(0.1));
+
+function updateSpeedDisplay() {
+    speedDisplay.textContent = `${scrollSpeed.toFixed(1)}x`;
+}
+
+function scroll() {
+    if (!isScrolling) return;
+    const currentTransform = getComputedStyle(content).transform;
+    const matrix = new DOMMatrix(currentTransform);
+    const currentY = matrix.m42;
+    content.style.transform = `translateY(${currentY - scrollSpeed}px)`;
+    requestAnimationFrame(scroll);
+}
+
+function toggleScrolling() {
+    isScrolling = !isScrolling;
+    startStopBtn.innerHTML = isScrolling ? '<i class="fas fa-pause"></i> Pause' : '<i class="fas fa-play"></i> Start';
+    if (isScrolling) scroll();
+}
+
+function adjustSpeed(delta) {
+    scrollSpeed = Math.max(0.5, Math.min(3, scrollSpeed + delta));
+    updateSpeedDisplay();
+}
+
+function adjustPosition(delta) {
+    const currentTransform = getComputedStyle(content).transform;
+    const matrix = new DOMMatrix(currentTransform);
+    const currentY = matrix.m42;
+    content.style.transform = `translateY(${currentY + delta}px)`;
+}
+
+function toggleTheme() {
+    document.body.classList.toggle('light-mode');
+    if (document.body.classList.contains('light-mode')) {
+        document.documentElement.style.setProperty('--bg-color', '#ffffff');
+        document.documentElement.style.setProperty('--text-color', '#000000');
+        document.documentElement.style.setProperty('--toolbar-bg', '#f0f0f0');
+        document.documentElement.style.setProperty('--toolbar-text', '#333333');
+    } else {
+        document.documentElement.style.setProperty('--bg-color', '#1a1a1a');
+        document.documentElement.style.setProperty('--text-color', '#e0e0e0');
+        document.documentElement.style.setProperty('--toolbar-bg', '#333333');
+        document.documentElement.style.setProperty('--toolbar-text', '#ffffff');
+    }
+}
+
+function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+        app.requestFullscreen().catch(err => {
+            alert(`Error attempting to enable fullscreen: ${err.message}`);
+        });
+    } else {
+        document.exitFullscreen();
+    }
+}
+
+document.addEventListener('keydown', (e) => {
+    switch (e.key) {
+        case ' ':
+            toggleScrolling();
+            break;
+        case 'ArrowUp':
+            adjustSpeed(0.1);
+            break;
+        case 'ArrowDown':
+            adjustSpeed(-0.1);
+            break;
+        case 'ArrowLeft':
+            adjustPosition(-50);
+            break;
+        case 'ArrowRight':
+            adjustPosition(50);
+            break;
+        case '+':
+            fontSizeInput.value = Math.min(72, parseInt(fontSizeInput.value) + 1);
+            content.style.fontSize = `${fontSizeInput.value}px`;
+            break;
+        case '-':
+            fontSizeInput.value = Math.max(12, parseInt(fontSizeInput.value) - 1);
+            content.style.fontSize = `${fontSizeInput.value}px`;
+            break;
+        case 'f':
+        case 'F':
+            toggleFullscreen();
+            break;
+        case 't':
+        case 'T':
+            themeToggle.click();
+            break;
+        case 'h':
+        case 'H':
+            toolbar.classList.toggle('hidden');
+            keyControls.classList.toggle('hidden');
+            break;
+    }
+    showToolbar();
+});
+
+document.addEventListener('fullscreenchange', () => {
+    if (document.fullscreenElement) {
+        fullscreenToggle.innerHTML = '<i class="fas fa-compress"></i>';
+    } else {
+        fullscreenToggle.innerHTML = '<i class="fas fa-expand"></i>';
+    }
+});
+
+updateSpeedDisplay();
+</script>
+</body>
+</html>
