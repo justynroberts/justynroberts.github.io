@@ -1,498 +1,972 @@
-<html><head><base href="https://pagerduty.websim.ai/" /><title>Trigger PagerDuty Event</title><script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script><style>
-    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xQq1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <title>Triggerincident.com</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
 
-    * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-    }
-
-    body {
-        font-family: 'IBM Plex Sans', sans-serif;
-        background-color: #1a1a1a;
-        color: #f0f0f0;
-        display: flex;
-        height: 100vh;
-        overflow: hidden;
-    }
-
-    #particles-js {
-        position: fixed;
-        width: 100%;
-        height: 100%;
-        z-index: -1;
-    }
-
-    .sidebar {
-        width: 250px;
-        background-color: #252525;
-        padding: 20px;
-        overflow-y: auto;
-        transition: all 0.3s ease;
-    }
-
-    .sidebar h2 {
-        margin-bottom: 20px;
-        font-weight: 500;
-    }
-
-    .categories {
-        list-style-type: none;
-    }
-
-    .categories li {
-        padding: 10px;
-        cursor: pointer;
-        transition: background-color 0.2s;
-    }
-
-    .categories li:hover, .categories li.active {
-        background-color: #3a3a3a;
-    }
-
-    .config {
-        margin-top: 30px;
-    }
-
-    .config input {
-        width: 100%;
-        padding: 8px;
-        margin-top: 5px;
-        background-color: #3a3a3a;
-        border: none;
-        color: #f0f0f0;
-    }
-
-    .main-content {
-        flex: 1;
-        padding: 20px;
-        overflow-y: auto;
-        position: relative;
-    }
-
-    .card-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        gap: 20px;
-        margin-bottom: 80px; /* Add space for the trigger button */
-    }
-
-    .card {
-        background-color: #2a2a2a;
-        border-radius: 8px;
-        padding: 15px;
-        transition: all 0.3s ease;
-        cursor: pointer;
-    }
-
-    .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    }
-
-    .card-header {
-        display: flex;
-        align-items: center;
-        margin-bottom: 10px;
-    }
-
-    .card-icon {
-        width: 30px;
-        height: 30px;
-        margin-right: 10px;
-    }
-
-    .card-title {
-        font-weight: 500;
-    }
-
-    .card-description {
-        font-size: 0.9em;
-        color: #b0b0b0;
-    }
-
-    .card-checkbox {
-        margin-top: 10px;
-    }
-
-    .trigger-btn {
-        position: fixed;
-        bottom: 20px;
-        left: 270px; /* Adjusted to be on the left */
-        padding: 15px 30px;
-        background-color: #ff4500;
-        color: white;
-        border: none;
-        border-radius: 50px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        font-size: 18px;
-        font-weight: bold;
-        box-shadow: 0 5px 15px rgba(255, 69, 0, 0.4);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .trigger-btn:hover {
-        background-color: #ff6347;
-        transform: translateY(-2px);
-        box-shadow: 0 7px 20px rgba(255, 69, 0, 0.6);
-    }
-
-    .trigger-btn:active {
-        transform: translateY(1px);
-        box-shadow: 0 3px 10px rgba(255, 69, 0, 0.4);
-    }
-
-    .trigger-btn .flame {
-        margin-right: 10px;
-        font-size: 24px;
-    }
-
-    .modal {
-        display: none;
-        position: fixed;
-        z-index: 1;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        overflow: auto;
-        background-color: rgba(0,0,0,0.4);
-    }
-
-    .modal-content {
-        background-color: #2a2a2a;
-        margin: 15% auto;
-        padding: 20px;
-        border-radius: 8px;
-        width: 80%;
-        max-width: 600px;
-    }
-
-    .close {
-        color: #aaa;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
-        cursor: pointer;
-    }
-
-    .close:hover,
-    .close:focus {
-        color: #f0f0f0;
-        text-decoration: none;
-        cursor: pointer;
-    }
-
-    #jsonEditor {
-        width: 100%;
-        height: 300px;
-        margin-top: 20px;
-        background-color: #1a1a1a;
-        color: #f0f0f0;
-        border: none;
-        padding: 10px;
-        font-family: monospace;
-    }
-
-    .save-btn {
-        margin-top: 10px;
-        padding: 8px 16px;
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-
-    .save-btn:hover {
-        background-color: #45a049;
-    }
-
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-    }
-
-    .fade-in {
-        animation: fadeIn 0.5s ease-in;
-    }
-
-    .routing-key-container {
-        display: flex;
-        align-items: center;
-    }
-
-    .routing-key-container button {
-        margin-left: 10px;
-        padding: 8px;
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-
-    .routing-key-container button:hover {
-        background-color: #45a049;
-    }
-
-    @keyframes pulse {
-        0% {
-            transform: scale(1);
-        }
-        50% {
-            transform: scale(1.05);
-        }
-        100% {
-            transform: scale(1);
-        }
-    }
-
-    .trigger-btn {
-        animation: pulse 2s infinite;
-    }
-
-    .help-icon {
-        cursor: pointer;
-        font-size: 20px;
-        margin-left: 10px;
-    }
-
-    .help-popup {
-        display: none;
-        position: absolute;
-        background-color: #3a3a3a;
-        border-radius: 8px;
-        padding: 15px;
-        width: 300px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        z-index: 1000;
-    }
-
-    .help-popup.show {
-        display: block;
-    }
-</style></head><body><div id="particles-js"></div><div class="sidebar"><h2>Trigger PagerDuty Event <span class="help-icon" id="helpIcon">❔</span></h2><div class="help-popup" id="helpPopup">
-        <p>This tool allows you to generate and trigger PagerDuty events. Select a category, choose your events, and click the "Trigger" button to send them to PagerDuty.</p>
-        <p>Don't forget to set your Routing Key in the configuration section!</p>
-    </div><ul class="categories" id="categories"></ul><div class="config"><h3>Configuration</h3><div class="routing-key-container"><input type="password" id="routingKey" placeholder="Enter your routing key"><button id="toggleRoutingKey">👁️</button></div></div></div><div class="main-content"><div class="card-container" id="cardContainer"></div><button class="trigger-btn" id="triggerBtn"><span class="flame">🔥</span> Trigger</button></div><div id="editModal" class="modal"><div class="modal-content"><span class="close">&times;</span><h2>Edit JSON Payload</h2><textarea id="jsonEditor"></textarea><button class="save-btn" id="saveJson">Save Changes</button></div></div><script>
-    // Particle.js configuration
-    particlesJS.load('particles-js', 'particles.json', function() {
-        console.log('particles.js loaded');
-    });
-
-    // Sample data structure
-    const categories = [
-        { name: "Critical Alerts", icon: "🚨" },
-        { name: "Warning Alerts", icon: "⚠️" },
-        { name: "Informational", icon: "ℹ️" },
-        { name: "System Errors", icon: "🔧" },
-        { name: "Network Issues", icon: "🌐" },
-        { name: "Database Alerts", icon: "💾" },
-        { name: "Security Alerts", icon: "🔒" }
-    ];
-
-    const payloads = {
-        "Critical Alerts": [
-            { title: "Service Down", description: "Critical service is not responding", payload: { severity: "critical", message: "Service is down" } },
-            { title: "High CPU Usage", description: "CPU usage exceeds 90%", payload: { severity: "critical", message: "High CPU usage detected" } }
-        ],
-        "Warning Alerts": [
-            { title: "Disk Space Low", description: "Disk space below 10%", payload: { severity: "warning", message: "Low disk space" } },
-            { title: "High Memory Usage", description: "Memory usage exceeds 80%", payload: { severity: "warning", message: "High memory usage" } }
-        ],
-        "Informational": [
-            { title: "Backup Completed", description: "Daily backup process finished", payload: { severity: "info", message: "Backup completed successfully" } },
-            { title: "User Login", description: "New user login detected", payload: { severity: "info", message: "New user login" } }
-        ],
-        "System Errors": [
-            { title: "Application Crash", description: "Application terminated unexpectedly", payload: { severity: "error", message: "Application crash detected" } },
-            { title: "Failed System Update", description: "System update process failed", payload: { severity: "error", message: "System update failed" } }
-        ],
-        "Network Issues": [
-            { title: "High Latency", description: "Network latency exceeds threshold", payload: { severity: "warning", message: "High network latency detected" } },
-            { title: "Packet Loss", description: "Significant packet loss detected", payload: { severity: "warning", message: "Packet loss detected" } }
-        ],
-        "Database Alerts": [
-            { title: "Slow Query", description: "Database query exceeding time limit", payload: { severity: "warning", message: "Slow database query detected" } },
-            { title: "Connection Pool Exhausted", description: "All database connections in use", payload: { severity: "critical", message: "Database connection pool exhausted" } }
-        ],
-        "Security Alerts": [
-            { title: "Failed Login Attempts", description: "Multiple failed login attempts detected", payload: { severity: "warning", message: "Multiple failed login attempts" } },
-            { title: "Unauthorized Access Attempt", description: "Attempt to access restricted resource", payload: { severity: "critical", message: "Unauthorized access attempt detected" } }
-        ]
-    };
-
-    // DOM elements
-    const categoriesList = document.getElementById('categories');
-    const cardContainer = document.getElementById('cardContainer');
-    const routingKeyInput = document.getElementById('routingKey');
-    const toggleRoutingKeyBtn = document.getElementById('toggleRoutingKey');
-    const triggerBtn = document.getElementById('triggerBtn');
-    const modal = document.getElementById('editModal');
-    const closeModal = document.getElementsByClassName('close')[0];
-    const jsonEditor = document.getElementById('jsonEditor');
-    const saveJsonBtn = document.getElementById('saveJson');
-    const helpIcon = document.getElementById('helpIcon');
-    const helpPopup = document.getElementById('helpPopup');
-
-    let currentCategory = categories[0].name;
-    let currentEditingCard = null;
-
-    // Populate categories
-    categories.forEach((category, index) => {
-        const li = document.createElement('li');
-        li.textContent = `${category.icon} ${category.name}`;
-        li.onclick = () => switchCategory(category.name);
-        if (index === 0) li.classList.add('active');
-        categoriesList.appendChild(li);
-    });
-
-    // Switch category function
-    function switchCategory(categoryName) {
-        currentCategory = categoryName;
-        document.querySelectorAll('.categories li').forEach(li => li.classList.remove('active'));
-        document.querySelector(`.categories li:nth-child(${categories.findIndex(c => c.name === categoryName) + 1})`).classList.add('active');
-        renderCards();
-    }
-
-    // Render cards function
-    function renderCards() {
-        cardContainer.innerHTML = '';
-        payloads[currentCategory].forEach((item, index) => {
-            const card = document.createElement('div');
-            card.className = 'card fade-in';
-            card.innerHTML = `
-                <div class="card-header">
-                    <div class="card-icon">${categories.find(c => c.name === currentCategory).icon}</div>
-                    <h3 class="card-title">${item.title}</h3>
-                </div>
-                <p class="card-description">${item.description}</p>
-                <label class="card-checkbox">
-                    <input type="checkbox" checked> Execute
-                </label>
-            `;
-            card.onclick = (e) => {
-                if (e.target.type !== 'checkbox') {
-                    openModal(item, index);
-                }
-            };
-            cardContainer.appendChild(card);
-        });
-    }
-
-    // Open modal function
-    function openModal(item, index) {
-        currentEditingCard = { item, index };
-        jsonEditor.value = JSON.stringify(item.payload, null, 2);
-        modal.style.display = 'block';
-    }
-
-    // Close modal function
-    closeModal.onclick = () => {
-        modal.style.display = 'none';
-    };
-
-    // Save JSON changes
-    saveJsonBtn.onclick = () => {
-        try {
-            const updatedPayload = JSON.parse(jsonEditor.value);
-            payloads[currentCategory][currentEditingCard.index].payload = updatedPayload;
-            modal.style.display = 'none';
-        } catch (error) {
-            alert('Invalid JSON. Please check your input.');
-        }
-    };
-
-    // Trigger function
-    triggerBtn.onclick = () => {
-        const routingKey = routingKeyInput.value;
-        if (!routingKey) {
-            alert('Please enter a routing key');
-            return;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
-        const selectedPayloads = Array.from(document.querySelectorAll('.card'))
-            .filter(card => card.querySelector('input[type="checkbox"]').checked)
-            .map(card => payloads[currentCategory][Array.from(card.parentNode.children).indexOf(card)].payload);
+        body {
+            font-family: 'IBM Plex Sans', sans-serif;
+            background-color: #1a1a1a;
+            color: #f0f0f0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
 
-        selectedPayloads.forEach(payload => {
-            fetch('https://events.pagerduty.com/v2/enqueue', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Routing-Key': routingKey
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #252525;
+            padding: 20px;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar h2 {
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .categories {
+            list-style-type: none;
+        }
+
+        .categories li {
+            padding: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .categories li:hover, .categories li.active {
+            background-color: #3a3a3a;
+        }
+
+        .config {
+            margin-top: 30px;
+        }
+
+        .config input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            background-color: #3a3a3a;
+            border: none;
+            color: #f0f0f0;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 80px; /* Space for the trigger button */
+        }
+
+        .card {
+            background-color: #2a2a2a;
+            border-radius: 8px;
+            padding: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .card-icon {
+            width: 30px;
+            height: 30px;
+            margin-right: 10px;
+        }
+
+        .card-title {
+            font-weight: 500;
+        }
+
+        .card-description {
+            font-size: 0.9em;
+            color: #b0b0b0;
+        }
+
+        .card-checkbox {
+            margin-top: 10px;
+        }
+
+        .trigger-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 270px; /* Adjusted to be on the left */
+            padding: 15px 30px;
+            background-color: #ff4500;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(255, 69, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .trigger-btn:hover {
+            background-color: #ff6347;
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(255, 69, 0, 0.6);
+        }
+
+        .trigger-btn:active {
+            transform: translateY(1px);
+            box-shadow: 0 3px 10px rgba(255, 69, 0, 0.4);
+        }
+
+        .trigger-btn .flame {
+            margin-right: 10px;
+            font-size: 24px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: #2a2a2a;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 600px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #f0f0f0;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        #jsonEditor {
+            width: 100%;
+            height: 300px;
+            margin-top: 20px;
+            background-color: #1a1a1a;
+            color: #f0f0f0;
+            border: none;
+            padding: 10px;
+            font-family: monospace;
+        }
+
+        .save-btn {
+            margin-top: 10px;
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .save-btn:hover {
+            background-color: #45a049;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .routing-key-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .routing-key-container button {
+            margin-left: 10px;
+            padding: 8px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .routing-key-container button:hover {
+            background-color: #45a049;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .trigger-btn {
+            animation: pulse 2s infinite;
+        }
+
+        .help-icon {
+            cursor: pointer;
+            font-size: 20px;
+            margin-left: 10px;
+        }
+
+        .help-popup {
+            display: none;
+            position: absolute;
+            background-color: #3a3a3a;
+            border-radius: 8px;
+            padding: 15px;
+            width: 300px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            z-index: 1000;
+        }
+
+        .help-popup.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+   
+    <div class="sidebar">
+        <h2>Trigger PagerDuty Event <span class="help-icon" id="helpIcon">ℹ️</span></h2>
+        <div class="help-popup" id="helpPopup">
+            <p>This tool allows you to generate and trigger PagerDuty events. Select a category, choose your events, and click the "Trigger" button to send them to PagerDuty.</p>
+            <p>Don't forget to set your Routing Key in the configuration section!</p>
+        </div>
+        <ul class="categories" id="categories"></ul>
+        <div class="config">
+            <h3>Configuration</h3>
+            <div class="routing-key-container">
+                <input type="password" id="routingKey" placeholder="Enter your routing key">
+                <button id="toggleRoutingKey">👁️</button>
+            </div>
+        </div>
+    </div>
+    <div class="main-content">
+        <div class="card-container" id="cardContainer"></div>
+        <button class="trigger-btn" id="triggerBtn"><span class="flame">🔥</span> Trigger</button>
+    </div>
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Edit JSON Payload</h2>
+            <textarea id="jsonEditor"></textarea>
+            <button class="save-btn" id="saveJson">Save Changes</button>
+        </div>
+    </div>
+
+    <script>
+
+
+        const categories = [
+            { name: "Datadog", icon: "🐶" },
+            { name: "New Relic", icon: "🔍" },
+            { name: "Prometheus", icon: "🔥" },
+            { name: "SolarWinds", icon: "☀️" },
+            { name: "CrowdStrike", icon: "🦅" },
+            { name: "Customer Sentiment", icon: "😊" }
+        ];
+
+        const payloads = {
+            "Datadog": [
+                { 
+                    title: "High CPU Usage", 
+                    description: "CPU usage exceeds 90%", 
+                    payload: { 
+                        "payload": {
+                            "summary": "High CPU usage detected on web-server-1",
+                            "timestamp": "2023-07-24T14:07:00Z",
+                            "severity": "critical",
+                            "source": "web-server-1",
+                            "component": "CPU",
+                            "group": "backend",
+                            "class": "performance",
+                            "custom_details": {
+                                "cpu_percent": "95.2%",
+                                "environment": "production",
+                                "team": "backend"
+                            }
+                        },
+                        "routing_key": "DYNAMIC",
+                        "dedup_key": "web-server-1/cpu",
+                        "event_action": "trigger",
+                        "client": "Datadog",
+                        "client_url": "https://www.datadoghq.com",
+                        "links": [
+                            {
+                                "href": "http://example.com",
+                                "text": "An example link."
+                            }
+                        ],
+                        "images": [
+                            {
+                                "src": "https://via.placeholder.com/600x400",
+                                "href": "https://example.com",
+                                "alt": "An example image"
+                            }
+                        ]
+                    }
                 },
-                body: JSON.stringify(payload)
-            })
-            .then(response => response.json())
-            .then(data => console.log('Success:', data))
-            .catch((error) => console.error('Error:', error));
+                { 
+                    title: "Memory Leak", 
+                    description: "Memory usage steadily increasing", 
+                    payload: { 
+                        "payload": {
+                            "summary": "Potential memory leak detected on app-server-2",
+                            "timestamp": "2023-07-24T14:15:00Z",
+                            "severity": "warning",
+                            "source": "app-server-2",
+                            "component": "Memory",
+                            "group": "backend",
+                            "class": "performance",
+                            "custom_details": {
+                                "memory_percent": "80.5%",
+                                "environment": "staging",
+                                "team": "backend"
+                            }
+                        },
+                        "routing_key": "DYNAMIC",
+                        "dedup_key": "app-server-2/memory",
+                        "event_action": "trigger",
+                        "client": "Datadog",
+                        "client_url": "https://www.datadoghq.com",
+                        "links": [
+                            {
+                                "href": "http://example.com",
+                                "text": "An example link."
+                            }
+                        ],
+                        "images": [
+                            {
+                                "src": "https://via.placeholder.com/600x400",
+                                "href": "https://example.com",
+                                "alt": "An example image"
+                            }
+                        ]
+                    }
+                }
+            ],
+            "New Relic": [
+                { 
+                    title: "Slow Transaction", 
+                    description: "Transaction response time > 5s", 
+                    payload: { 
+                        "payload": {
+                            "summary": "Slow transaction detected in checkout-service",
+                            "timestamp": "2023-07-24T14:20:00Z",
+                            "severity": "warning",
+                            "source": "checkout-service",
+                            "component": "Transaction",
+                            "group": "frontend",
+                            "class": "performance",
+                            "custom_details": {
+                                "transaction_time_ms": "5100",
+                                "environment": "production",
+                                "team": "frontend"
+                            }
+                        },
+                        "routing_key": "DYNAMIC",
+                        "dedup_key": "checkout-service/transaction",
+                        "event_action": "trigger",
+                        "client": "New Relic",
+                        "client_url": "https://www.newrelic.com",
+                        "links": [
+                            {
+                                "href": "http://example.com",
+                                "text": "An example link."
+                            }
+                        ],
+                        "images": [
+                            {
+                                "src": "https://via.placeholder.com/600x400",
+                                "href": "https://example.com",
+                                "alt": "An example image"
+                            }
+                        ]
+                    }
+                },
+                { 
+                    title: "Error Rate Spike", 
+                    description: "Error rate increased by 200%", 
+                    payload: { 
+                        "payload": {
+                            "summary": "Error rate spike detected in user-service",
+                            "timestamp": "2023-07-24T14:25:00Z",
+                            "severity": "critical",
+                            "source": "user-service",
+                            "component": "API",
+                            "group": "backend",
+                            "class": "performance",
+                            "custom_details": {
+                                "error_rate": "0.05",
+                                "environment": "production",
+                                "team": "api"
+                            }
+                        },
+                        "routing_key": "DYNAMIC",
+                        "dedup_key": "user-service/error-rate",
+                        "event_action": "trigger",
+                        "client": "New Relic",
+                        "client_url": "https://www.newrelic.com",
+                        "links": [
+                            {
+                                "href": "http://example.com",
+                                "text": "An example link."
+                            }
+                        ],
+                        "images": [
+                            {
+                                "src": "https://via.placeholder.com/600x400",
+                                "href": "https://example.com",
+                                "alt": "An example image"
+                            }
+                        ]
+                    }
+                }
+            ],
+            "Prometheus": [
+                { 
+                    title: "High Latency", 
+                    description: "API latency exceeds SLA", 
+                    payload: { 
+                        "payload": {
+                            "summary": "High API latency detected on /v1/orders",
+                            "timestamp": "2023-07-24T14:30:00Z",
+                            "severity": "critical",
+                            "source": "/v1/orders",
+                            "component": "API",
+                            "group": "backend",
+                            "class": "performance",
+                            "custom_details": {
+                                "latency_ms": "1200",
+                                "environment": "production",
+                                "team": "api"
+                            }
+                        },
+                        "routing_key": "DYNAMIC",
+                        "dedup_key": "/v1/orders/latency",
+                        "event_action": "trigger",
+                        "client": "Prometheus",
+                        "client_url": "https://prometheus.io",
+                        "links": [
+                            {
+                                "href": "http://example.com",
+                                "text": "An example link."
+                            }
+                        ],
+                        "images": [
+                            {
+                                "src": "https://via.placeholder.com/600x400",
+                                "href": "https://example.com",
+                                "alt": "An example image"
+                            }
+                        ]
+                    }
+                },
+                { 
+                    title: "Disk Space Low", 
+                    description: "Disk usage above 85%", 
+                    payload: { 
+                        "payload": {
+                            "summary": "Low disk space on db-server-3",
+                            "timestamp": "2023-07-24T14:35:00Z",
+                            "severity": "warning",
+                            "source": "db-server-3",
+                            "component": "Disk",
+                            "group": "infrastructure",
+                            "class": "capacity",
+                            "custom_details": {
+                                "disk_percent": "87.3%",
+                                "environment": "production",
+                                "team": "infrastructure"
+                            }
+                        },
+                        "routing_key": "DYNAMIC",
+                        "dedup_key": "db-server-3/disk",
+                        "event_action": "trigger",
+                        "client": "Prometheus",
+                        "client_url": "https://prometheus.io",
+                        "links": [
+                            {
+                                "href": "http://example.com",
+                                "text": "An example link."
+                            }
+                        ],
+                        "images": [
+                            {
+                                "src": "https://via.placeholder.com/600x400",
+                                "href": "https://example.com",
+                                "alt": "An example image"
+                            }
+                        ]
+                    }
+                }
+            ],
+            "SolarWinds": [
+                { 
+                    title: "Network Outage", 
+                    description: "Network switch down", 
+                    payload: { 
+                        "payload": {
+                            "summary": "Network switch outage detected at datacenter-1",
+                            "timestamp": "2023-07-24T14:40:00Z",
+                            "severity": "critical",
+                            "source": "switch-5",
+                            "component": "Network",
+                            "group": "network",
+                            "class": "outage",
+                            "custom_details": {
+                                "device": "switch-5",
+                                "location": "datacenter-1",
+                                "environment": "datacenter",
+                                "team": "network"
+                            }
+                        },
+                        "routing_key": "DYNAMIC",
+                        "dedup_key": "switch-5/outage",
+                        "event_action": "trigger",
+                        "client": "SolarWinds",
+                        "client_url": "https://www.solarwinds.com",
+                        "links": [
+                            {
+                                "href": "http://example.com",
+                                "text": "An example link."
+                            }
+                        ],
+                        "images": [
+                            {
+                                "src": "https://via.placeholder.com/600x400",
+                                "href": "https://example.com",
+                                "alt": "An example image"
+                            }
+                        ]
+                    }
+                },
+                { 
+                    title: "Bandwidth Saturation", 
+                    description: "Network bandwidth at 95%", 
+                    payload: { 
+                        "payload": {
+                            "summary": "High bandwidth usage detected on router-3",
+                            "timestamp": "2023-07-24T14:45:00Z",
+                            "severity": "warning",
+                            "source": "router-3",
+                            "component": "Network",
+                            "group": "network",
+                            "class": "capacity",
+                            "custom_details": {
+                                "bandwidth_percent": "95.5%",
+                                "environment": "datacenter",
+                                "team": "network"
+                            }
+                        },
+                        "routing_key": "DYNAMIC",
+                        "dedup_key": "router-3/bandwidth",
+                        "event_action": "trigger",
+                        "client": "SolarWinds",
+                        "client_url": "https://www.solarwinds.com",
+                        "links": [
+                            {
+                                "href": "http://example.com",
+                                "text": "An example link."
+                            }
+                        ],
+                        "images": [
+                            {
+                                "src": "https://via.placeholder.com/600x400",
+                                "href": "https://example.com",
+                                "alt": "An example image"
+                            }
+                        ]
+                    }
+                }
+            ],
+            "CrowdStrike": [
+                { 
+                    title: "Malware Detected", 
+                    description: "Malware found on endpoint", 
+                    payload: { 
+                        "payload": {
+                            "summary": "Malware detected on laptop-4",
+                            "timestamp": "2023-07-24T14:50:00Z",
+                            "severity": "critical",
+                            "source": "laptop-4",
+                            "component": "Endpoint",
+                            "group": "security",
+                            "class": "threat",
+                            "custom_details": {
+                                "malware_name": "Trojan.Generic",
+                                "environment": "corporate",
+                                "team": "security"
+                            }
+                        },
+                        "routing_key": "DYNAMIC",
+                        "dedup_key": "laptop-4/malware",
+                        "event_action": "trigger",
+                        "client": "CrowdStrike",
+                        "client_url": "https://www.crowdstrike.com",
+                        "links": [
+                            {
+                                "href": "http://example.com",
+                                "text": "An example link."
+                            }
+                        ],
+                        "images": [
+                            {
+                                "src": "https://via.placeholder.com/600x400",
+                                "href": "https://example.com",
+                                "alt": "An example image"
+                            }
+                        ]
+                    }
+                },
+                { 
+                    title: "Suspicious Activity", 
+                    description: "Unusual process behavior detected", 
+                    payload: { 
+                        "payload": {
+                            "summary": "Suspicious process activity on desktop-7",
+                            "timestamp": "2023-07-24T14:55:00Z",
+                            "severity": "warning",
+                            "source": "desktop-7",
+                            "component": "Endpoint",
+                            "group": "security",
+                            "class": "threat",
+                            "custom_details": {
+                                "process_name": "unknown.exe",
+                                "environment": "corporate",
+                                "team": "security"
+                            }
+                        },
+                        "routing_key": "DYNAMIC",
+                        "dedup_key": "desktop-7/suspicious",
+                        "event_action": "trigger",
+                        "client": "CrowdStrike",
+                        "client_url": "https://www.crowdstrike.com",
+                        "links": [
+                            {
+                                "href": "http://example.com",
+                                "text": "An example link."
+                            }
+                        ],
+                        "images": [
+                            {
+                                "src": "https://via.placeholder.com/600x400",
+                                "href": "https://example.com",
+                                "alt": "An example image"
+                            }
+                        ]
+                    }
+                }
+            ],
+            "Customer Sentiment": [
+                { 
+                    title: "Negative Feedback Spike", 
+                    description: "Sudden increase in negative reviews", 
+                    payload: { 
+                        "payload": {
+                            "summary": "Spike in negative customer feedback on web",
+                            "timestamp": "2023-07-24T15:00:00Z",
+                            "severity": "critical",
+                            "source": "web",
+                            "component": "Feedback",
+                            "group": "support",
+                            "class": "customer",
+                            "custom_details": {
+                                "negative_feedback_percent": "80.1%",
+                                "environment": "production",
+                                "team": "support"
+                            }
+                        },
+                        "routing_key": "DYNAMIC",
+                        "dedup_key": "web/feedback",
+                        "event_action": "trigger",
+                        "client": "Sentiment Analysis",
+                        "client_url": "https://example.com",
+                        "links": [
+                            {
+                                "href": "http://example.com",
+                                "text": "An example link."
+                            }
+                        ],
+                        "images": [
+                            {
+                                "src": "https://via.placeholder.com/600x400",
+                                "href": "https://example.com",
+                                "alt": "An example image"
+                            }
+                        ]
+                    }
+                },
+                { 
+                    title: "Customer Churn Risk", 
+                    description: "High-value customer showing churn signals", 
+                    payload: { 
+                        "payload": {
+                            "summary": "Customer at risk of churning",
+                            "timestamp": "2023-07-24T15:05:00Z",
+                            "severity": "warning",
+                            "source": "Sentiment Analysis",
+                            "component": "Customer",
+                            "group": "marketing",
+                            "class": "risk",
+                            "custom_details": {
+                                "churn_score": "0.85",
+                                "environment": "production",
+                                "team": "marketing",
+                                "customer_id": "12345"
+                            }
+                        },
+                        "routing_key": "DYNAMIC",
+                        "dedup_key": "customer/12345/churn",
+                        "event_action": "trigger",
+                        "client": "Sentiment Analysis",
+                        "client_url": "https://example.com",
+                        "links": [
+                            {
+                                "href": "http://example.com",
+                                "text": "An example link."
+                            }
+                        ],
+                        "images": [
+                            {
+                                "src": "https://via.placeholder.com/600x400",
+                                "href": "https://example.com",
+                                "alt": "An example image"
+                            }
+                        ]
+                    }
+                }
+            ]
+        };
+
+        const categoriesList = document.getElementById('categories');
+        const cardContainer = document.getElementById('cardContainer');
+        const routingKeyInput = document.getElementById('routingKey');
+        const toggleRoutingKeyBtn = document.getElementById('toggleRoutingKey');
+        const triggerBtn = document.getElementById('triggerBtn');
+        const modal = document.getElementById('editModal');
+        const closeModal = document.getElementsByClassName('close')[0];
+        const jsonEditor = document.getElementById('jsonEditor');
+        const saveJsonBtn = document.getElementById('saveJson');
+        const helpIcon = document.getElementById('helpIcon');
+        const helpPopup = document.getElementById('helpPopup');
+
+        let currentCategory = categories[0].name;
+        let currentEditingCard = null;
+
+        // Populate categories
+        categories.forEach((category, index) => {
+            const li = document.createElement('li');
+            li.textContent = `${category.icon} ${category.name}`;
+            li.onclick = () => switchCategory(category.name);
+            if (index === 0) li.classList.add('active');
+            categoriesList.appendChild(li);
         });
 
-        alert(`Triggering ${selectedPayloads.length} events`);
-    };
+        // Switch category function
+        function switchCategory(categoryName) {
+            currentCategory = categoryName;
+            document.querySelectorAll('.categories li').forEach(li => li.classList.remove('active'));
+            document.querySelector(`.categories li:nth-child(${categories.findIndex(c => c.name === categoryName) + 1})`).classList.add('active');
+            renderCards();
+        }
 
-    // Store routing key in cookie
-    function setRoutingKeyCookie(value) {
-        document.cookie = `routingKey=${value}; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/; SameSite=Strict`;
-    }
+        // Render cards function
+        function renderCards() {
+            cardContainer.innerHTML = '';
+            payloads[currentCategory].forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'card fade-in';
+                card.innerHTML = `
+                    <div class="card-header">
+                        <div class="card-icon">${categories.find(c => c.name === currentCategory).icon}</div>
+                        <h3 class="card-title">${item.title}</h3>
+                    </div>
+                    <p class="card-description">${item.description}</p>
+                    <label class="card-checkbox">
+                        <input type="checkbox" checked> Execute
+                    </label>
+                `;
+                card.onclick = (e) => {
+                    if (e.target.type !== 'checkbox') {
+                        openModal(item, index);
+                    }
+                };
+                cardContainer.appendChild(card);
+            });
+        }
 
-    // Get routing key from cookie
-    function getRoutingKeyCookie() {
-        const name = "routingKey=";
-        const decodedCookie = decodeURIComponent(document.cookie);
-        const cookieArray = decodedCookie.split(';');
-        for(let i = 0; i < cookieArray.length; i++) {
-            let cookie = cookieArray[i];
-            while (cookie.charAt(0) == ' ') {
-                cookie = cookie.substring(1);
+        // Open modal function
+        function openModal(item, index) {
+            currentEditingCard = { item, index };
+            jsonEditor.value = JSON.stringify(item.payload, null, 2);
+            modal.style.display = 'block';
+        }
+
+        // Close modal function
+        closeModal.onclick = () => {
+            modal.style.display = 'none';
+        };
+
+        // Save JSON changes
+        saveJsonBtn.onclick = () => {
+            try {
+                const updatedPayload = JSON.parse(jsonEditor.value);
+                payloads[currentCategory][currentEditingCard.index].payload = updatedPayload;
+                modal.style.display = 'none';
+            } catch (error) {
+                alert('Invalid JSON. Please check your input.');
             }
-            if (cookie.indexOf(name) == 0) {
-                return cookie.substring(name.length, cookie.length);
+        };
+
+        // Trigger function
+        triggerBtn.onclick = () => {
+            const routingKey = routingKeyInput.value;
+            if (!routingKey) {
+                alert('Please enter a routing key');
+                return;
             }
+
+            const selectedPayloads = Array.from(document.querySelectorAll('.card'))
+                .filter(card => card.querySelector('input[type="checkbox"]').checked)
+                .map(card => payloads[currentCategory][Array.from(card.parentNode.children).indexOf(card)].payload);
+
+            selectedPayloads.forEach(payload => {
+                fetch('https://events.pagerduty.com/v2/enqueue', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Routing-Key': routingKey
+                    },
+                    body: JSON.stringify(payload)
+                })
+                .then(response => response.json())
+                .then(data => console.log('Success:', data))
+                .catch((error) => console.error('Error:', error));
+            });
+
+            alert(`Triggering ${selectedPayloads.length} events`);
+        };
+
+        // Store routing key in cookie
+        function setRoutingKeyCookie(value) {
+            document.cookie = `routingKey=${value}; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/; SameSite=Strict`;
         }
-        return "";
-    }
 
-    // Toggle routing key visibility
-    toggleRoutingKeyBtn.onclick = () => {
-        if (routingKeyInput.type === "password") {
-            routingKeyInput.type = "text";
-            toggleRoutingKeyBtn.textContent = "🙈";
-        } else {
-            routingKeyInput.type = "password";
-            toggleRoutingKeyBtn.textContent = "👁️";
+        // Get routing key from cookie
+        function getRoutingKeyCookie() {
+            const name = "routingKey=";
+            const decodedCookie = decodeURIComponent(document.cookie);
+            const cookieArray = decodedCookie.split(';');
+            for(let i = 0; i < cookieArray.length; i++) {
+                let cookie = cookieArray[i];
+                while (cookie.charAt(0) == ' ') {
+                    cookie = cookie.substring(1);
+                }
+                if (cookie.indexOf(name) == 0) {
+                    return cookie.substring(name.length, cookie.length);
+                }
+            }
+            return "";
         }
-    };
 
-    // Store routing key in cookie when changed
-    routingKeyInput.onchange = () => {
-        setRoutingKeyCookie(routingKeyInput.value);
-    };
+        // Toggle routing key visibility
+        toggleRoutingKeyBtn.onclick = () => {
+            if (routingKeyInput.type === "password") {
+                routingKeyInput.type = "text";
+                toggleRoutingKeyBtn.textContent = "🙈";
+            } else {
+                routingKeyInput.type = "password";
+                toggleRoutingKeyBtn.textContent = "👁️";
+            }
+        };
 
-    // Load routing key from cookie
-    window.onload = () => {
-        const savedRoutingKey = getRoutingKeyCookie();
-        if (savedRoutingKey) {
-            routingKeyInput.value = savedRoutingKey;
-            routingKeyInput.type = "password";
-        }
-        renderCards();
-    };
+        // Store routing key in cookie when changed
+        routingKeyInput.onchange = () => {
+            setRoutingKeyCookie(routingKeyInput.value);
+        };
 
-    // Help popup functionality
-    helpIcon.onclick = () => {
-        helpPopup.classList.toggle('show');
-    };
+        // Load routing key from cookie
+        window.onload = () => {
+            const savedRoutingKey = getRoutingKeyCookie();
+            if (savedRoutingKey) {
+                routingKeyInput.value = savedRoutingKey;
+                routingKeyInput.type = "password";
+            }
+            renderCards();
+        };
 
-    // Close help popup when clicking outside
-    window.onclick = (event) => {
-        if (!event.target.matches('.help-icon') && !event.target.closest('.help-popup')) {
-            helpPopup.classList.remove('show');
-        }
-    };
-</script></body></html>
+        // Help popup functionality
+        helpIcon.onclick = () => {
+            helpPopup.classList.toggle('show');
+        };
+
+        // Close help popup when clicking outside
+        window.onclick = (event) => {
+            if (!event.target.matches('.help-icon') && !event.target.closest('.help-popup')) {
+                helpPopup.classList.remove('show');
+            }
+        };
+    </script>
+</body>
+</html>
