@@ -1,4 +1,4 @@
-<html><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>Teleprompter with Key Controls</title>
+<html><head><base href="/" /><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>Pro Teleprompter with Adjustable Width</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <style>
@@ -9,6 +9,7 @@
         --secondary-color: #2196F3;
         --toolbar-bg: #333333;
         --toolbar-text: #ffffff;
+        --content-width: 80%;
     }
     body {
         font-family: 'Roboto Mono', monospace;
@@ -35,12 +36,16 @@
     #content {
         position: absolute;
         bottom: 100%;
-        left: 0;
-        width: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: var(--content-width);
         padding: 20px;
         box-sizing: border-box;
         transition: transform 0.1s linear;
         text-align: center;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        line-height: 1.5;
     }
     #toolbar {
         background-color: var(--toolbar-bg);
@@ -84,7 +89,7 @@
     #file-input {
         display: none;
     }
-    #font-size {
+    #font-size, #line-height, #content-width {
         width: 50px;
         background-color: var(--toolbar-bg);
         color: var(--toolbar-text);
@@ -164,9 +169,18 @@
                 </label>
                 <input type="file" id="file-input" accept=".txt">
                 <button id="start-stop"><i class="fas fa-play"></i> Start</button>
+                <button id="rewind"><i class="fas fa-undo"></i> Rewind</button>
                 <div>
                     <i class="fas fa-font"></i>
                     <input type="number" id="font-size" value="36" min="12" max="72">
+                </div>
+                <div>
+                    <i class="fas fa-text-height"></i>
+                    <input type="number" id="line-height" value="150" min="100" max="300" step="10">
+                </div>
+                <div>
+                    <i class="fas fa-arrows-alt-h"></i>
+                    <input type="number" id="content-width" value="80" min="50" max="100" step="5">
                 </div>
             </div>
             <div class="toolbar-group">
@@ -191,6 +205,8 @@
         <p>F: Fullscreen</p>
         <p>T: Toggle Theme</p>
         <p>H: Hide Controls</p>
+        <p>R: Rewind</p>
+        <p>W/S: Adjust Width</p>
     </div>
 
 <script>
@@ -199,7 +215,10 @@ const content = document.getElementById('content');
 const toolbar = document.getElementById('toolbar');
 const fileInput = document.getElementById('file-input');
 const startStopBtn = document.getElementById('start-stop');
+const rewindBtn = document.getElementById('rewind');
 const fontSizeInput = document.getElementById('font-size');
+const lineHeightInput = document.getElementById('line-height');
+const contentWidthInput = document.getElementById('content-width');
 const themeToggle = document.getElementById('theme-toggle');
 const fullscreenToggle = document.getElementById('fullscreen-toggle');
 const speedDecreaseBtn = document.getElementById('speed-decrease');
@@ -229,16 +248,51 @@ fileInput.addEventListener('change', (e) => {
     const reader = new FileReader();
     reader.onload = (e) => {
         text = e.target.result;
-        content.innerHTML = text;
-        content.style.transform = 'translateY(100%)';
+        formatText();
     };
     reader.readAsText(file);
 });
 
+function formatText() {
+    let paragraphs = text.split(/\n\s*\n/);
+    paragraphs = paragraphs.map(para => {
+        para = para.trim();
+        let words = para.split(/\s+/);
+        let lines = [];
+        let currentLine = '';
+        
+        words.forEach(word => {
+            if (currentLine.length + word.length > 60) {  // Increased from 40 to 60
+                lines.push(currentLine.trim());
+                currentLine = '';
+            }
+            currentLine += word + ' ';
+        });
+        
+        if (currentLine.trim()) {
+            lines.push(currentLine.trim());
+        }
+        
+        return lines.join('\n');
+    });
+    
+    content.textContent = paragraphs.join('\n\n');
+    rewindTeleprompter();
+}
+
 startStopBtn.addEventListener('click', toggleScrolling);
+rewindBtn.addEventListener('click', rewindTeleprompter);
 
 fontSizeInput.addEventListener('input', () => {
     content.style.fontSize = `${fontSizeInput.value}px`;
+});
+
+lineHeightInput.addEventListener('input', () => {
+    content.style.lineHeight = `${lineHeightInput.value}%`;
+});
+
+contentWidthInput.addEventListener('input', () => {
+    document.documentElement.style.setProperty('--content-width', `${contentWidthInput.value}%`);
 });
 
 themeToggle.addEventListener('change', toggleTheme);
@@ -258,7 +312,7 @@ function scroll() {
     const currentTransform = getComputedStyle(content).transform;
     const matrix = new DOMMatrix(currentTransform);
     const currentY = matrix.m42;
-    content.style.transform = `translateY(${currentY - scrollSpeed}px)`;
+    content.style.transform = `translateX(-50%) translateY(${currentY - scrollSpeed}px)`;
     requestAnimationFrame(scroll);
 }
 
@@ -277,7 +331,14 @@ function adjustPosition(delta) {
     const currentTransform = getComputedStyle(content).transform;
     const matrix = new DOMMatrix(currentTransform);
     const currentY = matrix.m42;
-    content.style.transform = `translateY(${currentY + delta}px)`;
+    content.style.transform = `translateX(-50%) translateY(${currentY + delta}px)`;
+}
+
+function rewindTeleprompter() {
+    content.style.transform = 'translateX(-50%) translateY(100%)';
+    if (isScrolling) {
+        toggleScrolling();
+    }
 }
 
 function toggleTheme() {
@@ -303,6 +364,12 @@ function toggleFullscreen() {
     } else {
         document.exitFullscreen();
     }
+}
+
+function adjustWidth(delta) {
+    const newWidth = Math.max(50, Math.min(100, parseInt(contentWidthInput.value) + delta));
+    contentWidthInput.value = newWidth;
+    document.documentElement.style.setProperty('--content-width', `${newWidth}%`);
 }
 
 document.addEventListener('keydown', (e) => {
@@ -342,6 +409,18 @@ document.addEventListener('keydown', (e) => {
         case 'H':
             toolbar.classList.toggle('hidden');
             keyControls.classList.toggle('hidden');
+            break;
+        case 'r':
+        case 'R':
+            rewindTeleprompter();
+            break;
+        case 'w':
+        case 'W':
+            adjustWidth(5);
+            break;
+        case 's':
+        case 'S':
+            adjustWidth(-5);
             break;
     }
     showToolbar();
