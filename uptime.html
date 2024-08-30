@@ -1,498 +1,509 @@
-<html><head><base href="https://stylish-uptime-monitor.com" />
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Stylish Uptime Monitor with Custom Particles</title>
-<link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<style>
-  body {
-    font-family: 'Fira Sans', sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #1e1e1e;
-    color: #ffffff;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stylish Uptime Monitor with Custom Particles</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Fira Sans', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1e1e1e;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
 
-  .container {
-    width: 90%;
-    max-width: 1200px;
-    z-index: 1;
-  }
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            z-index: 1;
+        }
 
-  h1 {
-    text-align: center;
-    font-size: 2rem;
-    margin-bottom: 2rem;
-  }
+        h1 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 2rem;
+        }
 
-  .machine-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 30px;
-    justify-content: center;
-  }
+        .machine-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 30px;
+            justify-content: center;
+        }
 
-  .machine-card {
-    background-color: rgba(44, 44, 44, 0.8);
-    border-radius: 10px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-    width: 250px;
-    height: 250px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    margin: 0 auto;
-  }
+        .machine-card {
+            background-color: rgba(44, 44, 44, 0.8);
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            width: 250px;
+            height: 250px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            margin: 0 auto;
+        }
 
-  .machine-card.offline {
-    border: 2px solid #ff4136;
-  }
+        .machine-card.offline {
+            border: 2px solid #ff4136;
+        }
 
-  .machine-card .icon {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-  }
+        .machine-card .icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
 
-  .machine-card h3 {
-    margin: 0 0 1rem;
-    font-size: 1.2rem;
-    text-align: center;
-  }
+        .machine-card h3 {
+            margin: 0 0 1rem;
+            font-size: 1.2rem;
+            text-align: center;
+        }
 
-  .status-indicator {
-    width: 15px;
-    height: 15px;
-    border-radius: 50%;
-    display: block;
-    margin: 0 auto 0.5rem;
-  }
+        .status-indicator {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            display: block;
+            margin: 0 auto 0.5rem;
+        }
 
-  .status-up {
-    background-color: #2ecc40;
-  }
+        .status-up {
+            background-color: #2ecc40;
+        }
 
-  .status-down {
-    background-color: #ff4136;
-  }
+        .status-down {
+            background-color: #ff4136;
+        }
 
-  .status-text {
-    font-size: 0.9rem;
-    margin-bottom: 0.5rem;
-    text-align: center;
-  }
+        .status-text {
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
 
-  .uptime {
-    font-size: 0.8rem;
-    color: #999;
-    margin-bottom: 1rem;
-    text-align: center;
-  }
+        .uptime {
+            font-size: 0.8rem;
+            color: #999;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
 
-  .sparkline-container {
-    height: 50px;
-    width: 100%;
-  }
+        .sparkline-container {
+            height: 50px;
+            width: 100%;
+        }
 
-  .remove-btn {
-    position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
-    background: none;
-    border: none;
-    color: #999;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: color 0.3s ease;
-  }
+        .remove-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: color 0.3s ease;
+        }
 
-  .remove-btn:hover {
-    color: #ff4136;
-  }
+        .remove-btn:hover {
+            color: #ff4136;
+        }
 
-  .add-machine {
-    margin-top: 2rem;
-    text-align: center;
-    display: none;
-  }
+        .add-machine {
+            margin-top: 2rem;
+            text-align: center;
+            display: none;
+        }
 
-  .add-machine input {
-    margin-right: 0.5rem;
-    padding: 0.5rem;
-    border-radius: 5px;
-    border: 1px solid #444;
-    background-color: #2c2c2c;
-    color: #fff;
-  }
+        .add-machine input {
+            margin-right: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 5px;
+            border: 1px solid #444;
+            background-color: #2c2c2c;
+            color: #fff;
+        }
 
-  .add-machine button {
-    padding: 0.5rem 1rem;
-    background-color: #3498db;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
+        .add-machine button {
+            padding: 0.5rem 1rem;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
 
-  .add-machine button:hover {
-    background-color: #2980b9;
-  }
+        .add-machine button:hover {
+            background-color: #2980b9;
+        }
 
-  .fullscreen-btn, .config-btn {
-    position: fixed;
-    bottom: 1rem;
-    background: rgba(44, 44, 44, 0.7);
-    color: #fff;
-    border: none;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    font-size: 1.5rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    z-index: 1000;
-  }
+        .fullscreen-btn, .config-btn {
+            position: fixed;
+            bottom: 1rem;
+            background: rgba(44, 44, 44, 0.7);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            z-index: 1000;
+        }
 
-  .fullscreen-btn:hover, .config-btn:hover {
-    background: rgba(44, 44, 44, 0.9);
-  }
+        .fullscreen-btn:hover, .config-btn:hover {
+            background: rgba(44, 44, 44, 0.9);
+        }
 
-  .fullscreen-btn {
-    right: 1rem;
-  }
+        .fullscreen-btn {
+            right: 1rem;
+        }
 
-  .config-btn {
-    left: 1rem;
-  }
+        .config-btn {
+            left: 1rem;
+        }
 
-  .fullscreen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: 9999;
-    background-color: #1e1e1e;
-    overflow-y: auto;
-  }
+        .fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 9999;
+            background-color: #1e1e1e;
+            overflow-y: auto;
+        }
 
-  #particles-js {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    z-index: 0;
-  }
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0;
+        }
 
-  .config-mode .remove-btn {
-    display: block;
-  }
+        .config-mode .remove-btn {
+            display: block;
+        }
 
-  .config-mode .machine-card:hover {
-    transform: scale(1.05);
-  }
+        .config-mode .machine-card:hover {
+            transform: scale(1.05);
+        }
 
-  :root {
-    --sparkline-color: #3498db;
-  }
-</style>
+        :root {
+            --sparkline-color: #3498db;
+        }
+    </style>
 </head>
 <body>
-  <div id="particles-js"></div>
-  <div class="container">
-    <h1><i class="fas fa-heartbeat"></i> Uptime Monitor</h1>
-    <div id="machineGrid" class="machine-grid">
-      <!-- Machine cards will be dynamically added here -->
+    <div id="particles-js"></div>
+    <div class="container">
+        <h1><i class="fas fa-heartbeat"></i> Uptime Monitor</h1>
+        <div id="machineGrid" class="machine-grid">
+            <!-- Machine cards will be dynamically added here -->
+        </div>
+        <div class="add-machine">
+            <input type="text" id="machineName" placeholder="Machine Name">
+            <input type="text" id="machineIP" placeholder="IP Address or URL">
+            <input type="number" id="machinePort" placeholder="Port (optional)">
+            <button onclick="addMachine()"><i class="fas fa-plus"></i> Add Machine</button>
+        </div>
     </div>
-    <div class="add-machine">
-      <input type="text" id="machineName" placeholder="Machine Name">
-      <input type="text" id="machineIP" placeholder="IP Address">
-      <input type="number" id="machinePort" placeholder="Port">
-      <button onclick="addMachine()"><i class="fas fa-plus"></i> Add Machine</button>
-    </div>
-  </div>
-  <button class="fullscreen-btn" onclick="toggleFullscreen()">
-    <i class="fas fa-expand"></i>
-  </button>
-  <button class="config-btn" onclick="toggleConfig()">
-    <i class="fas fa-cog"></i>
-  </button>
+    <button class="fullscreen-btn" onclick="toggleFullscreen()">
+        <i class="fas fa-expand"></i>
+    </button>
+    <button class="config-btn" onclick="toggleConfig()">
+        <i class="fas fa-cog"></i>
+    </button>
 
-  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script>
-    let machines = [];
-    const historyLength = 50;
-    let configMode = false;
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let machines = [];
+        const historyLength = 50;
+        let configMode = false;
 
-    function loadMachines() {
-      const storedMachines = localStorage.getItem('machines');
-      if (storedMachines) {
-        machines = JSON.parse(storedMachines);
-      }
-    }
+        function loadMachines() {
+            const storedMachines = localStorage.getItem('machines');
+            if (storedMachines) {
+                machines = JSON.parse(storedMachines);
+            }
+        }
 
-    function saveMachines() {
-      localStorage.setItem('machines', JSON.stringify(machines));
-    }
+        function saveMachines() {
+            localStorage.setItem('machines', JSON.stringify(machines));
+        }
 
-    function addMachine() {
-      const name = document.getElementById('machineName').value;
-      const ip = document.getElementById('machineIP').value;
-      const port = document.getElementById('machinePort').value;
-      if (name && ip && port) {
-        machines.push({ 
-          name, 
-          ip,
-          port,
-          status: 'unknown', 
-          history: new Array(historyLength).fill(1),
-          uptime: 100
+        function addMachine() {
+            const name = document.getElementById('machineName').value;
+            const ip = document.getElementById('machineIP').value;
+            const port = document.getElementById('machinePort').value || null;
+            if (name && ip) {
+                machines.push({ 
+                    name, 
+                    ip,
+                    port,
+                    status: 'unknown', 
+                    history: new Array(historyLength).fill(1),
+                    uptime: 100
+                });
+                saveMachines();
+                updateGrid();
+                document.getElementById('machineName').value = '';
+                document.getElementById('machineIP').value = '';
+                document.getElementById('machinePort').value = '';
+            }
+        }
+
+        function removeMachine(index) {
+            machines.splice(index, 1);
+            saveMachines();
+            updateGrid();
+        }
+
+        function updateGrid() {
+            const grid = document.getElementById('machineGrid');
+            grid.innerHTML = '';
+            machines.forEach((machine, index) => {
+                const card = document.createElement('div');
+                card.className = `machine-card ${machine.status === 'down' ? 'offline' : ''}`;
+                card.innerHTML = `
+                    <div class="icon"><i class="fas fa-server"></i></div>
+                    <h3>${machine.name}</h3>
+                    <div>
+                        <div class="status-indicator ${machine.status === 'up' ? 'status-up' : 'status-down'}"></div>
+                        <div class="status-text">
+                            ${machine.status === 'up' ? '<i class="fas fa-check-circle"></i> Online' : '<i class="fas fa-times-circle"></i> Offline'}
+                        </div>
+                        <div class="uptime">${machine.uptime.toFixed(2)}% Uptime</div>
+                    </div>
+                    <div class="sparkline-container">
+                        <canvas id="sparkline-${index}" class="sparkline"></canvas>
+                    </div>
+                    <button class="remove-btn" onclick="removeMachine(${index})">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                `;
+                grid.appendChild(card);
+                
+                createSparkline(index, machine.history);
+            });
+        }
+
+        function createSparkline(index, data) {
+            const ctx = document.getElementById(`sparkline-${index}`).getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: new Array(historyLength).fill(''),
+                    datasets: [{
+                        data: data,
+                        borderColor: getComputedStyle(document.documentElement).getPropertyValue('--sparkline-color'),
+                        backgroundColor: 'rgba(123, 44, 191, 0.2)',
+                        borderWidth: 2,
+                        fill: true,
+                        pointRadius: 0,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { display: false },
+                        y: { 
+                            display: false, 
+                            min: 0, 
+                            max: 1
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    animation: false
+                }
+            });
+        }
+
+        function checkStatus(ip, port) {
+            return new Promise((resolve) => {
+                const urlPattern = /^(http|https):\/\//;
+                if (urlPattern.test(ip)) {
+                    // Handle URL
+                    fetch(ip, { mode: 'no-cors' })
+                        .then(() => resolve('up'))
+                        .catch(() => resolve('down'));
+                } else {
+                    // Handle IP address and port using WebSocket
+                    const start = Date.now();
+                    const ws = new WebSocket(`wss://${ip}:${port}`);
+                    
+                    const timeout = setTimeout(() => {
+                        ws.close();
+                        resolve('down');
+                    }, 5000);
+
+                    ws.onopen = () => {
+                        clearTimeout(timeout);
+                        ws.close();
+                        resolve('up');
+                    };
+
+                    ws.onerror = () => {
+                        clearTimeout(timeout);
+                        ws.close();
+                        resolve('down');
+                    };
+                }
+            });
+        }
+
+        async function updateStatuses() {
+            for (let machine of machines) {
+                const newStatus = await checkStatus(machine.ip, machine.port);
+                machine.status = newStatus;
+                machine.history.push(newStatus === 'up' ? 1 : 0);
+                if (machine.history.length > historyLength) {
+                    machine.history.shift();
+                }
+                
+                // Calculate uptime
+                const upCount = machine.history.filter(Boolean).length;
+                machine.uptime = (upCount / machine.history.length) * 100;
+            }
+            saveMachines();
+            updateGrid();
+        }
+
+        function toggleFullscreen() {
+            document.body.classList.toggle('fullscreen');
+            const btn = document.querySelector('.fullscreen-btn i');
+            if (document.body.classList.contains('fullscreen')) {
+                btn.classList.remove('fa-expand');
+                btn.classList.add('fa-compress');
+            } else {
+                btn.classList.remove('fa-compress');
+                btn.classList.add('fa-expand');
+            }
+            updateGrid();
+        }
+
+        function toggleConfig() {
+            configMode = !configMode;
+            document.body.classList.toggle('config-mode', configMode);
+            const addMachineDiv = document.querySelector('.add-machine');
+            addMachineDiv.style.display = configMode ? 'block' : 'none';
+            updateGrid();
+        }
+
+        // Initialize particles.js with the new configuration
+        particlesJS("particles-js", {
+            "particles": {
+                "number": {
+                    "value": 100,
+                    "density": {
+                        "enable": true,
+                        "value_area": 800
+                    }
+                },
+                "color": {
+                    "value": "#ffffff"
+                },
+                "shape": {
+                    "type": "star"
+                },
+                "opacity": {
+                    "value": 0.5,
+                    "random": false
+                },
+                "size": {
+                    "value": 1,
+                    "random": true
+                },
+                "line_linked": {
+                    "enable": true,
+                    "distance": 400,
+                    "color": "#26a269",
+                    "opacity": 0.1,
+                    "width": 1
+                },
+                "move": {
+                    "enable": true,
+                    "speed": 4.1,
+                    "direction": "right",
+                    "random": false,
+                    "straight": false,
+                    "out_mode": "out",
+                    "bounce": false,
+                    "attract": {
+                        "enable": false,
+                        "rotateX": 3000,
+                        "rotateY": 1500
+                    }
+                }
+            },
+            "interactivity": {
+                "detect_on": "canvas",
+                "events": {
+                    "onhover": {
+                        "enable": false,
+                        "mode": "repulse"
+                    },
+                    "onclick": {
+                        "enable": false,
+                        "mode": "push"
+                    },
+                    "resize": true
+                },
+                "modes": {
+                    "grab": {
+                        "distance": 400,
+                        "line_linked": {
+                            "opacity": 1
+                        }
+                    },
+                    "bubble": {
+                        "distance": 400,
+                        "size": 40,
+                        "duration": 2,
+                        "opacity": 8,
+                        "speed": 3
+                    },
+                    "repulse": {
+                        "distance": 200,
+                        "duration": 0.4
+                    },
+                    "push": {
+                        "particles_nb": 4
+                    },
+                    "remove": {
+                        "particles_nb": 2
+                    }
+                }
+            },
+            "retina_detect": true,
+            "fps_limit": 60
         });
-        saveMachines();
+
+        // Load machines from localStorage
+        loadMachines();
         updateGrid();
-        document.getElementById('machineName').value = '';
-        document.getElementById('machineIP').value = '';
-        document.getElementById('machinePort').value = '';
-      }
-    }
-
-    function removeMachine(index) {
-      machines.splice(index, 1);
-      saveMachines();
-      updateGrid();
-    }
-
-    function updateGrid() {
-      const grid = document.getElementById('machineGrid');
-      grid.innerHTML = '';
-      machines.forEach((machine, index) => {
-        const card = document.createElement('div');
-        card.className = `machine-card ${machine.status === 'down' ? 'offline' : ''}`;
-        card.innerHTML = `
-          <div class="icon"><i class="fas fa-server"></i></div>
-          <h3>${machine.name}</h3>
-          <div>
-            <div class="status-indicator ${machine.status === 'up' ? 'status-up' : 'status-down'}"></div>
-            <div class="status-text">
-              ${machine.status === 'up' ? '<i class="fas fa-check-circle"></i> Online' : '<i class="fas fa-times-circle"></i> Offline'}
-            </div>
-            <div class="uptime">${machine.uptime.toFixed(2)}% Uptime</div>
-          </div>
-          <div class="sparkline-container">
-            <canvas id="sparkline-${index}" class="sparkline"></canvas>
-          </div>
-          <button class="remove-btn" onclick="removeMachine(${index})">
-            <i class="fas fa-trash-alt"></i>
-          </button>
-        `;
-        grid.appendChild(card);
-        
-        createSparkline(index, machine.history);
-      });
-    }
-
-    function createSparkline(index, data) {
-      const ctx = document.getElementById(`sparkline-${index}`).getContext('2d');
-      new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: new Array(historyLength).fill(''),
-          datasets: [{
-            data: data,
-            borderColor: getComputedStyle(document.documentElement).getPropertyValue('--sparkline-color'),
-            backgroundColor: 'rgba(123, 44, 191, 0.2)',
-            borderWidth: 2,
-            fill: true,
-            pointRadius: 0,
-            tension: 0.4
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            x: { display: false },
-            y: { 
-              display: false, 
-              min: 0, 
-              max: 1
-            }
-          },
-          plugins: {
-            legend: { display: false }
-          },
-          animation: false
-        }
-      });
-    }
-
-    function checkStatus(ip, port) {
-      return new Promise((resolve) => {
-        const start = Date.now();
-        const ws = new WebSocket(`wss://${ip}:${port}`);
-        
-        const timeout = setTimeout(() => {
-          ws.close();
-          resolve('down');
-        }, 5000);
-
-        ws.onopen = () => {
-          clearTimeout(timeout);
-          const latency = Date.now() - start;
-          ws.close();
-          resolve('up');
-        };
-
-        ws.onerror = () => {
-          clearTimeout(timeout);
-          ws.close();
-          resolve('down');
-        };
-      });
-    }
-
-    async function updateStatuses() {
-      for (let machine of machines) {
-        const newStatus = await checkStatus(machine.ip, machine.port);
-        machine.status = newStatus;
-        machine.history.push(newStatus === 'up' ? 1 : 0);
-        if (machine.history.length > historyLength) {
-          machine.history.shift();
-        }
-        
-        // Calculate uptime
-        const upCount = machine.history.filter(Boolean).length;
-        machine.uptime = (upCount / machine.history.length) * 100;
-      }
-      saveMachines();
-      updateGrid();
-    }
-
-    function toggleFullscreen() {
-      document.body.classList.toggle('fullscreen');
-      const btn = document.querySelector('.fullscreen-btn i');
-      if (document.body.classList.contains('fullscreen')) {
-        btn.classList.remove('fa-expand');
-        btn.classList.add('fa-compress');
-      } else {
-        btn.classList.remove('fa-compress');
-        btn.classList.add('fa-expand');
-      }
-      updateGrid();
-    }
-
-    function toggleConfig() {
-      configMode = !configMode;
-      document.body.classList.toggle('config-mode', configMode);
-      const addMachineDiv = document.querySelector('.add-machine');
-      addMachineDiv.style.display = configMode ? 'block' : 'none';
-      updateGrid();
-    }
-
-    // Initialize particles.js with the new configuration
-    particlesJS("particles-js", {
-      "particles": {
-        "number": {
-          "value": 100,
-          "density": {
-            "enable": true,
-            "value_area": 800
-          }
-        },
-        "color": {
-          "value": "#ffffff"
-        },
-        "shape": {
-          "type": "star"
-        },
-        "opacity": {
-          "value": 0.5,
-          "random": false
-        },
-        "size": {
-          "value": 1,
-          "random": true
-        },
-        "line_linked": {
-          "enable": true,
-          "distance": 400,
-          "color": "#26a269",
-          "opacity": 0.1,
-          "width": 1
-        },
-        "move": {
-          "enable": true,
-          "speed": 4.1,
-          "direction": "right",
-          "random": false,
-          "straight": false,
-          "out_mode": "out",
-          "bounce": false,
-          "attract": {
-            "enable": false,
-            "rotateX": 3000,
-            "rotateY": 1500
-          }
-        }
-      },
-      "interactivity": {
-        "detect_on": "canvas",
-        "events": {
-          "onhover": {
-            "enable": false,
-            "mode": "repulse"
-          },
-          "onclick": {
-            "enable": false,
-            "mode": "push"
-          },
-          "resize": true
-        },
-        "modes": {
-          "grab": {
-            "distance": 400,
-            "line_linked": {
-              "opacity": 1
-            }
-          },
-          "bubble": {
-            "distance": 400,
-            "size": 40,
-            "duration": 2,
-            "opacity": 8,
-            "speed": 3
-          },
-          "repulse": {
-            "distance": 200,
-            "duration": 0.4
-          },
-          "push": {
-            "particles_nb": 4
-          },
-          "remove": {
-            "particles_nb": 2
-          }
-        }
-      },
-      "retina_detect": true,
-      "fps_limit": 60
-    });
-
-    // Load machines from localStorage
-    loadMachines();
-    updateGrid();
-    setInterval(updateStatuses, 5000);
-  </script>
-</body></html>
+        setInterval(updateStatuses, 5000);
+    </script>
+</body>
+</html>
