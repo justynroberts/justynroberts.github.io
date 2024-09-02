@@ -7,263 +7,263 @@
     <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            font-family: 'Fira Sans', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #1e1e1e;
-            color: #ffffff;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
+      body {
+          font-family: 'Fira Sans', sans-serif;
+          margin: 0;
+          padding: 0;
+          background-color: #1e1e1e;
+          color: #ffffff;
+          min-height: 100vh;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+      }
 
-        .container {
-            width: 90%;
-            max-width: 1200px;
-            z-index: 1;
-        }
+      .container {
+          width: 90%;
+          max-width: 1200px;
+          z-index: 1;
+      }
 
-        .title-container {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
+      .title-container {
+          text-align: center;
+          margin-bottom: 2rem;
+      }
 
-        h1 {
-            font-size: 3rem;
-            margin-bottom: 0;
-        }
+      h1 {
+          font-size: 3rem;
+          margin-bottom: 0;
+      }
 
-        .subtitle {
-            font-size: 1rem;
-            color: #999;
-            margin-top: 0.5rem;
-        }
+      .subtitle {
+          font-size: 1rem;
+          color: #999;
+          margin-top: 0.5rem;
+      }
 
-        .machine-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 30px;
-            justify-content: center;
-        }
+      .machine-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+          gap: 30px;
+          justify-content: center;
+      }
 
-        .machine-card {
-            background-color: rgba(44, 44, 44, 0.8);
-            border-radius: 10px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            width: 250px;
-            height: 250px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-between;
-            margin: 0 auto;
-        }
+      .machine-card {
+          background-color: rgba(44, 44, 44, 0.8);
+          border-radius: 10px;
+          padding: 1.5rem;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          transition: all 0.3s ease;
+          position: relative;
+          overflow: hidden;
+          width: 250px;
+          height: 250px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: space-between;
+          margin: 0 auto;
+      }
 
-        .machine-card.offline {
-            border: 2px solid #ff4136;
-        }
+      .machine-card.offline {
+          border: 2px solid #ff4136;
+      }
 
-        .machine-card .icon {
-            font-size: 2rem;
-            margin-bottom: 1rem;
-        }
+      .machine-card .icon {
+          font-size: 2rem;
+          margin-bottom: 1rem;
+      }
 
-        .machine-card h3 {
-            margin: 0 0 1rem;
-            font-size: 1.2rem;
-            text-align: center;
-        }
+      .machine-card h3 {
+          margin: 0 0 1rem;
+          font-size: 1.2rem;
+          text-align: center;
+      }
 
-        .status-indicator {
-            width: 15px;
-            height: 15px;
-            border-radius: 50%;
-            display: block;
-            margin: 0 auto 0.5rem;
-        }
+      .status-indicator {
+          width: 15px;
+          height: 15px;
+          border-radius: 50%;
+          display: block;
+          margin: 0 auto 0.5rem;
+      }
 
-        .status-up {
-            background-color: #2ecc40;
-        }
+      .status-up {
+          background-color: #2ecc40;
+      }
 
-        .status-down {
-            background-color: #ff4136;
-        }
+      .status-down {
+          background-color: #ff4136;
+      }
 
-        .status-text {
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
-            text-align: center;
-        }
+      .status-text {
+          font-size: 0.9rem;
+          margin-bottom: 0.5rem;
+          text-align: center;
+      }
 
-        .uptime {
-            font-size: 0.8rem;
-            color: #999;
-            margin-bottom: 1rem;
-            text-align: center;
-        }
+      .uptime {
+          font-size: 0.8rem;
+          color: #999;
+          margin-bottom: 1rem;
+          text-align: center;
+      }
 
-        .sparkline-container {
-            height: 50px;
-            width: 100%;
-        }
+      .sparkline-container {
+          height: 50px;
+          width: 100%;
+      }
 
-        .remove-btn {
-            position: absolute;
-            top: 0.5rem;
-            right: 0.5rem;
-            background: none;
-            border: none;
-            color: #999;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: color 0.3s ease;
-        }
+      .remove-btn {
+          position: absolute;
+          top: 0.5rem;
+          right: 0.5rem;
+          background: none;
+          border: none;
+          color: #999;
+          cursor: pointer;
+          font-size: 1rem;
+          transition: color 0.3s ease;
+      }
 
-        .remove-btn:hover {
-            color: #ff4136;
-        }
+      .remove-btn:hover {
+          color: #ff4136;
+      }
 
-        .add-machine, .pagerduty-config {
-            margin-top: 2rem;
-            text-align: center;
-            display: none;
-        }
+      .add-machine, .pagerduty-config {
+          margin-top: 2rem;
+          text-align: center;
+          display: none;
+      }
 
-        .add-machine input, .pagerduty-config input {
-            margin-right: 0.5rem;
-            padding: 0.5rem;
-            border-radius: 5px;
-            border: 1px solid #444;
-            background-color: #2c2c2c;
-            color: #fff;
-        }
+      .add-machine input, .pagerduty-config input {
+          margin-right: 0.5rem;
+          padding: 0.5rem;
+          border-radius: 5px;
+          border: 1px solid #444;
+          background-color: #2c2c2c;
+          color: #fff;
+      }
 
-        .add-machine button, .pagerduty-config button {
-            padding: 0.5rem 1rem;
-            background-color: #3498db;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
+      .add-machine button, .pagerduty-config button {
+          padding: 0.5rem 1rem;
+          background-color: #3498db;
+          color: #fff;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+          transition: background-color 0.3s ease;
+      }
 
-        .add-machine button:hover, .pagerduty-config button:hover {
-            background-color: #2980b9;
-        }
+      .add-machine button:hover, .pagerduty-config button:hover {
+          background-color: #2980b9;
+      }
 
-        .fullscreen-btn, .config-btn {
-            position: fixed;
-            bottom: 1rem;
-            background: rgba(44, 44, 44, 0.7);
-            color: #fff;
-            border: none;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            font-size: 1.5rem;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            z-index: 1000;
-        }
+      .fullscreen-btn, .config-btn {
+          position: fixed;
+          bottom: 1rem;
+          background: rgba(44, 44, 44, 0.7);
+          color: #fff;
+          border: none;
+          border-radius: 50%;
+          width: 50px;
+          height: 50px;
+          font-size: 1.5rem;
+          cursor: pointer;
+          transition: background-color 0.3s ease;
+          z-index: 1000;
+      }
 
-        .fullscreen-btn:hover, .config-btn:hover {
-            background: rgba(44, 44, 44, 0.9);
-        }
+      .fullscreen-btn:hover, .config-btn:hover {
+          background: rgba(44, 44, 44, 0.9);
+      }
 
-        .fullscreen-btn {
-            right: 1rem;
-        }
+      .fullscreen-btn {
+          right: 1rem;
+      }
 
-        .config-btn {
-            left: 1rem;
-        }
+      .config-btn {
+          left: 1rem;
+      }
 
-        .fullscreen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 9999;
-            background-color: #1e1e1e;
-            overflow-y: auto;
-        }
+      .fullscreen {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          z-index: 9999;
+          background-color: #1e1e1e;
+          overflow-y: auto;
+      }
 
-        #particles-js {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            z-index: 0;
-        }
+      #particles-js {
+          position: fixed;
+          width: 100%;
+          height: 100%;
+          top: 0;
+          left: 0;
+          z-index: 0;
+      }
 
-        .config-mode .remove-btn {
-            display: block;
-        }
+      .config-mode .remove-btn {
+          display: block;
+      }
 
-        .config-mode .machine-card:hover {
-            transform: scale(1.05);
-        }
+      .config-mode .machine-card:hover {
+          transform: scale(1.05);
+      }
 
-        :root {
-            --sparkline-color: #3498db;
-        }
+      :root {
+          --sparkline-color: #3498db;
+      }
 
-        .input-group {
-            position: relative;
-            display: inline-block;
-            margin-bottom: 10px;
-        }
+      .input-group {
+          position: relative;
+          display: inline-block;
+          margin-bottom: 10px;
+      }
 
-        .input-group i {
-            position: absolute;
-            left: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #999;
-        }
+      .input-group i {
+          position: absolute;
+          left: 10px;
+          top: 50%;
+          transform: translateY(-50%);
+          color: #999;
+      }
 
-        .input-group input {
-            padding-left: 30px;
-        }
+      .input-group input {
+          padding-left: 30px;
+      }
 
-        .tooltip {
-            position: relative;
-            display: inline-block;
-        }
+      .tooltip {
+          position: relative;
+          display: inline-block;
+      }
 
-        .tooltip .tooltiptext {
-            visibility: hidden;
-            width: 200px;
-            background-color: #555;
-            color: #fff;
-            text-align: center;
-            border-radius: 6px;
-            padding: 5px;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%;
-            left: 50%;
-            margin-left: -100px;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
+      .tooltip .tooltiptext {
+          visibility: hidden;
+          width: 200px;
+          background-color: #555;
+          color: #fff;
+          text-align: center;
+          border-radius: 6px;
+          padding: 5px;
+          position: absolute;
+          z-index: 1;
+          bottom: 125%;
+          left: 50%;
+          margin-left: -100px;
+          opacity: 0;
+          transition: opacity 0.3s;
+      }
 
-        .tooltip:hover .tooltiptext {
-            visibility: visible;
-            opacity: 1;
-        }
-    </style>
+      .tooltip:hover .tooltiptext {
+          visibility: visible;
+          opacity: 1;
+      }
+  </style>
 </head>
 <body>
   <div id="particles-js"></div>
@@ -445,13 +445,18 @@
       return new Promise((resolve) => {
         const urlPattern = /^(http|https):\/\//;
         if (urlPattern.test(ip)) {
-          // Handle URL
-          fetch(ip, { mode: 'no-cors' })
+          let url = new URL(ip);
+          if (!port) {
+            port = url.protocol === 'https:' ? 443 : 80;
+          }
+          url.port = port;
+          fetch(url.toString(), { mode: 'no-cors' })
               .then(() => resolve('up'))
               .catch(() => resolve('down'));
         } else {
-          // Handle IP address and port using WebSocket
-          const start = Date.now();
+          if (!port) {
+            port = 80; // Default port for non-HTTPS IPs without a specified port
+          }
           const ws = new WebSocket(`wss://${ip}:${port}`);
           
           const timeout = setTimeout(() => {
@@ -510,11 +515,37 @@
       const body = {
         routing_key: pagerDutyKey,
         event_action: 'trigger',
+        dedup_key: `${machine.ip}/outage`,
+        client: "Uptime Monitor",
+        client_url: "https://your-monitoring-tool.com",
         payload: {
           summary: `${machine.name} is down`,
+          timestamp: new Date().toISOString(),
+          severity: "critical",
           source: machine.ip,
-          severity: 'critical',
+          component: "Monitoring",
+          group: "infrastructure",
+          class: "outage",
+          custom_details: {
+            device: machine.name,
+            location: "datacenter-1",
+            environment: "production",
+            team: "network operations"
+          }
         },
+        links: [
+          {
+            href: "https://example.com/more-info",
+            text: "More details"
+          }
+        ],
+        images: [
+          {
+            src: "https://via.placeholder.com/600x400",
+            href: "https://example.com",
+            alt: "Outage visual"
+          }
+        ]
       };
 
       try {
