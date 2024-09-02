@@ -517,35 +517,13 @@
         event_action: 'trigger',
         dedup_key: `${machine.ip}/outage`,
         client: "Uptime Monitor",
-        client_url: "https://your-monitoring-tool.com",
         payload: {
-          summary: `${machine.name} is down`,
+          summary: `${machine.name} at ${machine.ip} is down `,
           timestamp: new Date().toISOString(),
           severity: "critical",
           source: machine.ip,
-          component: "Monitoring",
-          group: "infrastructure",
-          class: "outage",
-          custom_details: {
-            device: machine.name,
-            location: "datacenter-1",
-            environment: "production",
-            team: "network operations"
-          }
-        },
-        links: [
-          {
-            href: "https://example.com/more-info",
-            text: "More details"
-          }
-        ],
-        images: [
-          {
-            src: "https://via.placeholder.com/600x400",
-            href: "https://example.com",
-            alt: "Outage visual"
-          }
-        ]
+          component: "{machine.ip}",
+        }
       };
 
       try {
