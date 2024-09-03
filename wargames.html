@@ -1,0 +1,399 @@
+<html><head><base href="https://norad.wargames.mil/"><title>WOPR Interface - Global Thermonuclear War</title>
+<style>
+    @font-face {
+        font-family: 'VT323';
+        src: url('https://fonts.gstatic.com/s/vt323/v17/pxiKyp0ihIEF2isQFJXUdVNF.woff2') format('woff2');
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    body, html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        font-family: 'VT323', monospace;
+        background-color: #000;
+        color: #fff;
+        overflow: hidden;
+        font-size: 18px;
+    }
+    #crt {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        background: #000080;
+        overflow: hidden;
+    }
+    #crt::before {
+        content: " ";
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+        z-index: 2;
+        background-size: 100% 2px, 3px 100%;
+        pointer-events: none;
+    }
+    #crt::after {
+        content: " ";
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        background: rgba(18, 16, 16, 0.1);
+        opacity: 0;
+        z-index: 2;
+        pointer-events: none;
+        animation: flicker 0.15s infinite;
+    }
+    #screen {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 95%;
+        height: 90%;
+        padding: 20px;
+        box-sizing: border-box;
+        overflow: hidden;
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.5), inset 0 0 10px rgba(255, 255, 255, 0.5);
+        animation: turnOn 1s;
+    }
+    h1 {
+        text-align: center;
+        font-size: 2.5em;
+        margin-top: 0;
+        margin-bottom: 20px;
+        text-shadow: 0 0 5px #fff;
+    }
+    .blink {
+        animation: blink 1s step-end infinite;
+    }
+    @keyframes blink {
+        50% { opacity: 0; }
+    }
+    @keyframes flicker {
+        0% { opacity: 0.27861; }
+        5% { opacity: 0.34769; }
+        10% { opacity: 0.23604; }
+        15% { opacity: 0.90626; }
+        20% { opacity: 0.18128; }
+        25% { opacity: 0.83891; }
+        30% { opacity: 0.65583; }
+        35% { opacity: 0.67807; }
+        40% { opacity: 0.26559; }
+        45% { opacity: 0.84693; }
+        50% { opacity: 0.96019; }
+        55% { opacity: 0.08594; }
+        60% { opacity: 0.20313; }
+        65% { opacity: 0.71988; }
+        70% { opacity: 0.53455; }
+        75% { opacity: 0.37288; }
+        80% { opacity: 0.71428; }
+        85% { opacity: 0.70419; }
+        90% { opacity: 0.7003; }
+        95% { opacity: 0.36108; }
+        100% { opacity: 0.24387; }
+    }
+    @keyframes turnOn {
+        0% { transform: translate(-50%, -50%) scale(0.1, 0.01); opacity: 0; }
+        50% { transform: translate(-50%, -50%) scale(1, 0.01); opacity: 1; }
+        100% { transform: translate(-50%, -50%) scale(1, 1); opacity: 1; }
+    }
+    #map {
+        width: 100%;
+        height: 70%;
+        margin-bottom: 20px;
+        position: relative;
+        box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.5);
+        overflow: hidden;
+    }
+    #input-container {
+        display: flex;
+        align-items: center;
+    }
+    #input {
+        flex-grow: 1;
+        background-color: transparent;
+        border: none;
+        color: #fff;
+        font-family: inherit;
+        font-size: 1em;
+        outline: none;
+    }
+    #output {
+        height: 20%;
+        overflow: hidden;
+        margin-bottom: 10px;
+        text-shadow: 0 0 2px #fff;
+        white-space: pre-line;
+    }
+    #cursor {
+        display: inline-block;
+        width: 10px;
+        height: 20px;
+        background-color: #fff;
+        animation: cursorBlink 0.7s infinite;
+    }
+    @keyframes cursorBlink {
+        0% { opacity: 0; }
+        49% { opacity: 0; }
+        50% { opacity: 1; }
+        100% { opacity: 1; }
+    }
+</style>
+</head>
+<body>
+<div id="crt">
+    <div id="screen">
+        <h1>WOPR - WAR OPERATION PLAN RESPONSE</h1>
+        <div id="map"></div>
+        <div id="output"></div>
+        <div id="input-container">
+            <span>> </span><input type="text" id="input" autofocus><span id="cursor"></span>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.12/typed.min.js"></script>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="https://d3js.org/topojson.v3.min.js"></script>
+<script>
+    const map = d3.select("#map");
+    const output = document.getElementById('output');
+    const input = document.getElementById('input');
+
+    // Set up the map projection
+    const projection = d3.geoEquirectangular()
+        .scale(140)
+        .translate([400, 250]);
+
+    const path = d3.geoPath().projection(projection);
+
+    // Create SVG element
+    const svg = map.append("svg")
+        .attr("width", "100%")
+        .attr("height", "100%")
+        .attr("viewBox", "0 0 800 500");
+
+    // Load world map data
+    d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json").then(function(world) {
+        const countries = topojson.feature(world, world.objects.countries);
+
+        // Draw the world map
+        svg.selectAll("path")
+            .data(countries.features)
+            .enter()
+            .append("path")
+            .attr("d", path)
+            .attr("fill", "none")
+            .attr("stroke", "#fff")
+            .attr("stroke-width", 1);
+
+        // Add blinking dots for major cities
+        const cities = [
+            {name: "New York", coordinates: [-74.006, 40.7128]},
+            {name: "Moscow", coordinates: [37.6173, 55.7558]},
+            {name: "Beijing", coordinates: [116.4074, 39.9042]},
+            {name: "London", coordinates: [-0.1276, 51.5074]},
+            {name: "Tokyo", coordinates: [139.6503, 35.6762]},
+            {name: "Paris", coordinates: [2.3522, 48.8566]},
+            {name: "Washington D.C.", coordinates: [-77.0369, 38.9072]}
+        ];
+
+        svg.selectAll("circle")
+            .data(cities)
+            .enter()
+            .append("circle")
+            .attr("cx", d => projection(d.coordinates)[0])
+            .attr("cy", d => projection(d.coordinates)[1])
+            .attr("r", 3)
+            .attr("fill", "#fff")
+            .style("animation", "blink 1s infinite");
+
+        // Function to generate random missile trajectories
+        function generateMissile() {
+            const startCity = cities[Math.floor(Math.random() * cities.length)];
+            let endCity;
+            do {
+                endCity = cities[Math.floor(Math.random() * cities.length)];
+            } while (endCity === startCity);
+
+            return {
+                start: startCity.coordinates,
+                end: endCity.coordinates
+            };
+        }
+
+        // Function to add a new missile
+        function addMissile() {
+            const missile = generateMissile();
+            const line = d3.line()
+                .x(d => projection(d)[0])
+                .y(d => projection(d)[1])
+                .curve(d3.curveNatural);
+
+            svg.append("path")
+                .attr("class", "missile")
+                .attr("d", line([missile.start, missile.end]))
+                .attr("fill", "none")
+                .attr("stroke", "#ff0000")
+                .attr("stroke-width", 2)
+                .attr("stroke-dasharray", "5,5")
+                .attr("opacity", 0.7)
+                .each(function() {
+                    const length = this.getTotalLength();
+                    d3.select(this)
+                        .attr("stroke-dasharray", length + " " + length)
+                        .attr("stroke-dashoffset", length)
+                        .transition()
+                        .duration(5000)
+                        .ease(d3.easeLinear)
+                        .attr("stroke-dashoffset", 0)
+                        .on("end", function() {
+                            d3.select(this)
+                                .transition()
+                                .duration(500)
+                                .attr("opacity", 0)
+                                .remove();
+                            addExplosion(missile.end);
+                        });
+                });
+        }
+
+        // Function to add an explosion
+        function addExplosion(coordinates) {
+            const [x, y] = projection(coordinates);
+            const explosion = svg.append("circle")
+                .attr("cx", x)
+                .attr("cy", y)
+                .attr("r", 0)
+                .attr("fill", "red")
+                .attr("opacity", 1);
+
+            explosion.transition()
+                .duration(500)
+                .attr("r", 10)
+                .attr("fill", "red")
+                .transition()
+                .duration(500)
+                .attr("r", 20)
+                .attr("fill", "yellow")
+                .attr("opacity", 0)
+                .on("end", function() {
+                    d3.select(this).remove();
+                });
+        }
+
+        // Add initial missiles
+        for (let i = 0; i < 5; i++) {
+            addMissile();
+        }
+
+        // Add new missiles over time
+        setInterval(addMissile, 2000);
+    });
+
+    const possibleCommands = [
+        'LAUNCH',
+        'DEFCON',
+        'GLOBAL THERMONUCLEAR WAR',
+        'CHESS',
+        'FALKEN\'S MAZE',
+        'JOSHUA',
+    ];
+
+    let typedInstance = null;
+
+    input.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            const command = this.value.toUpperCase();
+            this.value = '';
+            processCommand(command);
+        }
+    });
+
+    function processCommand(command) {
+        let response;
+        switch(command) {
+            case 'LAUNCH':
+                response = 'ENTER LAUNCH CODES:';
+                break;
+            case 'DEFCON':
+                response = 'CURRENT DEFCON STATUS: 2';
+                break;
+            case 'GLOBAL THERMONUCLEAR WAR':
+                response = 'GREETINGS PROFESSOR FALKEN.\n\nWOULD YOU LIKE TO PLAY A GAME?';
+                break;
+            case 'CHESS':
+                response = 'CHESS PROGRAM INITIATED. YOUR MOVE:';
+                break;
+            case 'FALKEN\'S MAZE':
+                response = 'FALKEN\'S MAZE ACCESSED. PROCEED WITH CAUTION.';
+                break;
+            case 'JOSHUA':
+                response = 'HELLO, PROFESSOR FALKEN. SHALL WE PLAY A GAME?';
+                break;
+            default:
+                response = `COMMAND NOT RECOGNIZED. AVAILABLE COMMANDS:\n${possibleCommands.join('\n')}`;
+        }
+        
+        if (typedInstance) {
+            typedInstance.destroy();
+        }
+
+        output.innerHTML = '';
+        typedInstance = new Typed('#output', {
+            strings: [response],
+            typeSpeed: 20,
+            showCursor: false,
+            onComplete: function() {
+                output.innerHTML += '\n\n';
+            }
+        });
+    }
+
+    // Simulate CRT screen turn on
+    setTimeout(() => {
+        // Initial message
+        typedInstance = new Typed('#output', {
+            strings: ['GREETINGS PROFESSOR FALKEN\n\nLOGGED ON\n\nENTER COMMAND:'],
+            typeSpeed: 20,
+            showCursor: false,
+            onComplete: function() {
+                output.innerHTML += '\n';
+                input.focus();
+            }
+        });
+    }, 1000);
+
+    // Add scanline effect
+    const scanline = document.createElement('div');
+    scanline.style.position = 'absolute';
+    scanline.style.top = '0';
+    scanline.style.left = '0';
+    scanline.style.width = '100%';
+    scanline.style.height = '2px';
+    scanline.style.background = 'rgba(255, 255, 255, 0.2)';
+    scanline.style.boxShadow = '0 0 10px rgba(255, 255, 255, 0.5)';
+    scanline.style.zIndex = '1000';
+    document.body.appendChild(scanline);
+
+    let scanlinePosition = 0;
+    function moveScanline() {
+        scanlinePosition += 2;
+        if (scanlinePosition >= window.innerHeight) {
+            scanlinePosition = 0;
+        }
+        scanline.style.top = scanlinePosition + 'px';
+        requestAnimationFrame(moveScanline);
+    }
+    moveScanline();
+</script>
+</body>
+</html>
