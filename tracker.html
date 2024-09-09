@@ -1,0 +1,368 @@
+<html><head><base href="https://websimcreationengine.io/sales-engineer-time-tracker/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WorkStream</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:200" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/vue@3.2.31/dist/vue.global.prod.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <style>
+        [v-cloak] { display: none; }
+        body {
+            background: linear-gradient(-45deg, #d35400, #c0392b, #2980b9, #16a085);
+            background-size: 400% 400%;
+            animation: gradientBG 30s ease infinite;
+            min-height: 100vh;
+        }
+        @keyframes gradientBG {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+        .center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            margin: auto;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+        }
+        h1 {
+            text-align: center;
+            color: white;
+            text-shadow: 2px 2px 6px rgba(0,0,0,0.5);
+            font-family: 'Source Code Pro', monospace;
+            text-transform: uppercase;
+            font-weight: 900;
+        }
+        .card {
+            transition: all 0.3s ease;
+            color: #333;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 36px 0 rgba(0, 0, 0, 0.45);
+        }
+        .fade-enter-active, .fade-leave-active {
+            transition: all 0.5s ease;
+        }
+        .fade-enter-from, .fade-leave-to {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        input, select {
+            color: rgba(255, 255, 255, 0.8) !important;
+        }
+        ::placeholder {
+            color: rgba(255, 255, 255, 0.6) !important;
+        }
+    </style>
+</head>
+<body class="text-white">
+    <div id="app" v-cloak class="center">
+        <div class="container mx-auto p-4">
+            <h1 class="text-4xl font-black mb-8 text-center text-white">
+                <i class="fas fa-stream mr-2"></i>WorkStream
+            </h1>
+            
+            <div class="mb-8">
+                <h2 class="text-2xl font-semibold mb-4">Add New Entry</h2>
+                <div class="glass p-6">
+                    <div class="mb-4">
+                        <label class="block text-white text-sm font-bold mb-2" for="category">
+                            <i class="fas fa-folder mr-2"></i>Category
+                        </label>
+                        <div class="flex">
+                            <select v-model="newEntry.category" class="flex-grow bg-white bg-opacity-20 rounded-l border border-white border-opacity-30 focus:border-teal-500 focus:ring-2 focus:ring-teal-900 text-base outline-none text-white py-1 px-3 leading-8 transition-colors duration-200 ease-in-out">
+                                <option v-for="category in categories" :key="category" :value="category">{{ category }}</option>
+                            </select>
+                            <button @click="showAddCategory = true" class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded-r focus:outline-none focus:shadow-outline transition duration-300 ease-in-out" type="button">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div v-if="showAddCategory" class="mb-4">
+                        <label class="block text-white text-sm font-bold mb-2" for="newCategory">
+                            <i class="fas fa-folder-plus mr-2"></i>New Category
+                        </label>
+                        <div class="flex">
+                            <input v-model="newCategory" class="flex-grow bg-white bg-opacity-20 rounded-l border border-white border-opacity-30 focus:border-teal-500 focus:ring-2 focus:ring-teal-900 text-base outline-none text-white py-1 px-3 leading-8 transition-colors duration-200 ease-in-out" id="newCategory" type="text" placeholder="Enter new category name">
+                            <button @click="addCategory" class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded-r focus:outline-none focus:shadow-outline transition duration-300 ease-in-out" type="button">
+                                <i class="fas fa-check"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-white text-sm font-bold mb-2" for="activity">
+                            <i class="fas fa-tasks mr-2"></i>Activity
+                        </label>
+                        <div class="flex">
+                            <input v-model="newEntry.activity" list="activities" class="flex-grow bg-white bg-opacity-20 rounded-l border border-white border-opacity-30 focus:border-teal-500 focus:ring-2 focus:ring-teal-900 text-base outline-none text-white py-1 px-3 leading-8 transition-colors duration-200 ease-in-out" id="activity" type="text" placeholder="Enter or select activity">
+                            <datalist id="activities">
+                                <option v-for="activity in savedActivities" :key="activity" :value="activity"></option>
+                            </datalist>
+                            <button @click="saveActivity" class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded-r focus:outline-none focus:shadow-outline transition duration-300 ease-in-out" type="button">
+                                <i class="fas fa-save"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-white text-sm font-bold mb-2" for="hours">
+                            <i class="fas fa-clock mr-2"></i>Hours
+                        </label>
+                        <input v-model="newEntry.hours" class="w-full bg-white bg-opacity-20 rounded border border-white border-opacity-30 focus:border-teal-500 focus:ring-2 focus:ring-teal-900 text-base outline-none text-white py-1 px-3 leading-8 transition-colors duration-200 ease-in-out" id="hours" type="number" min="0" step="0.5" placeholder="Enter hours spent">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-white text-sm font-bold mb-2" for="date">
+                            <i class="fas fa-calendar-alt mr-2"></i>Date
+                        </label>
+                        <input v-model="newEntry.date" class="w-full bg-white bg-opacity-20 rounded border border-white border-opacity-30 focus:border-teal-500 focus:ring-2 focus:ring-teal-900 text-base outline-none text-white py-1 px-3 leading-8 transition-colors duration-200 ease-in-out" id="date" type="date">
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <button @click="addEntry" class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300 ease-in-out transform hover:scale-105" type="button">
+                            <i class="fas fa-plus mr-2"></i>Add Entry
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-semibold">This Week's Entries ({{ formatDateRange() }})</h2>
+                    <div>
+                        <button @click="previousWeek" class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded-l focus:outline-none focus:shadow-outline transition duration-300 ease-in-out">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button @click="currentWeek" class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 focus:outline-none focus:shadow-outline transition duration-300 ease-in-out">
+                            <i class="fas fa-calendar-week"></i>
+                        </button>
+                        <button @click="nextWeek" class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded-r focus:outline-none focus:shadow-outline transition duration-300 ease-in-out">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="glass p-6">
+                    <h3 class="text-xl font-semibold mb-4">Total Hours: {{ totalWeekHours }}</h3>
+                    <transition-group name="fade" tag="div">
+                        <div v-for="(entry, index) in weekEntries" :key="index" class="card glass mb-4 p-4">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <i :class="getCategoryIcon(entry.category)" class="mr-2"></i>
+                                    <span class="font-bold">{{ entry.category }}</span>
+                                    <span> | {{ entry.activity }}</span>
+                                </div>
+                                <div>
+                                    <span class="font-semibold">{{ entry.hours }} hours</span>
+                                    <span class="ml-2 text-gray-600">{{ formatDate(entry.date) }}</span>
+                                    <button @click="deleteEntry(index)" class="ml-2 text-red-500 hover:text-red-700">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </transition-group>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button @click="saveData" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-full focus:outline-none focus:shadow-outline transition duration-300 ease-in-out transform hover:scale-105" type="button">
+                    <i class="fas fa-save mr-2"></i>Save Data
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp, ref, computed, onMounted, watch } = Vue
+
+        createApp({
+            setup() {
+                const newEntry = ref({
+                    category: '',
+                    activity: '',
+                    hours: '',
+                    date: new Date().toISOString().substr(0, 10)
+                })
+
+                const entries = ref([])
+                const categories = ref(['Opportunity', 'Marketing', 'Other'])
+                const savedActivities = ref([])
+                const showAddCategory = ref(false)
+                const newCategory = ref('')
+                const currentWeekOffset = ref(0)
+
+                const weekEntries = computed(() => {
+                    const weekStart = new Date()
+                    weekStart.setDate(weekStart.getDate() - weekStart.getDay() + (currentWeekOffset.value * 7))
+                    const weekEnd = new Date(weekStart)
+                    weekEnd.setDate(weekEnd.getDate() + 6)
+                    return entries.value.filter(entry => {
+                        const entryDate = new Date(entry.date)
+                        return entryDate >= weekStart && entryDate <= weekEnd
+                    })
+                })
+
+                const totalWeekHours = computed(() => {
+                    return weekEntries.value.reduce((total, entry) => total + parseFloat(entry.hours), 0).toFixed(1)
+                })
+
+                function addEntry() {
+                    if (newEntry.value.category && newEntry.value.activity && newEntry.value.hours && newEntry.value.date) {
+                        entries.value.push({ ...newEntry.value })
+                        newEntry.value = {
+                            category: '',
+                            activity: '',
+                            hours: '',
+                            date: new Date().toISOString().substr(0, 10)
+                        }
+                        saveToLocalStorage()
+                        animateAddEntry()
+                    } else {
+                        alert('Please fill all required fields.')
+                    }
+                }
+
+                function saveData() {
+                    saveToLocalStorage()
+                    alert('Data saved successfully!')
+                }
+
+                function formatDate(dateString) {
+                    const options = { weekday: 'short', month: 'short', day: 'numeric' }
+                    return new Date(dateString).toLocaleDateString('en-US', options)
+                }
+
+                function formatDateRange() {
+                    const weekStart = new Date()
+                    weekStart.setDate(weekStart.getDate() - weekStart.getDay() + (currentWeekOffset.value * 7))
+                    const weekEnd = new Date(weekStart)
+                    weekEnd.setDate(weekEnd.getDate() + 6)
+                    return `${formatDate(weekStart.toISOString().substr(0, 10))} - ${formatDate(weekEnd.toISOString().substr(0, 10))}`
+                }
+
+                function getCategoryIcon(category) {
+                    switch(category.toLowerCase()) {
+                        case 'opportunity':
+                            return 'fas fa-briefcase'
+                        case 'marketing':
+                            return 'fas fa-bullhorn'
+                        default:
+                            return 'fas fa-tasks'
+                    }
+                }
+
+                function animateAddEntry() {
+                    gsap.from(".card:first-child", {
+                        duration: 0.5,
+                        opacity: 0,
+                        y: -50,
+                        ease: "power2.out"
+                    })
+                }
+
+                function deleteEntry(index) {
+                    entries.value.splice(index, 1)
+                    saveToLocalStorage()
+                }
+
+                function addCategory() {
+                    if (newCategory.value && !categories.value.includes(newCategory.value)) {
+                        categories.value.push(newCategory.value)
+                        newEntry.value.category = newCategory.value
+                        newCategory.value = ''
+                        showAddCategory.value = false
+                        saveToLocalStorage()
+                    }
+                }
+
+                function saveActivity() {
+                    if (newEntry.value.activity && !savedActivities.value.includes(newEntry.value.activity)) {
+                        savedActivities.value.push(newEntry.value.activity)
+                        saveToLocalStorage()
+                    }
+                }
+
+                function saveToLocalStorage() {
+                    const data = JSON.stringify({
+                        entries: entries.value,
+                        categories: categories.value,
+                        savedActivities: savedActivities.value
+                    })
+                    localStorage.setItem('workstreamData', data)
+                }
+
+                function loadFromLocalStorage() {
+                    const data = JSON.parse(localStorage.getItem('workstreamData'))
+                    if (data) {
+                        entries.value = data.entries || []
+                        categories.value = data.categories || ['Opportunity', 'Marketing', 'Other']
+                        savedActivities.value = data.savedActivities || []
+                    }
+                }
+
+                function previousWeek() {
+                    currentWeekOffset.value--
+                }
+
+                function nextWeek() {
+                    currentWeekOffset.value++
+                }
+
+                function currentWeek() {
+                    currentWeekOffset.value = 0
+                }
+
+                onMounted(() => {
+                    loadFromLocalStorage()
+                    gsap.from("h1", { duration: 1, opacity: 0, y: -50, ease: "power3.out" })
+                    gsap.from(".glass", { duration: 1, opacity: 0, y: 50, ease: "power3.out", stagger: 0.2 })
+                })
+
+                watch([entries, categories, savedActivities], () => {
+                    saveToLocalStorage()
+                }, { deep: true })
+
+                return {
+                    newEntry,
+                    entries,
+                    weekEntries,
+                    categories,
+                    savedActivities,
+                    showAddCategory,
+                    newCategory,
+                    currentWeekOffset,
+                    addEntry,
+                    saveData,
+                    formatDate,
+                    formatDateRange,
+                    getCategoryIcon,
+                    addCategory,
+                    saveActivity,
+                    deleteEntry,
+                    totalWeekHours,
+                    previousWeek,
+                    nextWeek,
+                    currentWeek
+                }
+            }
+        }).mount('#app')
+    </script>
+</body></html>
