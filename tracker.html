@@ -11,9 +11,9 @@
     <style>
         [v-cloak] { display: none; }
         body {
-            background: linear-gradient(-45deg, #d35400, #c0392b, #2980b9, #16a085);
-            background-size: 400% 400%;
-            animation: gradientBG 30s ease infinite;
+            background: linear-gradient(-45deg, #e67e22, #d35400, #3498db, #2980b9);
+            background-size: 300% 300%;
+            animation: gradientBG 120s ease infinite;
             min-height: 100vh;
         }
         @keyframes gradientBG {
@@ -33,17 +33,6 @@
             border-radius: 10px;
             border: 1px solid rgba(255, 255, 255, 0.18);
             box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-        }
-        .center {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: absolute;
-            margin: auto;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            left: 0;
         }
         h1 {
             text-align: center;
@@ -77,7 +66,7 @@
     </style>
 </head>
 <body class="text-white">
-    <div id="app" v-cloak class="center">
+    <div id="app" v-cloak class="min-h-screen flex items-start justify-center pt-16">
         <div class="container mx-auto p-4">
             <h1 class="text-4xl font-black mb-8 text-center text-white">
                 <i class="fas fa-stream mr-2"></i>WorkStream
@@ -181,12 +170,6 @@
                     </transition-group>
                 </div>
             </div>
-
-            <div class="text-center">
-                <button @click="saveData" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-full focus:outline-none focus:shadow-outline transition duration-300 ease-in-out transform hover:scale-105" type="button">
-                    <i class="fas fa-save mr-2"></i>Save Data
-                </button>
-            </div>
         </div>
     </div>
 
@@ -211,9 +194,9 @@
 
                 const weekEntries = computed(() => {
                     const weekStart = new Date()
-                    weekStart.setDate(weekStart.getDate() - weekStart.getDay() + (currentWeekOffset.value * 7))
+                    weekStart.setDate(weekStart.getDate() - weekStart.getDay() + 1 + (currentWeekOffset.value * 5)) // Start from Monday
                     const weekEnd = new Date(weekStart)
-                    weekEnd.setDate(weekEnd.getDate() + 6)
+                    weekEnd.setDate(weekEnd.getDate() + 4) // End on Friday
                     return entries.value.filter(entry => {
                         const entryDate = new Date(entry.date)
                         return entryDate >= weekStart && entryDate <= weekEnd
@@ -240,11 +223,6 @@
                     }
                 }
 
-                function saveData() {
-                    saveToLocalStorage()
-                    alert('Data saved successfully!')
-                }
-
                 function formatDate(dateString) {
                     const options = { weekday: 'short', month: 'short', day: 'numeric' }
                     return new Date(dateString).toLocaleDateString('en-US', options)
@@ -252,9 +230,9 @@
 
                 function formatDateRange() {
                     const weekStart = new Date()
-                    weekStart.setDate(weekStart.getDate() - weekStart.getDay() + (currentWeekOffset.value * 7))
+                    weekStart.setDate(weekStart.getDate() - weekStart.getDay() + 1 + (currentWeekOffset.value * 5)) // Start from Monday
                     const weekEnd = new Date(weekStart)
-                    weekEnd.setDate(weekEnd.getDate() + 6)
+                    weekEnd.setDate(weekEnd.getDate() + 4) // End on Friday
                     return `${formatDate(weekStart.toISOString().substr(0, 10))} - ${formatDate(weekEnd.toISOString().substr(0, 10))}`
                 }
 
@@ -319,11 +297,11 @@
                 }
 
                 function previousWeek() {
-                    currentWeekOffset.value--
+                    currentWeekOffset.value -= 1
                 }
 
                 function nextWeek() {
-                    currentWeekOffset.value++
+                    currentWeekOffset.value += 1
                 }
 
                 function currentWeek() {
@@ -350,7 +328,6 @@
                     newCategory,
                     currentWeekOffset,
                     addEntry,
-                    saveData,
                     formatDate,
                     formatDateRange,
                     getCategoryIcon,
