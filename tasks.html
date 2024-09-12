@@ -1,0 +1,414 @@
+<html><head><base href="https://websim-creation-engine.io/visual-task-app/">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Enhanced Visual Task App</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .background-animation {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    opacity: 0.5;
+  }
+
+  .container {
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 600px;
+    backdrop-filter: blur(10px);
+  }
+
+  h1, h2 {
+    font-family: 'Pacifico', cursive;
+    color: #4a4a4a;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 3rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+  }
+
+  h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+
+  .input-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+  }
+
+  #taskInput {
+    flex-grow: 1;
+    padding: 15px 20px;
+    border: none;
+    border-radius: 50px;
+    font-size: 1rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    margin-right: 15px;
+    background: rgba(255, 255, 255, 0.9);
+  }
+
+  #taskInput:focus {
+    outline: none;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  .icon-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.5rem;
+    transition: all 0.3s ease;
+    padding: 10px;
+    border-radius: 50%;
+  }
+
+  .icon-button:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+
+  #speakButton {
+    color: #3498db;
+  }
+
+  #showCompletedButton {
+    color: #2ecc71;
+  }
+
+  #taskList, #completedTaskList {
+    list-style-type: none;
+  }
+
+  .task-item {
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+  }
+
+  .task-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  }
+
+  .task-text {
+    flex-grow: 1;
+    margin-right: 20px;
+    word-break: break-word;
+  }
+
+  .task-actions {
+    display: flex;
+    align-items: center;
+  }
+
+  .delete-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    padding: 5px 10px;
+    color: #ff6b6b;
+  }
+
+  .delete-btn:hover {
+    color: #ff4757;
+    transform: scale(1.2);
+  }
+
+  @keyframes fadeOutLeft {
+    from {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateX(-50px);
+    }
+  }
+
+  .task-completed {
+    animation: fadeOutLeft 0.5s ease forwards;
+  }
+
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+  }
+
+  .modal-content {
+    background-color: rgba(255, 255, 255, 0.7);
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+    border-radius: 20px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    backdrop-filter: blur(10px);
+  }
+
+  .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+
+  .close:hover,
+  .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  @media (max-width: 480px) {
+    .container {
+      padding: 30px 20px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+    }
+
+    h2 {
+      font-size: 1.8rem;
+    }
+
+    #taskInput {
+      padding: 12px 15px;
+      font-size: 0.9rem;
+    }
+
+    .task-item {
+      padding: 15px;
+    }
+
+    .modal-content {
+      width: 95%;
+      margin: 20% auto;
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="background-animation"></div>
+  <div class="container">
+    <h1>Task Master</h1>
+    <div class="input-container">
+      <input type="text" id="taskInput" placeholder="Add a new task...">
+      <button id="speakButton" class="icon-button" title="Speak tasks">
+        <i class="fas fa-volume-up"></i>
+      </button>
+      <button id="showCompletedButton" class="icon-button" title="Show completed tasks">
+        <i class="fas fa-check-circle"></i>
+      </button>
+    </div>
+    <ul id="taskList"></ul>
+  </div>
+
+  <div id="completedTasksModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Completed Tasks</h2>
+      <ul id="completedTaskList"></ul>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
+  <script>
+    const taskInput = document.getElementById('taskInput');
+    const taskList = document.getElementById('taskList');
+    const speakButton = document.getElementById('speakButton');
+    const showCompletedButton = document.getElementById('showCompletedButton');
+    const completedTasksModal = document.getElementById('completedTasksModal');
+    const completedTaskList = document.getElementById('completedTaskList');
+    const closeModalBtn = document.querySelector('.close');
+    let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    let completedTasks = JSON.parse(localStorage.getItem('completedTasks')) || [];
+
+    function renderTasks() {
+      taskList.innerHTML = '';
+      tasks.forEach((task, index) => {
+        const li = document.createElement('li');
+        li.className = 'task-item';
+        li.innerHTML = `
+          <span class="task-text">${task}</span>
+          <div class="task-actions">
+            <button class="delete-btn" onclick="completeTask(${index})">✔</button>
+          </div>
+        `;
+        taskList.appendChild(li);
+      });
+    }
+
+    function renderCompletedTasks() {
+      completedTaskList.innerHTML = '';
+      completedTasks.forEach((task) => {
+        const li = document.createElement('li');
+        li.className = 'task-item';
+        li.innerHTML = `<span class="task-text">${task}</span>`;
+        completedTaskList.appendChild(li);
+      });
+    }
+
+    function addTask(e) {
+      if (e.key === 'Enter' && taskInput.value.trim() !== '') {
+        tasks.push(taskInput.value.trim());
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+        taskInput.value = '';
+        renderTasks();
+        animateNewTask();
+      }
+    }
+
+    function completeTask(index) {
+      const taskElement = taskList.children[index];
+      taskElement.classList.add('task-completed');
+      gsap.to(taskElement, {
+        opacity: 0,
+        x: -50,
+        duration: 0.5,
+        onComplete: () => {
+          const completedTask = tasks.splice(index, 1)[0];
+          completedTasks.push(completedTask);
+          localStorage.setItem('tasks', JSON.stringify(tasks));
+          localStorage.setItem('completedTasks', JSON.stringify(completedTasks));
+          renderTasks();
+        }
+      });
+    }
+
+    function animateNewTask() {
+      const newTask = taskList.lastElementChild;
+      gsap.from(newTask, {
+        opacity: 0,
+        y: 20,
+        duration: 0.5,
+        ease: "back.out(1.7)"
+      });
+    }
+
+    function speakTasks() {
+      if ('speechSynthesis' in window) {
+        const speech = new SpeechSynthesisUtterance();
+        speech.text = "Your outstanding tasks are: " + tasks.map((task, index) => `${index + 1}. ${task}`).join(", ");
+        speech.volume = 1;
+        speech.rate = 1;
+        speech.pitch = 1;
+        window.speechSynthesis.speak(speech);
+      } else {
+        alert("Sorry, your browser doesn't support text to speech!");
+      }
+    }
+
+    function showCompletedTasks() {
+      renderCompletedTasks();
+      completedTasksModal.style.display = "block";
+    }
+
+    function closeModal() {
+      completedTasksModal.style.display = "none";
+    }
+
+    taskInput.addEventListener('keypress', addTask);
+    speakButton.addEventListener('click', speakTasks);
+    showCompletedButton.addEventListener('click', showCompletedTasks);
+    closeModalBtn.addEventListener('click', closeModal);
+
+    window.onclick = function(event) {
+      if (event.target == completedTasksModal) {
+        closeModal();
+      }
+    }
+
+    renderTasks();
+
+    // Initialize Sortable
+    new Sortable(taskList, {
+      animation: 150,
+      ghostClass: 'sortable-ghost',
+      onEnd: function() {
+        tasks = Array.from(taskList.children).map(item => item.querySelector('.task-text').textContent);
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+      }
+    });
+
+    // Background animation
+    const backgroundAnimation = document.querySelector('.background-animation');
+
+    function createFloatingShape() {
+      const shape = document.createElement('div');
+      const size = Math.random() * 50 + 20;
+      shape.style.width = `${size}px`;
+      shape.style.height = `${size}px`;
+      shape.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+      shape.style.position = 'absolute';
+      shape.style.backgroundColor = `hsla(${Math.random() * 360}, 70%, 70%, 0.2)`;
+      shape.style.left = `${Math.random() * 100}%`;
+      shape.style.top = `${Math.random() * 100}%`;
+      backgroundAnimation.appendChild(shape);
+
+      gsap.to(shape, {
+        rotation: Math.random() * 360,
+        scale: Math.random() * 0.5 + 0.5,
+        x: `+=${Math.random() * 200 - 100}`,
+        y: `+=${Math.random() * 200 - 100}`,
+        duration: Math.random() * 10 + 5,
+        ease: 'sine.inOut',
+        repeat: -1,
+        yoyo: true,
+        onRepeat: () => {
+          shape.style.backgroundColor = `hsla(${Math.random() * 360}, 70%, 70%, 0.2)`;
+        }
+      });
+    }
+
+    for (let i = 0; i < 15; i++) {
+      createFloatingShape();
+    }
+  </script>
+</body>
+</html>
