@@ -1,0 +1,582 @@
+<html><head><base href="https://postman-clone.example.com/">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Postie</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&family=Open+Sans:wght@300;400;700&family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" rel="stylesheet">
+<style>
+    :root {
+        --primary-color: #BB86FC;
+        --secondary-color: #03DAC6;
+        --text-color: #E0E0E0;
+        --background-color: #121212;
+        --hover-color: #CF6679;
+        --nav-bg-color: rgba(30, 30, 30, 0.8);
+        --nav-text-color: #FFFFFF;
+        --accent-color: #FFB300;
+    }
+
+    body {
+        font-family: 'Open Sans', sans-serif;
+        background: linear-gradient(135deg, #121212, #1F1B24);
+        color: var(--text-color);
+        line-height: 1.6;
+        display: block;
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    .main-content {
+        flex-grow: 1;
+        padding: 30px;
+        overflow-y: auto;
+        height: 100vh;
+        position: relative;
+        width: 100%;
+    }
+
+    .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'Montserrat', sans-serif;
+    }
+
+    h1 {
+        text-align: center;
+        color: var(--primary-color);
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 10px;
+        animation: fadeInDown 1s ease-out;
+    }
+
+    .subtitle {
+        text-align: center;
+        color: var(--secondary-color);
+        font-size: 1.2em;
+        margin-bottom: 30px;
+        animation: fadeInUp 1s ease-out 0.5s both;
+    }
+
+    @keyframes fadeInDown {
+        0% {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeInUp {
+        0% {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .instructions {
+        display: none;
+    }
+
+    .query-form, .query-list, .modal-content {
+        background-color: rgba(30, 30, 30, 0.8);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        padding: 30px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+        animation: slideIn 0.5s ease-out;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+
+    input[type="text"],
+    select,
+    textarea {
+        width: 100%;
+        padding: 12px;
+        background-color: rgba(255, 255, 255, 0.1);
+        color: var(--text-color);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 4px;
+        font-family: 'Fira Code', monospace;
+        transition: border-color 0.3s ease;
+        box-sizing: border-box;
+    }
+
+    input[type="text"]:focus,
+    select:focus,
+    textarea:focus {
+        outline: none;
+        border-color: var(--primary-color);
+    }
+
+    textarea {
+        height: 100px;
+        resize: vertical;
+    }
+
+    button {
+        background-color: rgba(255, 179, 0, 0.8);
+        color: #fff;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+        background-color: var(--hover-color);
+    }
+
+    .query-item {
+        border-bottom: 1px solid #ddd;
+        padding: 15px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .query-item:last-child {
+        border-bottom: none;
+    }
+
+    .query-actions button {
+        margin-left: 15px;
+        font-size: 14px;
+        padding: 8px 12px;
+    }
+
+    .tooltip {
+        position: relative;
+        display: inline-block;
+    }
+
+    .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 120px;
+        background-color: rgba(3, 218, 198, 0.8);
+        color: #000;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px;
+        position: absolute;
+        z-index: 1;
+        bottom: 125%;
+        left: 50%;
+        margin-left: -60px;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.4);
+        animation: fadeIn 0.3s ease-out;
+    }
+
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: #000;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    #show-instructions {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        z-index: 100;
+        background-color: rgba(3, 218, 198, 0.8);
+        color: #000;
+        border: none;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        font-size: 24px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    #show-instructions:hover {
+        background-color: var(--hover-color);
+        color: var(--text-color);
+    }
+
+    @keyframes backgroundAnimation {
+        0% { transform: scale(1); }
+        100% { transform: scale(1.1); }
+    }
+
+    .header-pair {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .header-pair input {
+        flex: 1;
+        margin-right: 10px;
+    }
+
+    .header-pair button {
+        background: none;
+        border: none;
+        color: var(--text-color);
+        cursor: pointer;
+        font-size: 18px;
+        padding: 0;
+        width: 24px;
+        text-align: center;
+    }
+
+    .main-content::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: 
+            radial-gradient(circle at 10% 20%, rgba(91, 37, 255, 0.1) 0%, rgba(91, 37, 255, 0) 40%),
+            radial-gradient(circle at 90% 80%, rgba(3, 218, 198, 0.1) 0%, rgba(3, 218, 198, 0) 40%),
+            radial-gradient(circle at 50% 50%, rgba(255, 179, 0, 0.1) 0%, rgba(255, 179, 0, 0) 40%);
+        z-index: -1;
+        animation: backgroundAnimation 20s ease infinite alternate;
+    }
+</style>
+</head>
+<body>
+    <div class="main-content">
+        <div class="container">
+            <h1>Postie</h1>
+            <h2 class="subtitle">By Justyn</h2>
+            <div class="instructions">
+                <h3>How to use Postie:</h3>
+                <ol>
+                    <li>Enter a name for your query in the "Query Name" field.</li>
+                    <li>Select the HTTP method (GET, POST, PUT, DELETE) from the dropdown.</li>
+                    <li>Enter the URL you want to query.</li>
+                    <li>Add any headers in key-value format (optional).</li>
+                    <li>Add a request body if needed (for POST/PUT requests).</li>
+                    <li>Click "Save Query" to store it in local storage.</li>
+                    <li>Click "Test Query" to send the request and see the response.</li>
+                    <li>Use the buttons below to edit, delete, or test saved queries.</li>
+                </ol>
+            </div>
+            <div class="query-form">
+                <div class="form-group">
+                    <label for="query-name"><i class="fas fa-tag"></i> Query Name</label>
+                    <input type="text" id="query-name" placeholder="Enter query name">
+                </div>
+                <div class="form-group">
+                    <label for="http-method"><i class="fas fa-exchange-alt"></i> HTTP Method</label>
+                    <select id="http-method">
+                        <option value="GET">GET</option>
+                        <option value="POST">POST</option>
+                        <option value="PUT">PUT</option>
+                        <option value="DELETE">DELETE</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="url"><i class="fas fa-link"></i> URL</label>
+                    <input type="text" id="url" placeholder="Enter URL">
+                </div>
+                <div class="form-group">
+                    <label for="headers"><i class="fas fa-list-alt"></i> Headers</label>
+                    <div id="headers-container">
+                        <div class="header-pair">
+                            <input type="text" class="header-key" placeholder="Key">
+                            <input type="text" class="header-value" placeholder="Value">
+                        </div>
+                    </div>
+                    <button id="add-header" class="tooltip">
+                        <i class="fas fa-plus"></i> Add Header
+                        <span class="tooltiptext">Add a new header key-value pair</span>
+                    </button>
+                </div>
+                <div class="form-group">
+                    <label for="body"><i class="fas fa-file-alt"></i> Body</label>
+                    <textarea id="body" placeholder="Enter request body"></textarea>
+                </div>
+                <button id="save-query" class="tooltip">
+                    <i class="fas fa-save"></i> Save Query
+                    <span class="tooltiptext">Save this query to local storage</span>
+                </button>
+                <button id="test-query" class="tooltip">
+                    <i class="fas fa-play"></i> Test Query
+                    <span class="tooltiptext">Send this query and see the response</span>
+                </button>
+            </div>
+            <div class="query-list" id="query-list">
+                <!-- Saved queries will be displayed here -->
+            </div>
+            <button id="show-instructions" class="tooltip">
+                <i class="fas fa-question-circle"></i>
+                <span class="tooltiptext">Show Instructions</span>
+            </button>
+        </div>
+    </div>
+
+    <div id="instructions-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>How to use Postie:</h2>
+            <ol>
+                <li>Enter a name for your query in the "Query Name" field.</li>
+                <li>Select the HTTP method (GET, POST, PUT, DELETE) from the dropdown.</li>
+                <li>Enter the URL you want to query.</li>
+                <li>Add any headers in key-value format (optional).</li>
+                <li>Add a request body if needed (for POST/PUT requests).</li>
+                <li>Click "Save Query" to store it in local storage.</li>
+                <li>Click "Test Query" to send the request and see the response.</li>
+                <li>Use the buttons below to edit, delete, or test saved queries.</li>
+            </ol>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+    <script>
+        const queryNameInput = document.getElementById('query-name');
+        const httpMethodSelect = document.getElementById('http-method');
+        const urlInput = document.getElementById('url');
+        const headersContainer = document.getElementById('headers-container');
+        const bodyInput = document.getElementById('body');
+        const saveQueryBtn = document.getElementById('save-query');
+        const testQueryBtn = document.getElementById('test-query');
+        const queryList = document.getElementById('query-list');
+        const instructionsModal = document.getElementById('instructions-modal');
+        const showInstructionsBtn = document.getElementById('show-instructions');
+        const closeBtn = document.querySelector('.close');
+        const addHeaderBtn = document.getElementById('add-header');
+
+        let queries = JSON.parse(localStorage.getItem('queries')) || [];
+
+        function renderQueries() {
+            queryList.innerHTML = '';
+            queries.forEach((query, index) => {
+                const queryItem = document.createElement('div');
+                queryItem.className = 'query-item';
+                queryItem.innerHTML = `
+                    <div><i class="fas fa-file-code"></i> ${query.name}</div>
+                    <div class="query-actions">
+                        <button class="edit-query tooltip" data-index="${index}">
+                            <i class="fas fa-edit"></i>
+                            <span class="tooltiptext">Edit this query</span>
+                        </button>
+                        <button class="delete-query tooltip" data-index="${index}">
+                            <i class="fas fa-trash"></i>
+                            <span class="tooltiptext">Delete this query</span>
+                        </button>
+                        <button class="test-saved-query tooltip" data-index="${index}">
+                            <i class="fas fa-play"></i>
+                            <span class="tooltiptext">Test this saved query</span>
+                        </button>
+                    </div>
+                `;
+                queryList.appendChild(queryItem);
+            });
+
+            document.querySelectorAll('.edit-query').forEach(btn => {
+                btn.addEventListener('click', editQuery);
+            });
+            document.querySelectorAll('.delete-query').forEach(btn => {
+                btn.addEventListener('click', deleteQuery);
+            });
+            document.querySelectorAll('.test-saved-query').forEach(btn => {
+                btn.addEventListener('click', testSavedQuery);
+            });
+        }
+
+        function addHeaderPair() {
+            const headerPair = document.createElement('div');
+            headerPair.className = 'header-pair';
+            headerPair.innerHTML = `
+                <input type="text" class="header-key" placeholder="Key">
+                <input type="text" class="header-value" placeholder="Value">
+                <button class="remove-header tooltip">
+                    <i class="fas fa-minus-circle"></i>
+                    <span class="tooltiptext">Remove this header</span>
+                </button>
+            `;
+            headersContainer.appendChild(headerPair);
+
+            headerPair.querySelector('.remove-header').addEventListener('click', () => {
+                headerPair.remove();
+            });
+        }
+
+        function getHeadersObject() {
+            const headers = {};
+            document.querySelectorAll('.header-pair').forEach(pair => {
+                const key = pair.querySelector('.header-key').value.trim();
+                const value = pair.querySelector('.header-value').value.trim();
+                if (key && value) {
+                    headers[key] = value;
+                }
+            });
+            return headers;
+        }
+
+        function setHeadersFromObject(headersObj) {
+            headersContainer.innerHTML = '';
+            for (const [key, value] of Object.entries(headersObj)) {
+                const headerPair = document.createElement('div');
+                headerPair.className = 'header-pair';
+                headerPair.innerHTML = `
+                    <input type="text" class="header-key" value="${key}" placeholder="Key">
+                    <input type="text" class="header-value" value="${value}" placeholder="Value">
+                    <button class="remove-header tooltip">
+                        <i class="fas fa-minus-circle"></i>
+                        <span class="tooltiptext">Remove this header</span>
+                    </button>
+                `;
+                headersContainer.appendChild(headerPair);
+
+                headerPair.querySelector('.remove-header').addEventListener('click', () => {
+                    headerPair.remove();
+                });
+            }
+        }
+
+        function saveQuery() {
+            const query = {
+                name: queryNameInput.value,
+                method: httpMethodSelect.value,
+                url: urlInput.value,
+                headers: getHeadersObject(),
+                body: bodyInput.value
+            };
+
+            queries.push(query);
+            localStorage.setItem('queries', JSON.stringify(queries));
+            renderQueries();
+            clearForm();
+        }
+
+        function editQuery(e) {
+            const index = e.target.closest('.edit-query').dataset.index;
+            const query = queries[index];
+            queryNameInput.value = query.name;
+            httpMethodSelect.value = query.method;
+            urlInput.value = query.url;
+            setHeadersFromObject(query.headers);
+            bodyInput.value = query.body;
+
+            queries.splice(index, 1);
+            localStorage.setItem('queries', JSON.stringify(queries));
+            renderQueries();
+        }
+
+        function deleteQuery(e) {
+            const index = e.target.closest('.delete-query').dataset.index;
+            queries.splice(index, 1);
+            localStorage.setItem('queries', JSON.stringify(queries));
+            renderQueries();
+        }
+
+        async function testQuery() {
+            try {
+                const headers = getHeadersObject();
+                const response = await axios({
+                    method: httpMethodSelect.value,
+                    url: urlInput.value,
+                    headers: headers,
+                    data: bodyInput.value
+                });
+                
+                alert(`Status: ${response.status}\n\nResponse:\n${JSON.stringify(response.data, null, 2)}`);
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+            }
+        }
+
+        async function testSavedQuery(e) {
+            const index = e.target.closest('.test-saved-query').dataset.index;
+            const query = queries[index];
+            
+            try {
+                const response = await axios({
+                    method: query.method,
+                    url: query.url,
+                    headers: query.headers,
+                    data: query.body
+                });
+                
+                alert(`Status: ${response.status}\n\nResponse:\n${JSON.stringify(response.data, null, 2)}`);
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+            }
+        }
+
+        function clearForm() {
+            queryNameInput.value = '';
+            httpMethodSelect.value = 'GET';
+            urlInput.value = '';
+            bodyInput.value = '';
+            headersContainer.innerHTML = '';
+            addHeaderPair();
+        }
+
+        saveQueryBtn.addEventListener('click', saveQuery);
+        testQueryBtn.addEventListener('click', testQuery);
+        addHeaderBtn.addEventListener('click', addHeaderPair);
+
+        showInstructionsBtn.addEventListener('click', () => {
+            instructionsModal.style.display = 'block';
+        });
+
+        closeBtn.addEventListener('click', () => {
+            instructionsModal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (event) => {
+            if (event.target === instructionsModal) {
+                instructionsModal.style.display = 'none';
+            }
+        });
+
+        renderQueries();
+        addHeaderPair();
+    </script>
+</body>
+</html>
