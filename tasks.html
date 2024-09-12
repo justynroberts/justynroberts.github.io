@@ -89,10 +89,15 @@
     transition: all 0.3s ease;
     padding: 10px;
     border-radius: 50%;
+    position: relative;
   }
 
   .icon-button:hover {
     background-color: rgba(0, 0, 0, 0.1);
+  }
+
+  #addTaskButton {
+    color: #27ae60;
   }
 
   #speakButton {
@@ -135,18 +140,18 @@
     align-items: center;
   }
 
-  .delete-btn {
+  .complete-btn {
     background: none;
     border: none;
     cursor: pointer;
     font-size: 1.2rem;
     transition: all 0.3s ease;
     padding: 5px 10px;
-    color: #ff6b6b;
+    color: #3498db;
   }
 
-  .delete-btn:hover {
-    color: #ff4757;
+  .complete-btn:hover {
+    color: #2980b9;
     transform: scale(1.2);
   }
 
@@ -203,6 +208,27 @@
     cursor: pointer;
   }
 
+  /* Tooltip styles */
+  .tooltip {
+    position: absolute;
+    background-color: #333;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+
+  .icon-button:hover .tooltip {
+    opacity: 1;
+  }
+
   @media (max-width: 480px) {
     .container {
       padding: 30px 20px;
@@ -238,11 +264,17 @@
     <h1>Task Master</h1>
     <div class="input-container">
       <input type="text" id="taskInput" placeholder="Add a new task...">
+      <button id="addTaskButton" class="icon-button" title="Add task">
+        <i class="fas fa-plus"></i>
+        <span class="tooltip">Add task</span>
+      </button>
       <button id="speakButton" class="icon-button" title="Speak tasks">
         <i class="fas fa-volume-up"></i>
+        <span class="tooltip">Speak tasks</span>
       </button>
       <button id="showCompletedButton" class="icon-button" title="Show completed tasks">
         <i class="fas fa-check-circle"></i>
+        <span class="tooltip">Show completed</span>
       </button>
     </div>
     <ul id="taskList"></ul>
@@ -260,6 +292,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
   <script>
     const taskInput = document.getElementById('taskInput');
+    const addTaskButton = document.getElementById('addTaskButton');
     const taskList = document.getElementById('taskList');
     const speakButton = document.getElementById('speakButton');
     const showCompletedButton = document.getElementById('showCompletedButton');
@@ -277,7 +310,9 @@
         li.innerHTML = `
           <span class="task-text">${task}</span>
           <div class="task-actions">
-            <button class="delete-btn" onclick="completeTask(${index})">✔</button>
+            <button class="complete-btn" onclick="completeTask(${index})" title="Complete task">
+              <i class="fas fa-check"></i>
+            </button>
           </div>
         `;
         taskList.appendChild(li);
@@ -294,8 +329,8 @@
       });
     }
 
-    function addTask(e) {
-      if (e.key === 'Enter' && taskInput.value.trim() !== '') {
+    function addTask() {
+      if (taskInput.value.trim() !== '') {
         tasks.push(taskInput.value.trim());
         localStorage.setItem('tasks', JSON.stringify(tasks));
         taskInput.value = '';
@@ -353,7 +388,12 @@
       completedTasksModal.style.display = "none";
     }
 
-    taskInput.addEventListener('keypress', addTask);
+    taskInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        addTask();
+      }
+    });
+    addTaskButton.addEventListener('click', addTask);
     speakButton.addEventListener('click', speakTasks);
     showCompletedButton.addEventListener('click', showCompletedTasks);
     closeModalBtn.addEventListener('click', closeModal);
