@@ -1,0 +1,502 @@
+<html>
+<head>
+<base href="https://whiteboard.example.com/">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stylish Collaborative Whiteboard App</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary-color: #4a90e2;
+    --secondary-color: #ffffff;
+    --background-color: #f5f7fa;
+    --toolbar-width: 60px;
+    --toolbar-collapsed-width: 0px;
+    --transition-duration: 0.3s;
+    --font-family: 'Poppins', sans-serif;
+    --text-color: #333333;
+    --tooltip-background: rgba(0, 0, 0, 0.7);
+    --tooltip-color: #ffffff;
+    --separator-color: #e0e0e0;
+    --icon-size: 24px;
+    --tool-icon-size: 28px;
+    --button-background: #ffffff;
+    --button-border: #e0e0e0;
+    --button-hover-background: #f0f0f0;
+  }
+  * {
+    box-sizing: border-box;
+  }
+  body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: var(--font-family);
+    background-color: var(--background-color);
+    color: var(--text-color);
+    overflow: hidden;
+  }
+  .container {
+    display: flex;
+    height: 100%;
+  }
+  .toolbar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: var(--toolbar-width);
+    background-color: var(--secondary-color);
+    padding: 10px 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: left var(--transition-duration);
+    border-right: 1px solid var(--separator-color);
+    z-index: 10;
+  }
+  .toolbar.collapsed {
+    left: calc(-1 * var(--toolbar-width));
+  }
+  .tool {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 15px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 8px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--button-background);
+    border: 1px solid var(--button-border);
+    transition: background-color var(--transition-duration), transform var(--transition-duration);
+  }
+  .tool:hover, .tool.active {
+    background-color: var(--button-hover-background);
+    transform: translateY(-2px);
+  }
+  .tool svg {
+    width: var(--tool-icon-size);
+    height: var(--tool-icon-size);
+    fill: var(--primary-color);
+  }
+  #canvas {
+    flex: 1;
+    background-color: var(--secondary-color);
+  }
+  #colorPicker {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 15px;
+    cursor: pointer;
+    border: none;
+    padding: 0;
+    border-radius: 8px;
+  }
+  .brush-size-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 15px;
+    width: 100%;
+  }
+  .brush-size-label {
+    font-size: 12px;
+    margin-bottom: 5px;
+    color: var(--text-color);
+  }
+  #brushSize {
+    width: 80%;
+    margin: 5px 0;
+  }
+  .bottom-tools {
+    position: fixed;
+    bottom: 20px;
+    left: calc(var(--toolbar-width) + 20px);
+    display: flex;
+    gap: 15px;
+    transition: left var(--transition-duration);
+    z-index: 10;
+  }
+  .bottom-tools.shifted {
+    left: 20px;
+  }
+  .bottom-tool {
+    padding: 10px;
+    background-color: var(--button-background);
+    border: 1px solid var(--button-border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color var(--transition-duration), transform var(--transition-duration);
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .bottom-tool:hover {
+    background-color: var(--button-hover-background);
+    transform: translateY(-2px);
+  }
+  .bottom-tool svg {
+    width: var(--icon-size);
+    height: var(--icon-size);
+    fill: var(--primary-color);
+  }
+  #toggleToolbar {
+    position: fixed;
+    top: 20px;
+    left: calc(var(--toolbar-width) + 10px);
+    z-index: 20;
+    transition: left var(--transition-duration);
+    background-color: var(--button-background);
+    border: 1px solid var(--button-border);
+    border-radius: 8px;
+    cursor: pointer;
+    padding: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  #toggleToolbar.shifted {
+    left: 20px;
+  }
+  #toggleToolbar svg {
+    width: var(--icon-size);
+    height: var(--icon-size);
+    fill: var(--primary-color);
+  }
+  .tooltip {
+    position: absolute;
+    background-color: var(--tooltip-background);
+    color: var(--tooltip-color);
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity var(--transition-duration);
+    pointer-events: none;
+    z-index: 100;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-left: 10px;
+  }
+  .tool:hover .tooltip, #colorPicker:hover + .tooltip, .bottom-tool:hover .tooltip {
+    opacity: 1;
+  }
+  .separator {
+    width: 40px;
+    height: 1px;
+    background-color: var(--separator-color);
+    margin: 15px 0;
+  }
+  ::-webkit-scrollbar {
+    width: 5px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--primary-color);
+    border-radius: 10px;
+  }
+  #logo {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    width: 64px;
+    height: 64px;
+    z-index: 100;
+  }
+</style>
+</head>
+<body>
+<button id="toggleToolbar">
+  <svg viewBox="0 0 24 24">
+    <path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/>
+  </svg>
+</button>
+<div class="container">
+  <div class="toolbar">
+    <div class="tool active" id="pencil">
+      <svg viewBox="0 0 24 24">
+        <path d="M3 17.25V21h3.75L17.81 9.94l-2.12-2.12L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.41l-2.34-2.34a1.003 1.003 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+      </svg>
+      <span class="tooltip">Pencil</span>
+    </div>
+    <div class="tool" id="eraser">
+      <svg viewBox="0 0 24 24">
+        <path d="M16 16v2h-7v-2H5v-6h2V8h7v2h2v6z"/>
+      </svg>
+      <span class="tooltip">Eraser</span>
+    </div>
+    <div class="tool" id="text">
+      <svg viewBox="0 0 24 24">
+        <path d="M5 4v3h5v12h3V7h5V4z"/>
+      </svg>
+      <span class="tooltip">Text</span>
+    </div>
+    <div class="separator"></div>
+    <input type="color" id="colorPicker" value="#000000">
+    <span class="tooltip">Color</span>
+    <div class="brush-size-container">
+      <span class="brush-size-label">Size</span>
+      <input type="range" id="brushSize" min="1" max="20" value="2">
+    </div>
+    <div class="separator"></div>
+    <div class="tool" id="clear">
+      <svg viewBox="0 0 24 24">
+        <path d="M16 9v10H8V9h8m-1-6H9l-1 1H4v2h16V4h-4l-1-1z"/>
+      </svg>
+      <span class="tooltip">Clear Canvas</span>
+    </div>
+  </div>
+  <canvas id="canvas"></canvas>
+</div>
+<div class="bottom-tools">
+  <button class="bottom-tool" id="undo">
+    <svg viewBox="0 0 24 24">
+      <path d="M12 5V1L8 5h4zm-6.5 8c0-4.14 3.36-7.5 7.5-7.5 2.85 0 5.3 1.57 6.58 3.9L17 11c-0.95-2.05-3-3.5-5.5-3.5-3.03 0-5.5 2.47-5.5 5.5S8.47 18 11.5 18c2.5 0 4.55-1.45 5.5-3.5l2.08 1.04C17.8 18.43 15.35 20 12.5 20c-4.14 0-7.5-3.36-7.5-7.5z"/>
+    </svg>
+    <span class="tooltip">Undo</span>
+  </button>
+  <button class="bottom-tool" id="redo">
+    <svg viewBox="0 0 24 24">
+      <path d="M12 5V1l4 4h-4zm6.5 8c0-4.14-3.36-7.5-7.5-7.5-2.85 0-5.3 1.57-6.58 3.9L7 11c0.95-2.05 3-3.5 5.5-3.5 3.03 0 5.5 2.47 5.5 5.5S14.53 18 11.5 18c-2.5 0-4.55-1.45-5.5-3.5L3.92 16.54C5.2 18.93 7.65 20.5 10.5 20.5c4.14 0 7.5-3.36 7.5-7.5z"/>
+    </svg>
+    <span class="tooltip">Redo</span>
+  </button>
+  <button class="bottom-tool" id="save">
+    <svg viewBox="0 0 24 24">
+      <path d="M17 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7l-4-4zM12 19a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm3-11H5V5h10v3z"/>
+    </svg>
+    <span class="tooltip">Save</span>
+  </button>
+</div>
+<img id="logo" src="https://companiesmarketcap.com/img/company-logos/256/PD.png" alt="PD company logo" width="64" height="64">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.js"></script>
+<script>
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  let isDrawing = false;
+  let currentTool = 'pencil';
+  let lastX = 0;
+  let lastY = 0;
+  let undoStack = [];
+  let redoStack = [];
+  let drawingColor = '#000000';
+  let brushSize = 2;
+  const canvasBackgroundColor = '#ffffff';
+  
+  const socket = {
+    emit: (event, data) => console.log('Emitted:', event, data),
+    on: (event, callback) => console.log('Listening to:', event)
+  };
+  
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    redrawCanvas();
+  }
+  
+  window.addEventListener('load', () => {
+    resizeCanvas();
+    init();
+  });
+  
+  window.addEventListener('resize', resizeCanvas);
+  
+  function init() {
+    setTool('pencil');
+    ctx.strokeStyle = drawingColor;
+    ctx.lineWidth = brushSize;
+    ctx.lineCap = 'round';
+    clearCanvas();
+    saveState();
+  }
+  
+  function setTool(tool) {
+    currentTool = tool;
+    document.querySelectorAll('.tool').forEach(el => el.classList.remove('active'));
+    document.getElementById(tool).classList.add('active');
+    if (tool === 'eraser') {
+      ctx.globalCompositeOperation = 'destination-out';
+    } else {
+      ctx.globalCompositeOperation = 'source-over';
+    }
+  }
+  
+  document.querySelectorAll('.tool').forEach(tool => {
+    tool.addEventListener('click', () => setTool(tool.id));
+  });
+  
+  function getMousePos(e) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: (e.clientX - rect.left),
+      y: (e.clientY - rect.top)
+    };
+  }
+  
+  canvas.addEventListener('mousedown', (e) => {
+    isDrawing = true;
+    const pos = getMousePos(e);
+    [lastX, lastY] = [pos.x, pos.y];
+    saveState();
+  });
+  
+  canvas.addEventListener('mousemove', (e) => {
+    if (!isDrawing) return;
+    const pos = getMousePos(e);
+    drawLine(lastX, lastY, pos.x, pos.y, currentTool);
+    [lastX, lastY] = [pos.x, pos.y];
+  });
+  
+  canvas.addEventListener('mouseup', () => isDrawing = false);
+  canvas.addEventListener('mouseout', () => isDrawing = false);
+  
+  canvas.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const pos = {
+      x: touch.clientX,
+      y: touch.clientY
+    };
+    isDrawing = true;
+    [lastX, lastY] = [pos.x, pos.y];
+    saveState();
+  });
+  
+  canvas.addEventListener('touchmove', (e) => {
+    if (!isDrawing) return;
+    e.preventDefault();
+    const touch = e.touches[0];
+    const pos = {
+      x: touch.clientX,
+      y: touch.clientY
+    };
+    drawLine(lastX, lastY, pos.x, pos.y, currentTool);
+    [lastX, lastY] = [pos.x, pos.y];
+  });
+  
+  canvas.addEventListener('touchend', () => {
+    isDrawing = false;
+  });
+  
+  function drawLine(x0, y0, x1, y1, tool) {
+    ctx.strokeStyle = drawingColor;
+    ctx.lineWidth = brushSize;
+    ctx.beginPath();
+    ctx.moveTo(x0, y0);
+    ctx.lineTo(x1, y1);
+    ctx.stroke();
+    socket.emit('draw', {
+      x0: x0,
+      y0: y0,
+      x1: x1,
+      y1: y1,
+      tool: tool,
+      color: drawingColor,
+      lineWidth: brushSize
+    });
+  }
+  
+  function clearCanvas() {
+    ctx.fillStyle = canvasBackgroundColor;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    socket.emit('clear');
+  }
+  
+  function saveState() {
+    undoStack.push(canvas.toDataURL());
+    if (undoStack.length > 50) {
+      undoStack.shift();
+    }
+    redoStack = [];
+  }
+  
+  function undo() {
+    if (undoStack.length > 1) {
+      redoStack.push(undoStack.pop());
+      loadCanvasState(undoStack[undoStack.length - 1]);
+    }
+  }
+  
+  function redo() {
+    if (redoStack.length > 0) {
+      const dataUrl = redoStack.pop();
+      undoStack.push(dataUrl);
+      loadCanvasState(dataUrl);
+    }
+  }
+  
+  function loadCanvasState(dataUrl) {
+    const img = new Image();
+    img.onload = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0);
+    };
+    img.src = dataUrl;
+  }
+  
+  function redrawCanvas() {
+    if (undoStack.length > 0) {
+      loadCanvasState(undoStack[undoStack.length - 1]);
+    }
+  }
+  
+  function saveCanvas() {
+    const link = document.createElement('a');
+    link.download = 'whiteboard.png';
+    link.href = canvas.toDataURL();
+    link.click();
+  }
+  
+  document.getElementById('clear').addEventListener('click', () => {
+    clearCanvas();
+    saveState();
+  });
+  
+  document.getElementById('undo').addEventListener('click', undo);
+  document.getElementById('redo').addEventListener('click', redo);
+  document.getElementById('save').addEventListener('click', saveCanvas);
+  
+  document.getElementById('colorPicker').addEventListener('input', (e) => {
+    drawingColor = e.target.value;
+    ctx.strokeStyle = drawingColor;
+  });
+  
+  document.getElementById('brushSize').addEventListener('input', (e) => {
+    brushSize = e.target.value;
+    ctx.lineWidth = brushSize;
+  });
+  
+  socket.on('draw', (data) => {
+    ctx.globalCompositeOperation = data.tool === 'eraser' ? 'destination-out' : 'source-over';
+    ctx.strokeStyle = data.color;
+    ctx.lineWidth = data.lineWidth;
+    ctx.beginPath();
+    ctx.moveTo(data.x0, data.y0);
+    ctx.lineTo(data.x1, data.y1);
+    ctx.stroke();
+    ctx.globalCompositeOperation = currentTool === 'eraser' ? 'destination-out' : 'source-over';
+  });
+  
+  socket.on('clear', () => {
+    clearCanvas();
+  });
+  
+  const toggleToolbar = document.getElementById('toggleToolbar');
+  const toolbar = document.querySelector('.toolbar');
+  const bottomTools = document.querySelector('.bottom-tools');
+  
+  toggleToolbar.addEventListener('click', () => {
+    toolbar.classList.toggle('collapsed');
+    toggleToolbar.classList.toggle('shifted');
+    bottomTools.classList.toggle('shifted');
+  });
+</script>
+</body>
+</html>
