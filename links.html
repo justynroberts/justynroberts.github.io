@@ -1,0 +1,496 @@
+<html><head><base href="https://websimcreationengine.com/quicklinks/">
+<title>Quicklinks - Modern Bookmark Manager</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Montserrat:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+  :root {
+    --bg-color: #1a1a2e;
+    --text-color: #e0e0e0;
+    --accent-color: #4361ee;
+    --hover-color: #3a0ca3;
+    --card-bg: rgba(255, 255, 255, 0.1);
+  }
+  
+  * {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  *::-webkit-scrollbar {
+    display: none;
+  }
+  
+  html, body {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    font-family: 'Poppins', 'Roboto', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: background-color 0.3s ease;
+    position: relative;
+  }
+  
+  #content-wrapper {
+    width: 100%;
+    max-width: 1200px;
+    height: calc(100% - 180px);
+    overflow-y: auto;
+    padding-right: 20px;
+  }
+  
+  #starfield {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+  }
+  
+  h1 {
+    font-family: 'Montserrat', 'Roboto', sans-serif;
+    font-weight: 700;
+    font-size: 3.5rem;
+    margin-bottom: 30px;
+    background: linear-gradient(45deg, #4361ee, #3a0ca3);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  #urlBarContainer {
+    width: 100%;
+    max-width: 600px;
+    margin-bottom: 30px;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    position: absolute;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  #urlBarContainer.visible {
+    opacity: 1;
+    transform: translateY(0) translateX(-50%);
+  }
+
+  #bookmarkForm {
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    gap: 10px;
+  }
+
+  #bookmarkUrl {
+    flex-grow: 1;
+  }
+  
+  button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: var(--accent-color);
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  button:hover {
+    background-color: var(--hover-color);
+    transform: translateY(-2px);
+  }
+  
+  button:active {
+    transform: translateY(0);
+  }
+
+  #bookmarkList {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 12px;
+  }
+  
+  .bookmark {
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    aspect-ratio: 1 / 1;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .bookmark:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .bookmark i {
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+    color: var(--accent-color);
+  }
+  
+  .bookmark a {
+    color: var(--text-color);
+    text-decoration: none;
+    word-break: break-word;
+    display: block;
+    margin-bottom: 6px;
+    transition: color 0.3s ease;
+    font-size: 0.75rem;
+    line-height: 1.2;
+    max-height: 2.4em;
+    overflow: hidden;
+    font-weight: 400;
+  }
+  
+  .bookmark a:hover {
+    color: var(--accent-color);
+  }
+  
+  .bookmark .actions {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 6px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .bookmark:hover .actions {
+    opacity: 1;
+  }
+  
+  .bookmark button {
+    font-size: 0.6rem;
+    padding: 3px 6px;
+    background-color: transparent;
+    color: var(--text-color);
+  }
+  
+  .bookmark button:hover {
+    color: var(--accent-color);
+    background-color: transparent;
+  }
+  
+  .bookmark input {
+    width: calc(100% - 16px);
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+  }
+  
+  #toolbar {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 25px;
+    padding: 8px 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: opacity 0.3s ease;
+  }
+  
+  #toolbar:hover {
+    opacity: 1;
+  }
+  
+  #toolbar button {
+    font-size: 1rem;
+    padding: 8px 12px;
+    border-radius: 50%;
+    background-color: transparent;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    color: var(--text-color);
+  }
+  
+  #toolbar button:hover {
+    background-color: var(--accent-color);
+    color: white;
+  }
+  
+  @media (max-width: 768px) {
+    #bookmarkList {
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    }
+  }
+</style>
+</head>
+<body>
+  <canvas id="starfield"></canvas>
+  <h1>Quicklinks</h1>
+
+  <div id="urlBarContainer">
+    <form id="bookmarkForm">
+      <input type="text" id="bookmarkUrl" placeholder="Enter URL" required>
+      <button type="submit">Add Link</button>
+    </form>
+  </div>
+
+  <div id="content-wrapper">
+    <div id="bookmarkList"></div>
+  </div>
+
+  <div id="toolbar">
+    <button id="exportBtn" title="Export to JSON"><i class="fas fa-file-export"></i></button>
+    <button id="importBtn" title="Import from JSON"><i class="fas fa-file-import"></i></button>
+  </div>
+
+  <script>
+    // Starfield animation
+    const canvas = document.getElementById('starfield');
+    const ctx = canvas.getContext('2d');
+    let width, height;
+
+    function resizeCanvas() {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    const stars = [];
+    const numStars = 200;
+    const maxSpeed = 0.5;
+    const minSpeed = 0.1;
+
+    for (let i = 0; i < numStars; i++) {
+      stars.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        radius: Math.random() * 2 + 0.5,
+        speed: Math.random() * (maxSpeed - minSpeed) + minSpeed,
+        brightness: Math.random(),
+        twinkleSpeed: Math.random() * 0.05 + 0.01
+      });
+    }
+
+    function drawStars() {
+      ctx.clearRect(0, 0, width, height);
+      
+      stars.forEach(star => {
+        ctx.beginPath();
+        const gradient = ctx.createRadialGradient(star.x, star.y, 0, star.x, star.y, star.radius);
+        gradient.addColorStop(0, `rgba(255, 255, 255, ${star.brightness})`);
+        gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        ctx.fillStyle = gradient;
+        ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+        ctx.fill();
+        
+        star.y += star.speed;
+        if (star.y > height) {
+          star.y = 0;
+          star.x = Math.random() * width;
+        }
+        
+        star.brightness += Math.sin(Date.now() * star.twinkleSpeed) * 0.1;
+        star.brightness = Math.max(0.1, Math.min(1, star.brightness));
+        
+        star.x += Math.sin(Date.now() * 0.001) * 0.1 * star.speed;
+      });
+      
+      requestAnimationFrame(drawStars);
+    }
+
+    drawStars();
+
+    // Bookmark manager functionality
+    const bookmarkForm = document.getElementById('bookmarkForm');
+    const bookmarkList = document.getElementById('bookmarkList');
+    const exportBtn = document.getElementById('exportBtn');
+    const importBtn = document.getElementById('importBtn');
+    let bookmarks = JSON.parse(localStorage.getItem('bookmarks')) || [];
+
+    function addBookmarkAnimation(bookmarkEl) {
+      bookmarkEl.style.opacity = '0';
+      bookmarkEl.style.transform = 'translateY(20px)';
+      setTimeout(() => {
+        bookmarkEl.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+        bookmarkEl.style.opacity = '1';
+        bookmarkEl.style.transform = 'translateY(0)';
+      }, 50);
+    }
+
+    function truncateTitle(title, maxLength = 35) {
+      if (title.length <= maxLength) return title;
+      return title.substr(0, maxLength) + '...';
+    }
+
+    function renderBookmarks() {
+      bookmarkList.innerHTML = '';
+      bookmarks.forEach((bookmark, index) => {
+        const bookmarkEl = document.createElement('div');
+        bookmarkEl.className = 'bookmark';
+        bookmarkEl.innerHTML = `
+          <i class="fas fa-link"></i>
+          <a href="${bookmark.url}" target="_blank" title="${bookmark.title}">${truncateTitle(bookmark.title)}</a>
+          <div class="actions">
+            <button class="edit" onclick="editBookmark(${index})" title="Edit"><i class="fas fa-edit"></i></button>
+            <button class="remove" onclick="removeBookmark(${index})" title="Remove"><i class="fas fa-trash-alt"></i></button>
+          </div>
+        `;
+        bookmarkList.appendChild(bookmarkEl);
+        addBookmarkAnimation(bookmarkEl);
+      });
+    }
+
+    async function addBookmark(url) {
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        url = 'https://' + url;
+      }
+      try {
+        const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
+        const data = await response.json();
+        const html = data.contents;
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        const title = doc.querySelector('title')?.textContent || new URL(url).hostname;
+
+        bookmarks.push({ url, title });
+        localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+        renderBookmarks();
+      } catch (error) {
+        console.error('Error fetching title:', error);
+        const title = new URL(url).hostname;
+        bookmarks.push({ url, title });
+        localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+        renderBookmarks();
+      }
+    }
+
+    function removeBookmark(index) {
+      bookmarks.splice(index, 1);
+      localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+      renderBookmarks();
+    }
+
+    function editBookmark(index) {
+      const bookmark = bookmarks[index];
+      const bookmarkEl = document.querySelectorAll('.bookmark')[index];
+      bookmarkEl.innerHTML = `
+        <i class="fas fa-link"></i>
+        <input type="text" value="${bookmark.title}" id="editTitle${index}" title="${bookmark.title}">
+        <div class="actions">
+          <button class="edit" onclick="saveEdit(${index})" title="Save"><i class="fas fa-save"></i></button>
+          <button class="remove" onclick="cancelEdit(${index})" title="Cancel"><i class="fas fa-times"></i></button>
+        </div>
+      `;
+    }
+
+    function saveEdit(index) {
+      const newTitle = document.getElementById(`editTitle${index}`).value;
+      bookmarks[index].title = newTitle;
+      localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+      renderBookmarks();
+    }
+
+    function cancelEdit(index) {
+      renderBookmarks();
+    }
+
+    bookmarkForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const url = document.getElementById('bookmarkUrl').value;
+      addBookmark(url);
+      bookmarkForm.reset();
+    });
+
+    exportBtn.addEventListener('click', () => {
+      const dataStr = JSON.stringify(bookmarks);
+      const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+      const exportFileDefaultName = 'quicklinks_bookmarks.json';
+
+      const linkElement = document.createElement('a');
+      linkElement.setAttribute('href', dataUri);
+      linkElement.setAttribute('download', exportFileDefaultName);
+      linkElement.click();
+    });
+
+    importBtn.addEventListener('click', () => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json';
+      input.onchange = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            const importedBookmarks = JSON.parse(event.target.result);
+            bookmarks = importedBookmarks;
+            localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+            renderBookmarks();
+          } catch (error) {
+            console.error('Error importing bookmarks:', error);
+            alert('Invalid JSON file. Please try again.');
+          }
+        };
+        reader.readAsText(file);
+      };
+      input.click();
+    });
+
+    renderBookmarks();
+
+    const title = document.querySelector('h1');
+    const urlBarContainer = document.getElementById('urlBarContainer');
+
+    let urlBarVisible = false;
+    let urlBarTimer;
+
+    title.addEventListener('mouseenter', () => {
+      clearTimeout(urlBarTimer);
+      if (!urlBarVisible) {
+        urlBarContainer.classList.add('visible');
+        urlBarVisible = true;
+      }
+    });
+
+    title.addEventListener('mouseleave', () => {
+      urlBarTimer = setTimeout(() => {
+        urlBarContainer.classList.remove('visible');
+        urlBarVisible = false;
+      }, 300);
+    });
+
+    urlBarContainer.addEventListener('mouseenter', () => {
+      clearTimeout(urlBarTimer);
+    });
+
+    urlBarContainer.addEventListener('mouseleave', () => {
+      urlBarTimer = setTimeout(() => {
+        urlBarContainer.classList.remove('visible');
+        urlBarVisible = false;
+      }, 300);
+    });
+  </script>
+</body>
+</html>
