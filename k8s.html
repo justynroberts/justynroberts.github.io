@@ -1,0 +1,645 @@
+<html><head><base href="https://websim.io/k8s-explorer-babylon/"><title>KubeBridge - 3D Kubernetes Explorer</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body { 
+    margin: 0; 
+    padding: 0; 
+    overflow: hidden; 
+    font-family: 'Exo 2', sans-serif; 
+    background: linear-gradient(135deg, #000011 0%, #002244 100%);
+}
+#particles-js {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background-color: #000011;
+    z-index: -1;
+}
+#renderCanvas {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+    z-index: 1;
+}
+#info { 
+    position: absolute; 
+    top: 20px; 
+    left: 20px; 
+    color: #ffffff; 
+    font-size: 24px; 
+    text-shadow: 0 0 10px #ffffff; 
+    z-index: 2; 
+}
+#details { 
+    position: absolute; 
+    bottom: 20px; 
+    left: 20px; 
+    color: #ffffff; 
+    background: rgba(0,20,40,0.85); 
+    padding: 15px; 
+    border-radius: 10px; 
+    max-width: 400px; 
+    display: none; 
+    box-shadow: 0 0 20px #00ff99;
+    border: 1px solid #00ff99;
+    font-size: 16px; 
+    z-index: 2; 
+    backdrop-filter: blur(5px);
+}
+#details h3 {
+    margin-top: 0;
+    border-bottom: 1px solid #00ff99;
+    padding-bottom: 5px;
+}
+#controls { 
+    position: absolute; 
+    top: 20px; 
+    right: 20px; 
+    color: #ffffff; 
+    text-align: right; 
+    z-index: 2; 
+}
+.button { 
+    display: inline-block; 
+    margin-left: 10px; 
+    padding: 8px 20px; 
+    background: rgba(0,50,80,0.7); 
+    border: 1px solid #00ff99; 
+    border-radius: 25px; 
+    cursor: pointer; 
+    transition: all 0.3s; 
+    color: #ffffff; 
+}
+.button:hover { 
+    background: rgba(0, 255, 153, 0.2); 
+    border-color: #00ff99; 
+}
+#breadcrumb { 
+    position: absolute; 
+    top: 60px; 
+    left: 20px; 
+    color: #ffffff; 
+    font-size: 18px; 
+    background: rgba(0, 20, 40, 0.85);
+    padding: 10px; 
+    border-radius: 5px; 
+    z-index: 1000; 
+    box-shadow: 0 0 10px #00ff99; 
+    border: 1px solid #00ff99; 
+}
+.breadcrumb-item { 
+    cursor: pointer; 
+    text-decoration: underline; 
+    margin-right: 5px; 
+    color: #00ff99; 
+}
+.breadcrumb-item:hover {
+    color: #ffffff; 
+}
+#loadingScreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000011;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 3;
+}
+#loadingSpinner {
+    width: 80px;
+    height: 80px;
+    border: 10px solid #ffffff;
+    border-top: 10px solid #00ff99;
+    border-radius: 50%;
+    animation: spin 1.5s linear infinite;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@500&display=swap" rel="stylesheet">
+<script src="https://cdn.babylonjs.com/babylon.js"></script>
+<script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+</head>
+<body>
+<div id="loadingScreen">
+    <div id="loadingSpinner"></div>
+</div>
+<div id="particles-js"></div>
+<canvas id="renderCanvas"></canvas>
+<div id="info">KubeBridge</div>
+<div id="details"></div>
+<div id="controls">
+    <span class="button" id="resetView">Reset View</span>
+</div>
+<div id="breadcrumb"></div>
+
+<script>
+let scene, camera, engine;
+let clusters = [], nodes = [], namespaces = [], pods = [];
+let selectedObject = null;
+let currentLevel = 'clusters';
+let breadcrumb = [];
+
+function init() {
+    const canvas = document.getElementById("renderCanvas");
+    engine = new BABYLON.Engine(canvas, true);
+
+    BABYLON.SceneLoader.ShowLoadingScreen = false;
+
+    scene = createScene();
+
+    engine.runRenderLoop(() => {
+        scene.render();
+    });
+
+    window.addEventListener('resize', () => {
+        engine.resize();
+    });
+
+    scene.executeWhenReady(() => {
+        document.getElementById("loadingScreen").style.display = "none";
+    });
+}
+
+function createScene() {
+    const scene = new BABYLON.Scene(engine);
+    scene.clearColor = new BABYLON.Color4(0, 0, 0, 0);
+
+    const pipeline = new BABYLON.DefaultRenderingPipeline("pipeline", true, scene);
+    pipeline.bloomEnabled = true;
+    pipeline.bloomThreshold = 0.1;
+    pipeline.bloomWeight = 0.7;
+    pipeline.bloomKernel = 64;
+    pipeline.bloomScale = 0.5;
+
+    camera = new BABYLON.ArcRotateCamera("Camera", 0, 0, 30, BABYLON.Vector3.Zero(), scene);
+    camera.setPosition(new BABYLON.Vector3(0, 0, 30));
+    camera.attachControl(engine.getRenderingCanvas(), true);
+    
+    camera.angularSensibilityX = 3000;
+    camera.angularSensibilityY = 3000;
+    camera.wheelPrecision = 30;
+    camera.inertia = 0.7;
+    camera.panningInertia = 0.7;
+
+    const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
+
+    const ambientLight = new BABYLON.HemisphericLight("ambientLight", new BABYLON.Vector3(0, 1, 0), scene);
+    ambientLight.intensity = 0.2;
+    ambientLight.diffuse = new BABYLON.Color3(0.2, 0.2, 0.3);
+    ambientLight.specular = new BABYLON.Color3(0.5, 0.5, 0.5);
+    ambientLight.groundColor = new BABYLON.Color3(0, 0, 0);
+
+    createClusters(scene);
+    updateBreadcrumb();
+
+    scene.onPointerDown = function (evt, pickInfo) {
+        if (pickInfo.hit) {
+            const object = pickInfo.pickedMesh;
+            drillDown(object);
+        }
+    };
+
+    scene.registerBeforeRender(function () {
+        const deltaTime = engine.getDeltaTime() / 1000;
+        camera.alpha += 0.01 * deltaTime;
+        updateTextScale();
+    });
+
+    return scene;
+}
+
+function createClusters(scene) {
+    const clusterNames = ['Alpha-Cluster', 'Beta-Cluster', 'Gamma-Cluster'];
+    for (let i = 0; i < 3; i++) {
+        const cluster = createCluster(clusterNames[i], scene);
+        cluster.position.x = (i - 1) * 12;
+        clusters.push(cluster);
+    }
+}
+
+function createCluster(name, scene) {
+    const cluster = BABYLON.MeshBuilder.CreateIcoSphere("cluster", {radius: 3, subdivisions: 1}, scene);
+    const clusterMat = new BABYLON.StandardMaterial("clusterMat", scene);
+    clusterMat.wireframe = true;
+    clusterMat.emissiveColor = new BABYLON.Color3(0, 1, 1);
+    clusterMat.alpha = 0.9;
+    clusterMat.reflectionTexture = new BABYLON.CubeTexture("https://playground.babylonjs.com/textures/skybox", scene);
+    clusterMat.reflectionTexture.level = 0.5;
+    cluster.material = clusterMat;
+
+    const glowLayer = new BABYLON.GlowLayer("glow", scene);
+    glowLayer.intensity = 0.8;
+    glowLayer.blurKernelSize = 64;
+    glowLayer.addIncludedOnlyMesh(cluster);
+
+    const text = createTextMesh(name, 1.5, new BABYLON.Vector3(0, -4.0, 0), scene); 
+    text.parent = cluster;
+
+    return cluster;
+}
+
+function createTextMesh(text, size, position, scene) {
+    const planeWidth = size * 12;  
+    const planeHeight = size * 3;  
+    const plane = BABYLON.MeshBuilder.CreatePlane("textPlane", {width: planeWidth, height: planeHeight}, scene);
+    plane.position = position;
+
+    const textTexture = new BABYLON.DynamicTexture("textTexture", {width: 1024, height: 256}, scene);  
+    const textMaterial = new BABYLON.StandardMaterial("textMaterial", scene);
+    textMaterial.diffuseTexture = textTexture;
+    textMaterial.emissiveColor = new BABYLON.Color3(1, 1, 1);
+    textMaterial.alpha = 0.8; 
+    textMaterial.backFaceCulling = false; 
+    plane.material = textMaterial;
+
+    const fontSize = Math.floor(120 * size / 1.5);  
+    const font = `bold ${fontSize}px Arial`;
+    textTexture.drawText(text, null, null, font, "#ffffff", "transparent", true, true);  
+
+    plane.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
+
+    return plane;
+}
+
+function createNodes(clusterName, scene) {
+    const nodeGroup = new BABYLON.Mesh("nodeGroup", scene);
+    const nodeCount = 5;
+    const radius = 6;
+
+    for (let i = 0; i < nodeCount; i++) {
+        const angle = (i / nodeCount) * Math.PI * 2;
+        const node = BABYLON.MeshBuilder.CreateBox("node", {size: 1}, scene);
+        node.position.x = Math.cos(angle) * radius;
+        node.position.y = Math.sin(angle) * radius;
+        
+        const nodeMat = new BABYLON.StandardMaterial("nodeMat", scene);
+        nodeMat.emissiveColor = new BABYLON.Color3(0, 0.7, 0.7);
+        node.material = nodeMat;
+
+        const glowLayer = new BABYLON.GlowLayer("glow", scene);
+        glowLayer.intensity = 0.8;
+        glowLayer.blurKernelSize = 64;
+        glowLayer.addIncludedOnlyMesh(node);
+
+        const text = createTextMesh(`Node ${i+1}`, 1.0, new BABYLON.Vector3(0, -1.5, 0), scene); 
+        text.parent = node;
+        
+        node.parent = nodeGroup;
+        nodes.push(node);
+    }
+
+    return nodeGroup;
+}
+
+function createNamespaces(nodeName, scene) {
+    const namespaceGroup = new BABYLON.Mesh("namespaceGroup", scene);
+    const namespaceCount = 4;
+    const radius = 5;
+
+    for (let i = 0; i < namespaceCount; i++) {
+        const angle = (i / namespaceCount) * Math.PI * 2;
+        const namespace = BABYLON.MeshBuilder.CreateSphere("namespace", {diameter: 1}, scene);
+        namespace.position.x = Math.cos(angle) * radius;
+        namespace.position.y = Math.sin(angle) * radius;
+
+        const namespaceMat = new BABYLON.StandardMaterial("namespaceMat", scene);
+        namespaceMat.wireframe = true;
+        namespaceMat.emissiveColor = new BABYLON.Color3(0, 1, 0.5);
+        namespace.material = namespaceMat;
+
+        const glowLayer = new BABYLON.GlowLayer("glow", scene);
+        glowLayer.intensity = 0.8;
+        glowLayer.blurKernelSize = 64;
+        glowLayer.addIncludedOnlyMesh(namespace);
+
+        const text = createTextMesh(`Namespace ${i+1}`, 1.0, new BABYLON.Vector3(0, -1.5, 0), scene); 
+        text.parent = namespace;
+
+        namespace.parent = namespaceGroup;
+        namespaces.push(namespace);
+    }
+
+    return namespaceGroup;
+}
+
+function createPods(namespaceName, scene) {
+    const podGroup = new BABYLON.Mesh("podGroup", scene);
+    const podCount = 6;
+    const radius = 4;
+
+    const podStatuses = ['Running', 'Pending', 'Failed'];
+
+    for (let i = 0; i < podCount; i++) {
+        const angle = (i / podCount) * Math.PI * 2;
+        const pod = BABYLON.MeshBuilder.CreateCylinder("pod", {height: 0.5, diameter: 0.5}, scene);
+        pod.position.x = Math.cos(angle) * radius;
+        pod.position.y = Math.sin(angle) * radius;
+        
+        const podMat = new BABYLON.StandardMaterial("podMat", scene);
+        podMat.wireframe = true;
+
+        const status = podStatuses[Math.floor(Math.random() * podStatuses.length)];
+        switch(status) {
+            case 'Running':
+                podMat.emissiveColor = new BABYLON.Color3(0.5, 0.5, 0.5);
+                break;
+            case 'Pending':
+                podMat.emissiveColor = new BABYLON.Color3(1, 1, 0); 
+                podMat.emissiveIntensity = 1.5; 
+                break;
+            case 'Failed':
+                podMat.emissiveColor = new BABYLON.Color3(1, 0, 0);
+                podMat.emissiveIntensity = 1.5; 
+                break;
+        }
+        
+        pod.material = podMat;
+
+        const glowLayer = new BABYLON.GlowLayer("glow", scene);
+        glowLayer.intensity = 0.8;
+        glowLayer.blurKernelSize = 64;
+        glowLayer.addIncludedOnlyMesh(pod);
+
+        const text = createTextMesh(`Pod ${i+1}`, 0.7, new BABYLON.Vector3(0, -0.8, 0), scene); 
+        text.parent = pod;
+
+        pod.podInfo = {
+            name: `Pod-${i+1}`,
+            status: status,
+            namespace: namespaceName,
+            creationTimestamp: new Date(Date.now() - Math.random() * 10000000000).toISOString(),
+            ip: `10.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`,
+            nodeName: `Node-${Math.floor(Math.random() * 5) + 1}`,
+            restarts: Math.floor(Math.random() * 5),
+            cpuUsage: `${(Math.random() * 100).toFixed(2)}m`,
+            memoryUsage: `${(Math.random() * 512).toFixed(2)}Mi`,
+            containers: Math.floor(Math.random() * 3) + 1
+        };
+        
+        pod.parent = podGroup;
+        pods.push(pod);
+    }
+
+    return podGroup;
+}
+
+function showDetails(object) {
+    const detailsPanel = document.getElementById('details');
+    if (currentLevel === 'pods' && object.podInfo) {
+        detailsPanel.innerHTML = `
+            <h3>KubeBridge - ${object.podInfo.name}</h3>
+            <p>Type: Pod</p>
+            <p>Status: ${object.podInfo.status}</p>
+            <p>Namespace: ${object.podInfo.namespace}</p>
+            <p>Created: ${object.podInfo.creationTimestamp}</p>
+            <p>IP: ${object.podInfo.ip}</p>
+            <p>Node: ${object.podInfo.nodeName}</p>
+            <p>Restarts: ${object.podInfo.restarts}</p>
+            <p>CPU Usage: ${object.podInfo.cpuUsage}</p>
+            <p>Memory Usage: ${object.podInfo.memoryUsage}</p>
+            <p>Containers: ${object.podInfo.containers}</p>
+        `;
+    } else {
+        detailsPanel.innerHTML = `
+            <h3>${object.name}</h3>
+            <p>Type: ${currentLevel.slice(0, -1)}</p>
+            <p>Children: ${object.getChildren().length}</p>
+        `;
+    }
+    detailsPanel.style.display = 'block';
+}
+
+function drillDown(object) {
+    let parent = object;
+    while (parent.parent && parent.parent !== scene) {
+        parent = parent.parent;
+    }
+
+    showDetails(parent);
+
+    const animation = new BABYLON.Animation("scaleAnimation", "scaling", 60, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+    const keys = []; 
+    keys.push({ frame: 0, value: object.scaling.clone() });
+    keys.push({ frame: 20, value: object.scaling.multiplyByFloats(1.5, 1.5, 1.5) });
+    animation.setKeys(keys);
+    object.animations = [animation];
+    scene.beginAnimation(object, 0, 20, false);
+    
+    switch(currentLevel) {
+        case 'clusters':
+            clusters.forEach(cluster => cluster.dispose());
+            clusters = [];
+            const nodeGroup = createNodes(parent.name, scene);
+            scene.addMesh(nodeGroup);
+            currentLevel = 'nodes';
+            breadcrumb = [parent.name];
+            break;
+        case 'nodes':
+            nodes.forEach(node => node.dispose());
+            nodes = [];
+            const namespaceGroup = createNamespaces(parent.name, scene);
+            scene.addMesh(namespaceGroup);
+            currentLevel = 'namespaces';
+            breadcrumb.push(parent.name);
+            break;
+        case 'namespaces':
+            namespaces.forEach(namespace => namespace.dispose());
+            namespaces = [];
+            const podGroup = createPods(parent.name, scene);
+            scene.addMesh(podGroup);
+            currentLevel = 'pods';
+            breadcrumb.push(parent.name);
+            break;
+        case 'pods':
+            break;
+    }
+
+    updateBreadcrumb();
+}
+
+function resetView() {
+    scene.meshes.slice().forEach(mesh => mesh.dispose());
+    clusters = [];
+    nodes = [];
+    namespaces = [];
+    pods = [];
+    createClusters(scene);
+
+    currentLevel = 'clusters';
+    breadcrumb = [];
+    updateBreadcrumb();
+}
+
+function updateBreadcrumb() {
+    const breadcrumbDiv = document.getElementById('breadcrumb');
+    const levels = ['Overview', 'Cluster', 'Node', 'Namespace', 'Pod'];
+    const currentLevelIndex = levels.indexOf(currentLevel.slice(0, -1).charAt(0).toUpperCase() + currentLevel.slice(0, -1).slice(1));
+    
+    breadcrumbDiv.innerHTML = levels.map((item, index) => 
+        `<span class="breadcrumb-item" onclick="navigateTo(${index - 1})">${item}</span>`
+    ).join(' > ');
+
+    if (currentLevelIndex >= 0) {
+        breadcrumbDiv.children[currentLevelIndex].style.color = '#ffffff';
+    }
+}
+
+function navigateTo(index) {
+    if (index < 0) {
+        resetView();
+    } else {
+        while (breadcrumb.length > index + 1) {
+            breadcrumb.pop();
+        }
+        resetToLevel(index);
+    }
+}
+
+function resetToLevel(level) {
+    scene.meshes.slice().forEach(mesh => mesh.dispose());
+    clusters = [];
+    nodes = [];
+    namespaces = [];
+    pods = [];
+
+    let objectToZoom;
+
+    switch(level) {
+        case -1: 
+        case 0: 
+            createClusters(scene);
+            currentLevel = 'clusters';
+            objectToZoom = scene;
+            break;
+        case 1: 
+            objectToZoom = createNodes(breadcrumb[0], scene);
+            scene.addMesh(objectToZoom);
+            currentLevel = 'nodes';
+            break;
+        case 2: 
+            objectToZoom = createNamespaces(breadcrumb[1], scene);
+            scene.addMesh(objectToZoom);
+            currentLevel = 'namespaces';
+            break;
+        case 3: 
+            objectToZoom = createPods(breadcrumb[2], scene);
+            scene.addMesh(objectToZoom);
+            currentLevel = 'pods';
+            break;
+    }
+
+    updateBreadcrumb();
+}
+
+function updateTextScale() {
+    scene.meshes.forEach(mesh => {
+        if (mesh.name.startsWith("textPlane")) {
+            const distance = BABYLON.Vector3.Distance(mesh.position, camera.position);
+            const scale = Math.max(0.5, Math.min(1.5, 8 / distance));  
+            mesh.scaling = new BABYLON.Vector3(scale, scale, 1);
+        }
+    });
+}
+
+particlesJS("particles-js", {
+  particles: {
+    number: {
+      value: 200,
+      density: {
+        enable: true,
+        value_area: 800
+      }
+    },
+    color: {
+      value: ["#00ff99", "#0066ff", "#ff0066"]
+    },
+    shape: {
+      type: ["circle", "triangle", "edge"],
+      stroke: {
+        width: 0,
+        color: "#000000"
+      }
+    },
+    opacity: {
+      value: 0.6,
+      random: true,
+      anim: {
+        enable: true,
+        speed: 1,
+        opacity_min: 0.3,
+        sync: false
+      }
+    },
+    size: {
+      value: 3,
+      random: true,
+      anim: {
+        enable: true,
+        speed: 2,
+        size_min: 0.5,
+        sync: false
+      }
+    },
+    line_linked: {
+      enable: false
+    },
+    move: {
+      enable: true,
+      speed: 1.5,
+      direction: "none",
+      random: true,
+      straight: false,
+      out_mode: "out",
+      bounce: false,
+    }
+  },
+  interactivity: {
+    detect_on: "canvas",
+    events: {
+      onhover: {
+        enable: true,
+        mode: ["grab", "bubble"]
+      },
+      onclick: {
+        enable: true,
+        mode: "repulse"
+      },
+      resize: true
+    },
+    modes: {
+      grab: {
+        distance: 200,
+        line_linked: {
+          opacity: 1
+        }
+      },
+      bubble: {
+        distance: 200,
+        size: 4,
+        duration: 1,
+        opacity: 0.8,
+        speed: 3
+      },
+      repulse: {
+        distance: 150,
+        duration: 0.4
+      }
+    }
+  },
+  retina_detect: true
+});
+
+document.getElementById('resetView').addEventListener('click', resetView);
+
+window.addEventListener('DOMContentLoaded', init);
+</script>
+</body></html>
