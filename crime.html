@@ -87,7 +87,7 @@
   <!-- Script -->
   <script>
     const map = L.map('map').setView([52.629729, -1.131592], 13);
-
+    
     // Add OpenStreetMap tiles
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
@@ -112,91 +112,91 @@
       'other-crime': '#800000',
     };
 
-    // Create a legend
-    const legend = L.control({ position: 'topright' });
-
-    legend.onAdd = function () {
-      const div = L.DomUtil.create('div', 'legend');
-      div.innerHTML = '<h4>Crime Categories</h4>';
-      for (let category in categoryColors) {
-        div.innerHTML += `
-          <div>
-            <span style="background:${categoryColors[category]}"></span>${category
-          .replace(/-/g, ' ')
-          .toUpperCase()}
-          </div>
-        `;
-      }
-      return div;
-    };
-
-    legend.addTo(map);
-
     const loader = document.getElementById('loader');
 
-    let markersGroup = L.layerGroup().addTo(map);
     let clickMarkersGroup = L.layerGroup().addTo(map);
+    let lastLat = map.getCenter().lat;
+    let lastLng = map.getCenter().lng;
 
-    function fetchCrimeData(date, lat, lng) {
+    // Create a new function to fetch and display crime data at a point within 1km radius
+    function fetchCrimeDataAtPoint(date, lat, lng) {
       loader.style.display = 'block';
-      markersGroup.clearLayers();
-
+      clickMarkersGroup.clearLayers(); // Clear previous markers
+    
+      // Calculate the bounding box for a 1km radius around the point
+      const centerLat = lat;
+      const centerLng = lng;
+    
+      // Approximate 1km in degrees
+      const deltaLat = 1 / 111; // ~0.009 degrees latitude per km
+      const deltaLng = 1 / (111 * Math.cos((centerLat * Math.PI) / 180)); // Adjust for longitude
+    
+      // Create bounding box coordinates
+      const lat1 = centerLat + deltaLat;
+      const lng1 = centerLng - deltaLng;
+      const lat2 = centerLat + deltaLat;
+      const lng2 = centerLng + deltaLng;
+      const lat3 = centerLat - deltaLat;
+      const lng3 = centerLng + deltaLng;
+      const lat4 = centerLat - deltaLat;
+      const lng4 = centerLng - deltaLng;
+    
+      const poly = `${lat1},${lng1}:${lat2},${lng2}:${lat3},${lng3}:${lat4},${lng4}`;
+    
+      // Fetch crime data within the polygon
       fetch(
-        `https://data.police.uk/api/crimes-street/all-crime?lat=${lat}&lng=${lng}&date=${date}`
+        `https://data.police.uk/api/crimes-street/all-crime?poly=${poly}&date=${date}`
       )
         .then((response) => response.json())
         .then((data) => {
-          // Group crimes by location
-          const crimesByLocation = {};
-          data.forEach((crime) => {
-            const key = `${crime.location.latitude},${crime.location.longitude}`;
-            if (!crimesByLocation[key]) {
-              crimesByLocation[key] = {
-                lat: crime.location.latitude,
-                lng: crime.location.longitude,
-                crimes: [],
-              };
-            }
-            crimesByLocation[key].crimes.push(crime);
-          });
+          clickMarkersGroup.clearLayers();
+          lastLat = lat; // Update the last known location
+          lastLng = lng;
 
-          // Add markers to the map
-          for (let key in crimesByLocation) {
-            const location = crimesByLocation[key];
+          if (data.length > 0) {
             const crimeCounts = {};
-
-            location.crimes.forEach((crime) => {
+    
+            data.forEach((crime) => {
               if (!crimeCounts[crime.category]) {
                 crimeCounts[crime.category] = 0;
               }
               crimeCounts[crime.category]++;
             });
-
+    
             const pieData = Object.keys(crimeCounts).map((category) => ({
               category,
               count: crimeCounts[category],
             }));
-
-            // Create a pie chart icon
+    
+            // Create a pie chart icon at the location
             const icon = L.divIcon({
               html: createPieChart(pieData),
               className: '',
-              iconSize: [30, 30],
-              iconAnchor: [15, 15],
+              iconSize: [50, 50],
+              iconAnchor: [25, 25],
             });
-
-            const marker = L.marker([location.lat, location.lng], { icon }).addTo(
-              markersGroup
-            );
-
+    
+            const marker = L.marker([lat, lng], { icon }).addTo(clickMarkersGroup);
+    
+            // Calculate total number of crimes
+            const totalCrimes = data.length;
+    
             // Create popup content
-            let popupContent = `<b>${location.crimes[0].location.street.name}</b><br>`;
+            let popupContent = `<div class="popup-content"><b>Total Crimes: ${totalCrimes}</b><br>`;
             for (let category in crimeCounts) {
               popupContent += `${category.replace(/-/g, ' ')}: ${crimeCounts[category]}<br>`;
             }
-            marker.bindPopup(popupContent);
+            popupContent += '</div>';
+            marker.bindPopup(popupContent).openPopup();
+    
+            loader.style.display = 'none';
+          } else {
+            L.popup()
+              .setLatLng([lat, lng])
+              .setContent('No crimes reported within 1km of this location.')
+              .openOn(map);
+            loader.style.display = 'none';
           }
-          loader.style.display = 'none';
         })
         .catch((error) => {
           console.error('Error fetching crime data:', error);
@@ -208,27 +208,27 @@
     function createPieChart(data) {
       const total = data.reduce((sum, item) => sum + item.count, 0);
       let cumulativePercent = 0;
-
+    
       const svgParts = data.map((slice) => {
         const [startX, startY] = getCoordinatesForPercent(cumulativePercent);
-
+    
         cumulativePercent += slice.count / total;
-
+    
         const [endX, endY] = getCoordinatesForPercent(cumulativePercent);
-
+    
         const largeArcFlag = slice.count / total > 0.5 ? 1 : 0;
-
+    
         const pathData = [
           `M 15 15`,
           `L ${startX} ${startY}`,
           `A 15 15 0 ${largeArcFlag} 1 ${endX} ${endY}`,
           `Z`,
         ].join(' ');
-
+    
         return `<path d="${pathData}" fill="${categoryColors[slice.category] ||
           '#000'}"></path>`;
       });
-
+    
       return `
         <svg width="30" height="30" viewBox="0 0 30 30">
           ${svgParts.join('')}
@@ -243,102 +243,21 @@
       return [x, y];
     }
 
-    // Initial fetch to use the map's center coordinates
+    // At page load, fetch and display crime data at the center of the map
     const initialDate = '2023-01';
     const initialCenter = map.getCenter();
-    fetchCrimeData(initialDate, initialCenter.lat, initialCenter.lng);
+    fetchCrimeDataAtPoint(initialDate, initialCenter.lat, initialCenter.lng);
 
-    // Update the date when changed
-    document.getElementById('date').addEventListener('change', function () {
-      const selectedDate = this.value;
-      const center = map.getCenter();
-      fetchCrimeData(selectedDate, center.lat, center.lng);
-    });
-
-    // Map click event to fetch data within 1km radius
+    // Update the map click event to fetch and display crime data at the clicked location
     map.on('click', function (e) {
       const selectedDate = document.getElementById('date').value;
-      loader.style.display = 'block';
+      fetchCrimeDataAtPoint(selectedDate, e.latlng.lat, e.latlng.lng);
+    });
 
-      clickMarkersGroup.clearLayers(); // Clear previous click markers
-
-      // Calculate the bounding box for a 1km radius around the clicked point
-      const centerLat = e.latlng.lat;
-      const centerLng = e.latlng.lng;
-
-      // Approximate 1km in degrees
-      const deltaLat = 1 / 111; // ~0.009 degrees latitude per km
-      const deltaLng = 1 / (111 * Math.cos((centerLat * Math.PI) / 180)); // Adjust for longitude
-
-      // Create bounding box coordinates
-      const lat1 = centerLat + deltaLat;
-      const lng1 = centerLng - deltaLng;
-      const lat2 = centerLat + deltaLat;
-      const lng2 = centerLng + deltaLng;
-      const lat3 = centerLat - deltaLat;
-      const lng3 = centerLng + deltaLng;
-      const lat4 = centerLat - deltaLat;
-      const lng4 = centerLng - deltaLng;
-
-      const poly = `${lat1},${lng1}:${lat2},${lng2}:${lat3},${lng3}:${lat4},${lng4}`;
-
-      // Fetch crime data within the polygon
-      fetch(
-        `https://data.police.uk/api/crimes-street/all-crime?poly=${poly}&date=${selectedDate}`
-      )
-        .then((response) => response.json())
-        .then((data) => {
-          clickMarkersGroup.clearLayers();
-
-          if (data.length > 0) {
-            const crimeCounts = {};
-
-            data.forEach((crime) => {
-              if (!crimeCounts[crime.category]) {
-                crimeCounts[crime.category] = 0;
-              }
-              crimeCounts[crime.category]++;
-            });
-
-            const pieData = Object.keys(crimeCounts).map((category) => ({
-              category,
-              count: crimeCounts[category],
-            }));
-
-            // Create a pie chart icon at the clicked location
-            const icon = L.divIcon({
-              html: createPieChart(pieData),
-              className: '',
-              iconSize: [50, 50],
-              iconAnchor: [25, 25],
-            });
-
-            const marker = L.marker([centerLat, centerLng], { icon }).addTo(clickMarkersGroup);
-
-            // Calculate total number of crimes
-            const totalCrimes = data.length;
-
-            // Create popup content
-            let popupContent = `<div class="popup-content"><b>Total Crimes: ${totalCrimes}</b><br>`;
-            for (let category in crimeCounts) {
-              popupContent += `${category.replace(/-/g, ' ')}: ${crimeCounts[category]}<br>`;
-            }
-            popupContent += '</div>';
-            marker.bindPopup(popupContent).openPopup();
-
-            loader.style.display = 'none';
-          } else {
-            L.popup()
-              .setLatLng(e.latlng)
-              .setContent('No crimes reported within 1km of this location.')
-              .openOn(map);
-            loader.style.display = 'none';
-          }
-        })
-        .catch((error) => {
-          console.error('Error fetching crime data:', error);
-          loader.style.display = 'none';
-        });
+    // Update the date picker event to refresh the pie chart at the last known location
+    document.getElementById('date').addEventListener('change', function () {
+      const selectedDate = this.value;
+      fetchCrimeDataAtPoint(selectedDate, lastLat, lastLng);
     });
   </script>
 </body>
