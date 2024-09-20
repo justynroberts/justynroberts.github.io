@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Earthquakes on OpenStreetMap with Time Slider</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Leaflet CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+  <!-- Leaflet MarkerCluster Plugin CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"
+  />
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"
+  />
+  <style>
+    /* Set the height of the map */
+    #map {
+      height: 100vh;
+      margin: 0;
+    }
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+    /* Control styles */
+    #controls {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.8);
+      padding: 10px 20px;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+    }
+    #monthSlider {
+      margin-left: 10px;
+      margin-right: 10px;
+    }
+    #selectedMonth {
+      font-weight: bold;
+      font-size: 1.2em;
+    }
+    /* Legend styles */
+    .legend {
+      background: rgba(255,255,255,0.8);
+      padding: 10px;
+      line-height: 18px;
+      color: #555;
+      position: absolute;
+      bottom: 30px;
+      left: 10px;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+    .legend-title {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .legend-scale ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .legend-scale ul li {
+      display: flex;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+    .legend-scale ul li span {
+      margin-left: 5px;
+    }
+    .legend i {
+      width: 18px;
+      height: 18px;
+      display: inline-block;
+      margin-right: 5px;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <div id="controls">
+    <label for="monthSlider">Select Month: </label>
+    <input type="range" id="monthSlider" min="1" max="12" value="3">
+    <span id="selectedMonth">March</span>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  ></script>
+  <!-- Leaflet MarkerCluster Plugin -->
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+  <!-- Anime.js for Animations -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+  <script>
+    // Initialize the map
+    var map = L.map('map').setView([20, 0], 2);
+
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    }).addTo(map);
+
+    // Initialize marker cluster group
+    var markers = L.markerClusterGroup();
+
+    // LayerGroup to hold earthquake layers
+    var earthquakeLayerGroup = L.layerGroup().addTo(map);
+
+    // Define a function to get color based on magnitude
+    function getColor(magnitude) {
+      return magnitude >= 8 ? '#800026' :
+             magnitude >= 7 ? '#BD0026' :
+             magnitude >= 6 ? '#E31A1C' :
+             magnitude >= 5 ? '#FC4E2A' :
+             magnitude >= 4 ? '#FD8D3C' :
+             magnitude >= 3 ? '#FEB24C' :
+             magnitude >= 2 ? '#FED976' :
+                              '#FFEDA0';
+    }
+
+    // Function to load earthquake data for a given month
+    function loadEarthquakes(month) {
+      // Clear previous earthquakes
+      earthquakeLayerGroup.clearLayers();
+      markers.clearLayers();
+
+      var year = 2023; // Fixed year for simplicity
+      var startDate = new Date(year, month - 1, 1);
+      var endDate = new Date(year, month, 0); // Last day of the month
+      var startTime = startDate.toISOString().split('T')[0];
+      var endTime = endDate.toISOString().split('T')[0];
+
+      var url =
+        'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson' +
+        '&starttime=' +
+        startTime +
+        '&endtime=' +
+        endTime +
+        '&minmagnitude=2';
+
+      // Fetch earthquake data
+      fetch(url)
+        .then((response) => response.json())
+        .then((data) => {
+          var geojsonLayer = L.geoJSON(data, {
+            pointToLayer: function (feature, latlng) {
+              var magnitude = feature.properties.mag;
+              var color = getColor(magnitude);
+              var marker = L.circleMarker(latlng, {
+                radius: magnitude * 2,
+                fillColor: color,
+                color: '#000',
+                weight: 1,
+                opacity: 1,
+                fillOpacity: 0.8,
+                className: 'earthquake-marker'
+              });
+              return marker;
+            },
+            onEachFeature: function (feature, layer) {
+              const time = new Date(feature.properties.time);
+              layer.bindPopup(
+                `<strong>${feature.properties.place}</strong><br/>
+                Magnitude: ${feature.properties.mag}<br/>
+                Time: ${time.toUTCString()}`
+              );
+            },
+          });
+          markers.addLayer(geojsonLayer);
+          earthquakeLayerGroup.addLayer(markers);
+          // Animate markers
+          animateMarkers();
+        })
+        .catch((error) => {
+          console.error('Error fetching earthquake data:', error);
+        });
+    }
+
+    // Function to animate markers
+    function animateMarkers() {
+      var svgElements = document.querySelectorAll('.earthquake-marker');
+
+      svgElements.forEach(function(elem) {
+        anime({
+          targets: elem,
+          scale: [0, 1],
+          easing: 'easeOutElastic(1, .5)',
+          duration: 1000,
+        });
+      });
+    }
+
+    // Initialize with default month (March)
+    var monthSlider = document.getElementById('monthSlider');
+    var selectedMonthLabel = document.getElementById('selectedMonth');
+    var monthNames = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+
+    function updateMonth() {
+      var month = parseInt(monthSlider.value);
+      selectedMonthLabel.textContent = monthNames[month - 1];
+      loadEarthquakes(month);
+    }
+
+    monthSlider.addEventListener('input', updateMonth);
+    updateMonth(); // Initial load
+
+    // Create Legend
+    var legend = L.control({position: 'bottomleft'});
+
+    legend.onAdd = function (map) {
+
+      var div = L.DomUtil.create('div', 'legend'),
+          grades = [2, 3, 4, 5, 6, 7, 8],
+          labels = [];
+
+      div.innerHTML += '<div class="legend-title">Magnitude</div>';
+      // Loop through magnitude intervals and generate a label with a colored square for each interval
+      for (var i = 0; i < grades.length; i++) {
+          div.innerHTML +=
+              '<div><i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
+              grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '</div>' : '+');
+      }
+
+      return div;
+    };
+
+    legend.addTo(map);
+
+    // Add a map attribution for USGS data
+    map.attributionControl.addAttribution('Earthquake data &copy; <a href="https://earthquake.usgs.gov/">USGS</a>');
+
+  </script>
+</body>
+</html>
+```
+
+---
+
+**Changes and Enhancements:**
+
+1. **Ensured Only Earthquakes from the Selected Month are Displayed:**
+
+   - **Clearing Previous Data:**
+     - The `earthquakeLayerGroup.clearLayers();` and `markers.clearLayers();` methods are called at the beginning of the `loadEarthquakes` function to remove all existing earthquake markers before adding new ones.
+     - This guarantees that only the earthquakes from the selected month are displayed.
+
+2. **Made the Visualization Cooler:**
+
+   - **Marker Clustering:**
+     - Integrated the [Leaflet.markercluster](https://github.com/Leaflet/Leaflet.markercluster) plugin to cluster markers in areas with many earthquakes.
+     - This improves the map's readability and performance, especially in regions with high earthquake density.
+
+   - **Animations with Anime.js:**
+     - Added [Anime.js](https://animejs.com/) library via CDN for smooth animations.
+     - Implemented an animation that causes markers to scale from 0 to their full size with an elastic easing effect when they are added to the map.
+
+     ```javascript
+     function animateMarkers() {
+       var svgElements = document.querySelectorAll('.earthquake-marker');
+
+       svgElements.forEach(function(elem) {
+         anime({
+           targets: elem,
+           scale: [0, 1],
+           easing: 'easeOutElastic(1, .5)',
+           duration: 1000,
+         });
+       });
+     }
+     ```
+
+     - The animation is triggered after the markers are added to the map.
+
+   - **Improved UI Styling:**
+     - Adjusted the controls styling to make them more visually appealing.
+       - Positioned the controls overlay on top of the map with a semi-transparent background.
+       - Centered the controls and styled the labels for a cleaner look.
+     - Enhanced the slider and label to be more prominent.
+
+   - **Legend Positioning and Styling:**
+     - Styled the legend to be consistent with the new UI theme.
+     - Used semi-transparent backgrounds to ensure the map remains visible underneath.
+
+3. **Additional Enhancements:**
+
+   - **Attribution to USGS:**
+     - Added an attribution line to acknowledge the source of earthquake data.
+
+     ```javascript
+     map.attributionControl.addAttribution('Earthquake data &copy; <a href="https://earthquake.usgs.gov/">USGS</a>');
+     ```
+
+   - **Responsive Design:**
+     - Ensured that the map and controls display properly on different screen sizes.
+
+   - **Improved Clarity in Legend:**
+     - Adjusted the legend labels for better readability.
+
+---
+
+**Usage Instructions:**
+
+- **Selecting a Month:**
+  - Use the slider at the top center to choose a month. The map will automatically update to show **only** the earthquakes that occurred during that month.
+  - Previous month's data is cleared when a new month is selected, ensuring that only the relevant data is displayed.
+
+- **Interacting with the Map:**
+  - **Clusters:**
+    - Earthquake markers are clustered in areas with multiple events. Click on a cluster to zoom in and see individual events.
+  - **Animated Markers:**
+    - Markers animate into view when loaded, adding a dynamic effect to the map.
+  - **Popups:**
+    - Click on individual markers to view detailed information about each earthquake, including location, magnitude, and time.
+
+- **Understanding the Legend:**
+  - The legend in the bottom-left corner explains the color coding of the earthquake markers based on their magnitude.
+  - Colors range from light yellow for lower magnitudes to dark red for higher magnitudes.
+
+---
+
+**Potential Further Enhancements:**
+
+- **Time-lapse Animation:**
+  - Implement a play button to animate the earthquakes over the months, creating a time-lapse visualization.
+- **Additional Filters:**
+  - Allow users to filter earthquakes by depth or other properties.
+- **Heatmap Layer:**
+  - Add an optional heatmap layer to visualize the density of earthquakes.
+- **Real-time Data:**
+  - Include options to view the most recent earthquakes or data updated in real-time.
+
+---
+
+**Troubleshooting:**
+
+- **CORS Issues:**
+  - If CORS errors occur when fetching data from the USGS API, consider using a proxy or setting appropriate headers if you have control over the server.
+- **Internet Connection:**
+  - Ensure a stable internet connection, as the application relies on external data and libraries.
+- **Browser Compatibility:**
+  - The application is designed to work on modern browsers. If issues arise, try updating your browser or testing on a different one.
+
+---
+
+**Enjoy Exploring Earthquake Data with Enhanced Visualizations!**
+
+Feel free to let me know if you need further adjustments or additional features.
