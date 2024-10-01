@@ -3,7 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xQq1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <!-- Updated Bootstrap CDN to official Bootstrap CDN with correct integrity -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <title>Triggerincident.com</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
@@ -798,7 +799,6 @@
                 }
             ]
         };
-
         const categoriesList = document.getElementById('categories');
         const cardContainer = document.getElementById('cardContainer');
         const routingKeyInput = document.getElementById('routingKey');
@@ -879,38 +879,62 @@
             }
         };
 
-        // Trigger function
+        // Trigger function with fixes
         triggerBtn.onclick = () => {
-            const routingKey = routingKeyInput.value;
+            const routingKey = routingKeyInput.value.trim();
             if (!routingKey) {
                 alert('Please enter a routing key');
                 return;
             }
 
-            const selectedPayloads = Array.from(document.querySelectorAll('.card'))
-                .filter(card => card.querySelector('input[type="checkbox"]').checked)
-                .map(card => payloads[currentCategory][Array.from(card.parentNode.children).indexOf(card)].payload);
+            const selectedCards = Array.from(document.querySelectorAll('.card'))
+                .filter(card => card.querySelector('input[type="checkbox"]').checked);
+
+            if (selectedCards.length === 0) {
+                alert('Please select at least one event to trigger.');
+                return;
+            }
+
+            const selectedPayloads = selectedCards.map(card => {
+                const index = Array.from(card.parentNode.children).indexOf(card);
+                // Deep clone the payload to avoid mutating the original
+                const payloadClone = JSON.parse(JSON.stringify(payloads[currentCategory][index].payload));
+                payloadClone.routing_key = routingKey; // Replace "DYNAMIC" with actual routing key
+                return payloadClone;
+            });
 
             selectedPayloads.forEach(payload => {
                 fetch('https://events.pagerduty.com/v2/enqueue', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'X-Routing-Key': routingKey
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(payload)
                 })
-                .then(response => response.json())
-                .then(data => console.log('Success:', data))
-                .catch((error) => console.error('Error:', error));
+                .then(response => {
+                    if (response.ok) {
+                        return response.json().then(data => {
+                            console.log('Success:', data);
+                        });
+                    } else {
+                        // Attempt to read as text if not JSON
+                        return response.text().then(text => {
+                            throw new Error(text || 'Unknown error occurred');
+                        });
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error.message);
+                    alert(`Failed to trigger event: ${error.message}`);
+                });
             });
 
-            alert(`Triggering ${selectedPayloads.length} events`);
+            alert(`Triggering ${selectedPayloads.length} event(s)`);
         };
 
         // Store routing key in cookie
         function setRoutingKeyCookie(value) {
-            document.cookie = `routingKey=${value}; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/; SameSite=Strict`;
+            document.cookie = `routingKey=${encodeURIComponent(value)}; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/; SameSite=Strict`;
         }
 
         // Get routing key from cookie
@@ -919,11 +943,8 @@
             const decodedCookie = decodeURIComponent(document.cookie);
             const cookieArray = decodedCookie.split(';');
             for(let i = 0; i < cookieArray.length; i++) {
-                let cookie = cookieArray[i];
-                while (cookie.charAt(0) == ' ') {
-                    cookie = cookie.substring(1);
-                }
-                if (cookie.indexOf(name) == 0) {
+                let cookie = cookieArray[i].trim();
+                if (cookie.indexOf(name) === 0) {
                     return cookie.substring(name.length, cookie.length);
                 }
             }
