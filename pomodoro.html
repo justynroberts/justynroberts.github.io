@@ -1,0 +1,203 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pomodoro Timer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Stylesheet -->
+    <style>
+        body {
+            margin: 0;
+            background-color: #000;
+            color: #fff;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        .background {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            z-index: -1;
+        }
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+            width: 100%;
+            max-width: 400px;
+        }
+        .timer {
+            position: relative;
+            margin-bottom: 40px;
+        }
+        .timer svg {
+            width: 100%;
+            height: auto;
+        }
+        .timer-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4rem;
+            font-weight: 700;
+            color: #fff;
+        }
+        .controls, .modes {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .controls button, .modes button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #fff;
+            padding: 15px 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 30px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            flex: 1 1 100px;
+            max-width: 120px;
+            backdrop-filter: blur(10px);
+        }
+        .controls button:hover, .modes button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-5px);
+        }
+        .modes button.active {
+            background: rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        @media (min-width: 600px) {
+            .controls button, .modes button {
+                flex: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+    <div class="container">
+        <div class="modes">
+            <button id="pomodoro" class="active">Pomodoro</button>
+            <button id="short-break">Short Break</button>
+            <button id="long-break">Long Break</button>
+        </div>
+        <div class="timer" id="timer">
+            <svg viewBox="0 0 200 200">
+                <circle cx="100" cy="100" r="90" stroke="#333" stroke-width="10" fill="none"/>
+                <circle cx="100" cy="100" r="90" stroke="#fff" stroke-width="10" fill="none" stroke-dasharray="565.48" stroke-dashoffset="0" transform="rotate(-90 100 100)" id="progress"/>
+            </svg>
+            <div class="timer-text" id="timer-text">25:00</div>
+        </div>
+        <div class="controls">
+            <button id="start">Start</button>
+            <button id="pause">Pause</button>
+            <button id="reset">Reset</button>
+        </div>
+    </div>
+    <!-- JavaScript -->
+    <script>
+        const timerText = document.getElementById('timer-text');
+        const progressCircle = document.getElementById('progress');
+        const startButton = document.getElementById('start');
+        const pauseButton = document.getElementById('pause');
+        const resetButton = document.getElementById('reset');
+        const pomodoroButton = document.getElementById('pomodoro');
+        const shortBreakButton = document.getElementById('short-break');
+        const longBreakButton = document.getElementById('long-break');
+
+        let totalTime = 25 * 60;
+        let timeLeft = totalTime;
+        let timerInterval;
+        let isRunning = false;
+
+        function updateTimer() {
+            const minutes = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+            const seconds = (timeLeft % 60).toString().padStart(2, '0');
+            timerText.textContent = `${minutes}:${seconds}`;
+
+            const progress = (timeLeft / totalTime) * 565.48;
+            progressCircle.style.strokeDashoffset = 565.48 - progress;
+        }
+
+        function startTimer() {
+            if (isRunning) return;
+            isRunning = true;
+            timerInterval = setInterval(() => {
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    isRunning = false;
+                    // Add notification or sound here
+                } else {
+                    timeLeft--;
+                    updateTimer();
+                }
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            clearInterval(timerInterval);
+            isRunning = false;
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            isRunning = false;
+            timeLeft = totalTime;
+            updateTimer();
+        }
+
+        function setMode(mode) {
+            pomodoroButton.classList.remove('active');
+            shortBreakButton.classList.remove('active');
+            longBreakButton.classList.remove('active');
+
+            switch(mode) {
+                case 'pomodoro':
+                    totalTime = 25 * 60;
+                    pomodoroButton.classList.add('active');
+                    break;
+                case 'short':
+                    totalTime = 5 * 60;
+                    shortBreakButton.classList.add('active');
+                    break;
+                case 'long':
+                    totalTime = 15 * 60;
+                    longBreakButton.classList.add('active');
+                    break;
+            }
+            timeLeft = totalTime;
+            resetTimer();
+        }
+
+        startButton.addEventListener('click', startTimer);
+        pauseButton.addEventListener('click', pauseTimer);
+        resetButton.addEventListener('click', resetTimer);
+
+        pomodoroButton.addEventListener('click', () => setMode('pomodoro'));
+        shortBreakButton.addEventListener('click', () => setMode('short'));
+        longBreakButton.addEventListener('click', () => setMode('long'));
+
+        // Ensure the SVG circle animation works on initial load
+        updateTimer();
+    </script>
+</body>
+</html>
