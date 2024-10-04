@@ -1,20 +1,4 @@
-<html><head><base href="https://joyful-phoenix-18fcea.netlify.app/"><style type="text/css">@font-face { font-family: Proxima Nova; src: url("https://litmus.com/fonts/Emails/proximanova-regular-webfont.eot"); src: url("https://litmus.com/fonts/Emails/proximanova-regular-webfont.eot?#iefix") format("embedded-opentype"), url("https://litmus.com/fonts/Emails/proximanova-regular-webfont.woff") format("woff"), url("https://litmus.com/fonts/Emails/proximanova-regular-webfont.ttf") format("truetype"), url("https://litmus.com/fonts/Emails/proximanova-regular-webfont.svg#proxima_nova_rgregular") format("svg"); font-weight: 400; font-style: normal; }
-@font-face { font-family: Proxima Nova; src: url("https://litmus.com/fonts/Emails/proximanova-bold-webfont.eot"); src: url("https://litmus.com/fonts/Emails/proximanova-bold-webfont.eot?#iefix") format("embedded-opentype"), url("https://litmus.com/fonts/Emails/proximanova-bold-webfont.woff") format("woff"), url("https://litmus.com/fonts/Emails/proximanova-bold-webfont.ttf") format("truetype"), url("https://litmus.com/fonts/Emails/proximanova-bold-webfont.svg#proxima_nova_rgbold") format("svg"); font-weight: 700; font-style: normal; }
-body{margin:0;background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);color:#fff;font-family:Proxima Nova,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;position:relative;overflow-x:hidden}
-.stars{position:fixed;top:0;left:0;width:100%;height:120%;background-image:url("https://assets.website-files.com/5e4b18feebfd930a24cfb637/6011c8b33a9f39b610cd9474_stars.png");background-repeat:repeat;z-index:-2;opacity:.7;background-size:50%;animation:animStar 50s linear infinite}
-@keyframes animStar{0%{transform:translateY(0)}100%{transform:translateY(-100%)}}
-.container{text-align:center;padding:40px;box-sizing:border-box;width:100%;max-width:500px;border-radius:20px;backdrop-filter:blur(20px);background-color:rgba(15,15,24,.8);box-shadow:rgba(0,0,0,.2) 0 7px 29px 0;font-weight:600;position:relative;z-index:99}
-.timer{position:relative;display:flex;align-items:center;justify-content:center;margin-bottom:60px;height:300px}
-svg{width:300px;height:300px;fill:none;stroke-width:10;stroke:#fff}
-.timer-text{position:absolute;font-size:4.5rem;font-weight:700;color:#fff;text-shadow:0 0 20px rgba(10,175,230,1),0 0 20px rgba(10,175,230,0)}
-.controls,.modes{display:flex;justify-content:center;flex-wrap:wrap;gap:15px;margin-bottom:40px}
-.controls button,.modes button{position:relative;overflow:hidden;border-radius:8px;border:0;background:rgba(255,255,255,.1);backdrop-filter:blur(10px);color:#fff;padding:20px 30px;font-size:1.1rem;cursor:pointer;transition:all .2s ease;letter-spacing:2px;text-transform:uppercase;font-weight:600;outline:2px solid transparent}
-.controls button:before,.modes button:before{content:"";position:absolute;top:0;left:0;height:100%;width:0%;background:rgba(255,255,255,.2);z-index:-1;transition:all .35s ease-in-out}
-.controls button:hover,.modes button:hover{box-shadow:0 8px 17px 0 rgba(0,0,0,.2),0 6px 20px 0 rgba(0,0,0,.19);transform:translateY(-2px)}
-.controls button:hover:before,.modes button:hover:before{width:100%}
-.modes button.active{background:rgba(255,255,255,.2);box-shadow:0 8px 17px 0 rgba(0,0,0,.2),0 6px 20px 0 rgba(0,0,0,.19);transform:translateY(-3px);outline-color:rgba(255,255,255,.4)}
-@media screen and (max-width:600px){.container{padding:20px}.timer{height:250px}svg{width:250px;height:250px}.timer-text{font-size:3.5rem}}
-</style>
+<html><head><base href="https://joyful-phoenix-18fcea.netlify.app/"><style type="text/css">@font-face { font-family: Proxima Nova; src: url("https://litmus.com/fonts/Emails/proximanova-regular-webfont.eot"); src: url("https://litmus.com/fonts/Emails/proximanova-regular-webfont.eot?#iefix") format("embedded-opentype"), url("https://litmus.com/fonts/Emails/proximanova-regular-webfont.woff") format("woff"), url("https://litmus.com/fonts/Emails/proximanova-regular-webfont.ttf") format("truetype"), url("https://litmus.com/fonts/Emails/proximanova-regular-webfont.svg#proxima_nova_rgregular") format("svg"); font-weight: 400; font-style: normal; } @font-face { font-family: Proxima Nova; src: url("https://litmus.com/fonts/Emails/proximanova-bold-webfont.eot"); src: url("https://litmus.com/fonts/Emails/proximanova-bold-webfont.eot?#iefix") format("embedded-opentype"), url("https://litmus.com/fonts/Emails/proximanova-bold-webfont.woff") format("woff"), url("https://litmus.com/fonts/Emails/proximanova-bold-webfont.ttf") format("truetype"), url("https://litmus.com/fonts/Emails/proximanova-bold-webfont.svg#proxima_nova_rgbold") format("svg"); font-weight: 700; font-style: normal; } body{margin:0;background:radial-gradient(ellipse at bottom,#1b2735 0%,#090a0f 100%);color:#fff;font-family:Proxima Nova,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;position:relative;overflow-x:hidden} .stars{position:fixed;top:0;left:0;width:100%;height:120%;background-image:url(https://assets.website-files.com/5e4b18feebfd930a24cfb637/6011c8b33a9f39b610cd9474_stars.png);background-repeat:repeat;z-index:-2;opacity:.7;background-size:50%;animation:animStar 50s linear infinite} @keyframes animStar{0%{transform:translateY(0)}100%{transform:translateY(-100%)}} .container{display:flex;text-align:center;padding:40px;box-sizing:border-box;width:100%;max-width:800px;border-radius:20px;backdrop-filter:blur(20px);background-color:rgba(15,15,24,.8);box-shadow:rgba(0,0,0,.2) 0 7px 29px 0;font-weight:600;position:relative;z-index:99} .timer-container{display:flex;flex-direction:column;align-items:center;padding:40px;box-sizing:border-box;width:100%;max-width:800px;border-radius:20px;backdrop-filter:blur(20px);background-color:rgba(15,15,24,.8);box-shadow:rgba(0,0,0,.2) 0 7px 29px 0;font-weight:600;position:relative;z-index:99} .timer{position:relative;display:flex;align-items:center;justify-content:center;margin-bottom:20px; height:300px} svg{width:300px;height:300px;fill:none;stroke-width:10;stroke:#fff} .timer-text{position:absolute;font-size:4.5rem;font-weight:700;color:#fff;text-shadow:0 0 20px rgba(10,175,230,1),0 0 20px rgba(10,175,230,0)} .next-text { margin: 20px 0; font-size: 1.2rem; display: none; } .controls,.modes{display:flex;justify-content:center;flex-wrap:wrap;gap:15px;margin-bottom:40px} .controls button{position:relative;overflow:hidden;border-radius:8px;border:0;background:rgba(255,255,255,.1);backdrop-filter:blur(10px);color:#fff;padding:20px 30px;font-size:1.1rem;cursor:pointer;transition:all .2s ease;letter-spacing:2px;text-transform:uppercase;font-weight:600;outline:2px solid transparent} .controls button:before{content:"";position:absolute;top:0;left:0;height:100%;width:0%;background:rgba(255,255,255,.2);z-index:-1;transition:all .35s ease-in-out} .controls button:hover{box-shadow:0 8px 17px 0 rgba(0,0,0,.2),0 6px 20px 0 rgba(0,0,0,.19);transform:translateY(-2px)} .controls button:hover:before{width:100%} .modes{gap:15px;justify-content:center} .modes button{display:flex;align-items:center;gap:10px;border-radius:8px;background-color:rgba(255,255,255,.1);backdrop-filter:blur(10px);color:#fff;padding:10px 15px;font-size:1rem;border:0;cursor:pointer;transition:all .2s ease;font-weight:600} .modes button:hover{background-color:rgba(255,255,255,.2);box-shadow:0 8px 17px 0 rgba(0,0,0,.2),0 6px 20px 0 rgba(0,0,0,.19);transform:translateY(-2px)} .modes button img{filter:invert(1);width:24px;height:24px} .modes button.active{background-color:rgba(255,255,255,.3)} .hour-view{flex:1;padding:20px;display:none} .hour-stack{position:relative;width:40px;height:240px;background:rgba(255,255,255,.1);border-radius:8px;overflow:hidden;margin-right:20px} .hour-block{position:absolute;bottom:0;left:0;width:100%;background:rgba(255,255,255,.2);transition:height .5s ease-in-out} .hour-text{font-size:0.9rem;text-align:center;padding-left:10px} @media screen and (max-width:600px){.container{flex-direction:column;padding:20px}.timer{height:250px}svg{width:250px;height:250px}.timer-text{font-size:3.5rem}.hour-view{margin-top:40px}}</style>
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -24,25 +8,42 @@ svg{width:300px;height:300px;fill:none;stroke-width:10;stroke:#fff}
 <body>
 <div class="stars"></div>
 <div class="container">
-  <div class="modes">
-    <button id="pomodoro" class="active">Pomodoro</button>
-    <button id="short-break">Short Break</button>  
-    <button id="long-break">Long Break</button>
+  <div class="timer-container">
+    <div class="modes" style="justify-content: center;">
+      <button id="pomodoro" class="active">
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%23ffffff' d='M256 48C141.1 48 48 141.1 48 256s93.1 208 208 208 208-93.1 208-208S370.9 48 256 48zm0 398.7c-105.1 0-190.7-85.5-190.7-190.7 0-105.1 85.5-190.7 190.7-190.7 105.1 0 190.7 85.5 190.7 190.7 0 105.1-85.6 190.7-190.7 190.7z'/%3E%3Cpath fill='%23ffffff' d='M264 128h-16v120h120v-16H264z'/%3E%3C/svg%3E">
+        <span>Pomodoro</span>
+      </button>
+      <button id="short-break">
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%23ffffff' d='M256 48C141.1 48 48 141.1 48 256s93.1 208 208 208 208-93.1 208-208S370.9 48 256 48zm0 398.7c-105.1 0-190.7-85.5-190.7-190.7 0-105.1 85.5-190.7 190.7-190.7 105.1 0 190.7 85.5 190.7 190.7 0 105.1-85.6 190.7-190.7 190.7z'/%3E%3Cpath fill='%23ffffff' d='M264 128h-16v120h-80v16h96z'/%3E%3C/svg%3E">
+        <span>Short Break</span>
+      </button>
+      <button id="long-break">
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%23ffffff' d='M256 48C141.1 48 48 141.1 48 256s93.1 208 208 208 208-93.1 208-208S370.9 48 256 48zm0 398.7c-105.1 0-190.7-85.5-190.7-190.7 0-105.1 85.5-190.7 190.7-190.7 105.1 0 190.7 85.5 190.7 190.7 0 105.1-85.6 190.7-190.7 190.7z'/%3E%3Cpath fill='%23ffffff' d='M264 128h-16v160H136v16h128z'/%3E%3C/svg%3E">
+        <span>Long Break</span>  
+      </button>
+      <button id="hour">
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%23ffffff' d='M256 48C141.1 48 48 141.1 48 256s93.1 208 208 208 208-93.1 208-208S370.9 48 256 48zm0 398.7c-105.1 0-190.7-85.5-190.7-190.7 0-105.1 85.5-190.7 190.7-190.7 105.1 0 190.7 85.5 190.7 190.7 0 105.1-85.6 190.7-190.7 190.7z'/%3E%3Cpath fill='%23ffffff' d='M316.2 312.8L256 271.4V128h-15.9v152l65.2 45.1z'/%3E%3C/svg%3E">
+        <span>1 Hour</span>
+      </button>
+    </div>
+    
+    <div class="timer">
+      <div class="timer-text" id="timer-text">25:00</div>
+      <svg>
+        <circle cx="150" cy="150" r="140" id="progress" stroke-dasharray="879.6459430051421" stroke-dashoffset="879.6459430051421" transform="rotate(-90 150 150)"></circle>
+      </svg>
+    </div>
+    
+    <div class="next-text" id="next-text"></div>
+    
+    <div class="controls">
+      <button id="start">Start</button>
+      <button id="pause">Pause</button>
+      <button id="reset">Reset</button>
+    </div>
   </div>
 
-  <div class="timer">
-    <div class="timer-text" id="timer-text">25:00</div>
-    <svg>
-      <circle cx="150" cy="150" r="140" id="progress" stroke-dasharray="879.6459430051421" stroke-dashoffset="879.6459430051421"></circle>
-    </svg>
-  </div>
-  
-  <div class="controls">
-    <button id="start">Start</button>
-    <button id="pause">Pause</button>
-    <button id="reset">Reset</button>
-  </div>
-  
 </div>
 
 <script>
@@ -54,19 +55,30 @@ const resetButton = document.getElementById('reset');
 const pomodoroButton = document.getElementById('pomodoro');
 const shortBreakButton = document.getElementById('short-break');
 const longBreakButton = document.getElementById('long-break');
+const hourButton = document.getElementById('hour');
 
 let totalTime = 25 * 60;
 let timeLeft = totalTime;
 let timerInterval;
 let isRunning = false;
+let hourMode = false;
+let hourCycle;
+let currentCycleIndex = 0;
+let elapsedTime = 0;
+
+const circumference = 879.6459430051421;
 
 function updateTimer() {
   const minutes = Math.floor(timeLeft / 60).toString().padStart(2, '0');
   const seconds = (timeLeft % 60).toString().padStart(2, '0');
   timerText.textContent = `${minutes}:${seconds}`;
   
-  const progress = (timeLeft / totalTime) * 879.6459430051421;
-  progressCircle.style.strokeDashoffset = progress;
+  const progress = timeLeft / totalTime * circumference; 
+  progressCircle.style.strokeDashoffset = circumference - progress;
+
+  if (hourMode) {
+    updateNextText();
+  }
 }
 
 function startTimer() {
@@ -76,11 +88,15 @@ function startTimer() {
     if (timeLeft <= 0) {
       clearInterval(timerInterval);
       isRunning = false;
-      timeLeft = 0; 
+      timeLeft = 0;
       updateTimer();
+      if (hourMode) {
+        startNextCycle();
+      }
     } else {
       timeLeft--;
       updateTimer();
+      elapsedTime++;
     }
   }, 1000);
 }
@@ -94,6 +110,7 @@ function resetTimer() {
   clearInterval(timerInterval);
   isRunning = false;
   timeLeft = totalTime;
+  elapsedTime = 0;
   updateTimer();
 }
 
@@ -101,33 +118,86 @@ function setMode(mode) {
   pomodoroButton.classList.remove('active');
   shortBreakButton.classList.remove('active');
   longBreakButton.classList.remove('active');
+  hourButton.classList.remove('active');
 
   switch(mode) {
-    case 'pomodoro': 
+    case 'pomodoro':
       totalTime = 25 * 60;
       pomodoroButton.classList.add('active');
+      hourMode = false;
       break;
     case 'short':
       totalTime = 5 * 60;
       shortBreakButton.classList.add('active');
+      hourMode = false;
       break;
     case 'long':
       totalTime = 15 * 60;
       longBreakButton.classList.add('active');
+      hourMode = false;
       break;
+    case 'hour':
+      hourButton.classList.add('active');
+      startHourCycle();
+      return;
   }
-  
+
   timeLeft = totalTime;
   resetTimer();
+
+  updateNextText();
+}
+
+function startHourCycle() {
+  hourMode = true;
+  hourCycle = [
+    {name: 'Pomodoro', time: 25},
+    {name: 'Short Break', time: 5}, 
+    {name: 'Pomodoro', time: 25},
+    {name: 'Short Break', time: 5},
+    {name: 'Long Break', time: 15}
+  ];
+  currentCycleIndex = 0;
+  elapsedTime = 0;
+  startNextCycle();
+}
+
+function startNextCycle() {
+  if (currentCycleIndex >= hourCycle.length) {
+    hourMode = false;
+    currentCycleIndex = 0;
+    updateNextText();
+    return;
+  }
+
+  const nextCycle = hourCycle[currentCycleIndex];
+  totalTime = nextCycle.time * 60;
+  timeLeft = totalTime;
+  
+  resetTimer();
+  startTimer();
+  currentCycleIndex++;
+  updateNextText();
+}
+
+function updateNextText() {
+  const nextText = document.getElementById('next-text');
+  if (hourMode && currentCycleIndex < hourCycle.length) {
+    const nextCycle = hourCycle[currentCycleIndex];
+    nextText.textContent = `Next Up: ${nextCycle.name}`;
+    nextText.style.display = 'block';
+  } else {
+    nextText.style.display = 'none';
+  }
 }
 
 startButton.addEventListener('click', startTimer);
 pauseButton.addEventListener('click', pauseTimer);
 resetButton.addEventListener('click', resetTimer);
-
 pomodoroButton.addEventListener('click', () => setMode('pomodoro'));
-shortBreakButton.addEventListener('click', () => setMode('short'));
+shortBreakButton.addEventListener('click', () => setMode('short'));  
 longBreakButton.addEventListener('click', () => setMode('long'));
+hourButton.addEventListener('click', () => setMode('hour'));
 
 updateTimer();
 </script>
