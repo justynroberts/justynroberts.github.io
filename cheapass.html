@@ -1,0 +1,639 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cheapass</title>
+    <!-- Modern Webfont -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Add Feather Icons Script -->
+    <script src="https://unpkg.com/feather-icons"></script>
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #222; /* Dark grey background */
+            margin: 0;
+            padding: 0;
+            color: #eee; /* Light grey text */
+            overflow: hidden;
+            position: relative;
+        }
+        /* CRT Scanlines Effect */
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                to bottom,
+                rgba(255, 255, 255, 0.3) 0px,
+                rgba(255, 255, 255, 0.3) 2px,
+                transparent 2px,
+                transparent 4px
+            );
+            pointer-events: none;
+            z-index: 10;
+            animation: crt-glitch 30s infinite; /* Run animation every 30 seconds */
+        }
+        /* Glitch Effect Animation */
+        @keyframes crt-glitch {
+            0%, 99.9% {
+                opacity: 0;
+            }
+            99.91%, 100% {
+                opacity: 1;
+            }
+        }
+        /* Container and General Styling */
+        .container {
+            width: 400px;
+            margin: 50px auto;
+            position: relative;
+            animation: float 6s ease-in-out infinite;
+        }
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        /* H1 Styling */
+        h1 {
+            text-align: center;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 40px;
+            color: #ccc;
+            position: relative;
+            overflow: hidden;
+        }
+        h1::after {
+            content: '';
+            display: block;
+            width: 0;
+            height: 3px;
+            background: linear-gradient(to right, #444, #666);
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            animation: underline 2s forwards;
+        }
+        @keyframes underline {
+            to { width: 100%; }
+        }
+        /* Form Inputs */
+        .input-icon {
+            position: relative;
+            margin: 5px 0;
+        }
+        .input-icon i {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            stroke: #666;
+            width: 20px;
+            height: 20px;
+            stroke-width: 2px;
+        }
+        .input-icon input {
+            width: 100%;
+            padding-left: 40px; /* Adjust padding to accommodate the icon */
+            margin: 0; /* Remove default margins */
+            height: 45px; /* Increased height */
+            border: 1px solid #333;
+            border-radius: 4px;
+            background: #2a2a2a;
+            font-size: 16px;
+            color: #eee;
+            box-sizing: border-box;
+        }
+        input::placeholder {
+            color: #666;
+        }
+        /* Buttons */
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(45deg, #444, #666);
+            color: #fff;
+            border: none;
+            margin-top: 20px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 4px;
+            transition: background 0.5s;
+        }
+        button:hover {
+            background: linear-gradient(45deg, #666, #444);
+        }
+        /* Password List */
+        #password-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px; /* Space between cards */
+            margin: 20px 0;
+            padding: 0;
+            justify-items: center; /* Center cards horizontally */
+        }
+        /* Password Entry Cards */
+        .password-entry {
+            width: 100%;
+            max-width: 600px;
+            margin: 0;
+            background: linear-gradient(135deg, #2a2a2a, #3a3a3a); /* Gradient background */
+            padding: 30px; /* Increased padding for more space */
+            border-radius: 15px; /* More rounded corners */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+            transition: max-height 0.3s ease, box-shadow 0.3s ease;
+        }
+        .password-entry:hover {
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6);
+        }
+        .password-entry::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, rgba(255, 0, 150, 0.2), rgba(0, 229, 255, 0.2)); /* Gradient border */
+            z-index: -1;
+            filter: blur(5px);
+            animation: borderGlow 5s infinite;
+        }
+        @keyframes borderGlow {
+            0% {
+                opacity: 0.7;
+            }
+            50% {
+                opacity: 0.3;
+            }
+            100% {
+                opacity: 0.7;
+            }
+        }
+        /* Icons */
+        .password-entry .icon {
+            width: 36px;
+            height: 36px;
+            margin-right: 15px;
+            stroke: #888;
+            stroke-width: 2px;
+        }
+        /* Entry Text */
+        .password-entry .card-content {
+            display: flex;
+            flex-direction: column;
+            gap: 15px; /* Increased gap between elements */
+        }
+        .password-entry h3 {
+            margin: 0 0 10px 0;
+            font-size: 22px; /* Slightly larger font */
+            color: #fff;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.2); /* Subtle text glow */
+        }
+        .password-entry .additional-info {
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.3s ease, opacity 0.3s ease;
+        }
+        .password-entry:hover .additional-info {
+            max-height: 200px; /* Adjust as needed */
+            opacity: 1;
+        }
+        .password-entry p {
+            margin: 3px 0;
+            font-size: 15px;
+            color: #ddd;
+            display: flex;
+            align-items: center;
+            gap: 10px; /* Space between icon and text */
+        }
+        /* Password Reveal */
+        .password-reveal {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            color: #888;
+        }
+        .password-text {
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0s, opacity 0.5s ease;
+            position: absolute;
+            background: #333;
+            padding: 5px;
+            border-radius: 4px;
+            top: -30px;
+            left: 0;
+            color: #fff;
+            white-space: nowrap;
+            z-index: 10;
+        }
+        .password-reveal:hover .password-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        /* Copy Button */
+        .copy-button {
+            background: #555;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 10px;
+            border-radius: 4px;
+            transition: background 0.5s;
+        }
+        .copy-button:hover {
+            background: #777;
+        }
+        /* Delete Icon */
+        .delete-icon {
+            stroke: #888;
+            cursor: pointer;
+            width: 24px;
+            height: 24px;
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            stroke-width: 2px;
+        }
+        .delete-icon:hover {
+            stroke: #aaa;
+        }
+        /* Logout */
+        .logout {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .logout button {
+            width: auto;
+            padding: 10px 20px;
+        }
+        /* Form Section */
+        .form-section p {
+            text-align: center;
+            font-size: 14px;
+            color: #ccc;
+        }
+        /* Forgot Icon Styling */
+        .forgot-icon {
+            margin-top: 15px;
+            text-align: center;
+            cursor: pointer;
+            color: #888;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+        .forgot-icon i {
+            margin-right: 5px;
+        }
+        .forgot-icon:hover {
+            color: #aaa;
+        }
+        /* Add Password Toggle Icon */
+        #toggle-add-password {
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+        }
+        #toggle-add-password i {
+            width: 36px;
+            height: 36px;
+            stroke: #888;
+            stroke-width: 2px;
+            transition: stroke 0.3s;
+        }
+        #toggle-add-password:hover i {
+            stroke: #aaa;
+        }
+        /* Align the icon container */
+        .icon-container {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        /* Style icon buttons */
+        .icon-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+        .icon-button i {
+            stroke: #888;
+            width: 24px;
+            height: 24px;
+            stroke-width: 2px;
+        }
+        .icon-button:hover i {
+            stroke: #aaa;
+        }
+    </style>
+</head>
+<body>
+    <!-- Application Container -->
+    <div class="container" id="app">
+        <h1>Cheapass</h1>
+        <div id="setup-master-password" class="form-section">
+            <p>Please create a master password</p>
+            <div class="input-icon">
+              <i data-feather="lock"></i>
+              <input type="password" id="new-master-password" placeholder="Master Password" onkeypress="handleKeyPress(event, setMasterPassword)">
+            </div>
+            <div class="input-icon">
+              <i data-feather="lock"></i>
+              <input type="password" id="confirm-master-password" placeholder="Confirm Password" onkeypress="handleKeyPress(event, setMasterPassword)">
+            </div>
+            <button onclick="setMasterPassword()">Set Master Password</button>
+        </div>
+        <div id="login" class="form-section" style="display: none;">
+            <p>Please enter your master password</p>
+            <div class="input-icon">
+              <i data-feather="lock"></i>
+              <input type="password" id="master-password" placeholder="Master Password" onkeypress="handleKeyPress(event, login)">
+            </div>
+            <button onclick="login()">Login</button>
+            <!-- Forgot Icon -->
+            <div class="forgot-icon" onclick="resetApp()">
+                <i data-feather="refresh-ccw"></i> Forgot Password?
+            </div>
+        </div>
+        <div id="password-manager" style="display: none;">
+            <!-- Add Password Toggle Icon -->
+            <div id="toggle-add-password" onclick="toggleAddPassword()">
+              <i data-feather="plus-circle"></i>
+            </div>
+            <div id="add-password-section" style="display: none;">
+                <div class="input-icon">
+                    <i data-feather="tag"></i>
+                    <input type="text" id="friendly-name" placeholder="Friendly Name">
+                </div>
+                <div class="input-icon">
+                    <i data-feather="user"></i>
+                    <input type="text" id="username" placeholder="Username">
+                </div>
+                <div class="input-icon">
+                    <i data-feather="lock"></i>
+                    <input type="text" id="password" placeholder="Password">
+                </div>
+                <button onclick="addPassword()">Add Password</button>
+            </div>
+            <div id="password-list"></div>
+            <div class="logout">
+                <button onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        let masterKey;
+
+        async function setMasterPassword() {
+            const newPassword = document.getElementById('new-master-password').value;
+            const confirmPassword = document.getElementById('confirm-master-password').value;
+
+            if (newPassword && newPassword === confirmPassword) {
+                masterKey = await deriveKey(newPassword);
+                const hash = await hashPassword(newPassword);
+                localStorage.setItem('masterPasswordHash', hash);
+                document.getElementById('setup-master-password').style.display = 'none';
+                document.getElementById('password-manager').style.display = 'block';
+                loadPasswords();
+            } else {
+                alert('Passwords do not match.');
+            }
+        }
+
+        async function login() {
+            const enteredPassword = document.getElementById('master-password').value;
+            const storedHash = localStorage.getItem('masterPasswordHash');
+            const hash = await hashPassword(enteredPassword);
+
+            if (hash === storedHash) {
+                masterKey = await deriveKey(enteredPassword);
+                document.getElementById('login').style.display = 'none';
+                document.getElementById('password-manager').style.display = 'block';
+                loadPasswords();
+            } else {
+                alert('Incorrect master password.');
+            }
+        }
+
+        function logout() {
+            masterKey = null;
+            document.getElementById('password-manager').style.display = 'none';
+            document.getElementById('login').style.display = 'block';
+            document.getElementById('master-password').value = '';
+        }
+
+        async function addPassword() {
+            const friendlyName = document.getElementById('friendly-name').value;
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (friendlyName && username && password) {
+                let passwords = JSON.parse(localStorage.getItem('passwords')) || [];
+                const encryptedPassword = await encrypt(password, masterKey);
+                passwords.push({ friendlyName, username, password: encryptedPassword });
+                localStorage.setItem('passwords', JSON.stringify(passwords));
+                document.getElementById('friendly-name').value = '';
+                document.getElementById('username').value = '';
+                document.getElementById('password').value = '';
+                loadPasswords();
+            } else {
+                alert('Please fill in all fields.');
+            }
+        }
+
+        async function loadPasswords() {
+            let passwords = JSON.parse(localStorage.getItem('passwords')) || [];
+            const passwordList = document.getElementById('password-list');
+            passwordList.innerHTML = '';
+            for (let [index, entry] of passwords.entries()) {
+                const decryptedPassword = await decrypt(entry.password, masterKey);
+                const entryDiv = document.createElement('div');
+                entryDiv.className = 'password-entry';
+                entryDiv.innerHTML = `
+                    <div class="card-content">
+                        <h3>${entry.friendlyName}</h3>
+                        <div class="additional-info">
+                            <p><i data-feather="user"></i> ${entry.username}</p>
+                            <p>
+                                <i data-feather="lock"></i> 
+                                <span class="password-reveal">
+                                    •••••••• <span class="password-text">${decryptedPassword}</span>
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="icon-container">
+                        <button class="icon-button copy-button" onclick="copyPassword('${decryptedPassword}')">
+                            <i data-feather="copy"></i>
+                        </button>
+                        <button class="icon-button delete-button" onclick="deletePassword(${index})">
+                            <i data-feather="trash-2"></i>
+                        </button>
+                    </div>
+                `;
+                passwordList.appendChild(entryDiv);
+            }
+            feather.replace();
+        }
+
+        async function deletePassword(index) {
+            let passwords = JSON.parse(localStorage.getItem('passwords')) || [];
+            passwords.splice(index, 1);
+            localStorage.setItem('passwords', JSON.stringify(passwords));
+            loadPasswords();
+        }
+
+        function resetApp() {
+            if (confirm('This will delete all your stored data and reset the app. Are you sure?')) {
+                // Clear all local storage data
+                localStorage.clear();
+                masterKey = null;
+                // Hide all sections
+                document.getElementById('login').style.display = 'none';
+                document.getElementById('password-manager').style.display = 'none';
+                // Show the setup screen
+                document.getElementById('setup-master-password').style.display = 'block';
+                // Clear input fields
+                document.getElementById('new-master-password').value = '';
+                document.getElementById('confirm-master-password').value = '';
+            }
+        }
+
+        async function deriveKey(password) {
+            const enc = new TextEncoder();
+            const salt = enc.encode('some-static-salt'); // For production, use a unique salt stored alongside the hash
+            const keyMaterial = await window.crypto.subtle.importKey(
+                'raw',
+                enc.encode(password),
+                'PBKDF2',
+                false,
+                ['deriveKey']
+            );
+            return await window.crypto.subtle.deriveKey(
+                {
+                    name: 'PBKDF2',
+                    salt: salt,
+                    iterations: 100000,
+                    hash: 'SHA-256'
+                },
+                keyMaterial,
+                { name: 'AES-GCM', length: 256 },
+                false,
+                ['encrypt', 'decrypt']
+            );
+        }
+
+        async function hashPassword(password) {
+            const enc = new TextEncoder();
+            const data = enc.encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            return arrayBufferToHexString(hashBuffer);
+        }
+
+        function arrayBufferToHexString(arrayBuffer) {
+            return Array.from(new Uint8Array(arrayBuffer))
+                .map(b => ('00' + b.toString(16)).slice(-2))
+                .join('');
+        }
+
+        async function encrypt(text, key) {
+            const enc = new TextEncoder();
+            const iv = window.crypto.getRandomValues(new Uint8Array(12));
+            const encrypted = await window.crypto.subtle.encrypt(
+                {
+                    name: 'AES-GCM',
+                    iv: iv
+                },
+                key,
+                enc.encode(text)
+            );
+            const encryptedArray = new Uint8Array(encrypted);
+            const result = {
+                iv: Array.from(iv),
+                data: Array.from(encryptedArray)
+            };
+            return btoa(JSON.stringify(result));
+        }
+
+        async function decrypt(cipher, key) {
+            const decoded = JSON.parse(atob(cipher));
+            const iv = new Uint8Array(decoded.iv);
+            const data = new Uint8Array(decoded.data);
+            try {
+                const decrypted = await window.crypto.subtle.decrypt(
+                    {
+                        name: 'AES-GCM',
+                        iv: iv
+                    },
+                    key,
+                    data
+                );
+                const dec = new TextDecoder();
+                return dec.decode(decrypted);
+            } catch (e) {
+                console.error(e);
+                alert('Decryption failed.');
+                return '';
+            }
+        }
+
+        function copyPassword(password) {
+            navigator.clipboard.writeText(password).then(() => {
+                alert('Password copied to clipboard.');
+            }, () => {
+                alert('Failed to copy password.');
+            });
+        }
+
+        window.onload = async function() {
+            if (localStorage.getItem('masterPasswordHash')) {
+                document.getElementById('setup-master-password').style.display = 'none';
+                document.getElementById('login').style.display = 'block';
+            } else {
+                document.getElementById('setup-master-password').style.display = 'block';
+                document.getElementById('login').style.display = 'none';
+            }
+
+            // Replace Feather icons
+            feather.replace();
+        }
+
+        function toggleAddPassword() {
+            const section = document.getElementById('add-password-section');
+            const toggleIcon = document.querySelector('#toggle-add-password i');
+
+            if (section.style.display === 'none' || section.style.display === '') {
+                section.style.display = 'block';
+                toggleIcon.setAttribute('data-feather', 'minus-circle');
+            } else {
+                section.style.display = 'none';
+                toggleIcon.setAttribute('data-feather', 'plus-circle');
+            }
+            // Re-initialize Feather icons to reflect the change
+            feather.replace();
+        }
+
+        function handleKeyPress(event, callback) {
+            if (event.key === 'Enter') {
+                callback();
+            }
+        }
+    </script>
+</body>
+</html>
