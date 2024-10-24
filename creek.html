@@ -1,0 +1,239 @@
+<html>
+<head>
+    <title>Miles To Anderby Creek</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #141414;
+            font-family: 'Bebas Neue', cursive;
+            color: #FFFFFF;
+            text-align: center;
+        }
+        #header {
+            background-color: #000000;
+            padding: 20px;
+        }
+        #header h1 {
+            margin: 0;
+            font-size: 48px;
+            font-weight: normal;
+        }
+        #distance-container {
+            margin: 50px auto;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #e50914, #b81d24);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 2s infinite;
+        }
+        #distance {
+            font-size: 64px;
+            font-weight: bold;
+        }
+        #weather {
+            margin-top: 30px;
+            animation: fadeIn 2s;
+        }
+        #weather-icon {
+            width: 100px;
+            height: 100px;
+        }
+        #temperature {
+            font-size: 36px;
+            margin-top: 10px;
+        }
+        #loading, #error {
+            font-size: 24px;
+            margin-top: 50px;
+        }
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(229, 9, 20, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 20px rgba(229, 9, 20, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(229, 9, 20, 0);
+            }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div id="header">
+        <h1>Miles To Anderby Creek</h1>
+    </div>
+    <div id="loading">Calculating your distance...</div>
+    <div id="distance-container" style="display:none;">
+        <div id="distance"></div>
+    </div>
+    <div id="weather" style="display:none;">
+        <img id="weather-icon" src="" alt="Weather Icon">
+        <div id="temperature"></div>
+    </div>
+    <div id="error" style="display:none;">Unable to retrieve your location.</div>
+
+    <script>
+        // Coordinates of Anderby Creek
+        const anderbyCreekCoords = {
+            latitude: 53.2580,
+            longitude: 0.3269
+        };
+
+        // Coordinates of Chapel Saint Leonards
+        const chapelStLeonardsCoords = {
+            latitude: 53.2243,
+            longitude: 0.3402
+        };
+
+        // Function to calculate distance using Haversine formula
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Radius of the Earth in kilometers
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a =
+                0.5 - Math.cos(dLat)/2 +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                (1 - Math.cos(dLon))/2;
+
+            const distanceKm = R * 2 * Math.asin(Math.sqrt(a));
+            const distanceMiles = distanceKm * 0.621371; // Convert km to miles
+            return distanceMiles;
+        }
+
+        // Function to display distance
+        function displayDistance(distance) {
+            const distanceElement = document.getElementById('distance');
+            distanceElement.innerHTML = `${distance.toFixed(2)}<br>Miles`;
+            document.getElementById('distance-container').style.display = 'flex';
+        }
+
+        // Function to fetch weather
+        function fetchWeather() {
+            // Using Open-Meteo API which doesn't require an API key
+            const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${chapelStLeonardsCoords.latitude}&longitude=${chapelStLeonardsCoords.longitude}&hourly=temperature_2m,weathercode&current_weather=true`;
+
+            fetch(weatherUrl)
+                .then(response => response.json())
+                .then(data => {
+                    const weatherDiv = document.getElementById('weather');
+                    const temperature = data.current_weather.temperature;
+                    const weatherCode = data.current_weather.weathercode;
+                    const description = weatherDescriptions[weatherCode] || 'Unknown';
+
+                    const iconUrl = weatherIcons[weatherCode] || 'https://openweathermap.org/img/wn/01d@2x.png';
+
+                    document.getElementById('weather-icon').src = iconUrl;
+                    document.getElementById('temperature').innerHTML = `${temperature.toFixed(1)}&deg;C<br>${description}`;
+                    weatherDiv.style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Error fetching weather data:', error);
+                });
+        }
+
+        // Weather code mappings
+        const weatherDescriptions = {
+            0: 'Clear sky',
+            1: 'Mainly clear',
+            2: 'Partly cloudy',
+            3: 'Overcast',
+            45: 'Fog',
+            48: 'Depositing rime fog',
+            51: 'Light drizzle',
+            53: 'Moderate drizzle',
+            55: 'Dense drizzle',
+            56: 'Light freezing drizzle',
+            57: 'Dense freezing drizzle',
+            61: 'Slight rain',
+            63: 'Moderate rain',
+            65: 'Heavy rain',
+            66: 'Light freezing rain',
+            67: 'Heavy freezing rain',
+            71: 'Slight snow fall',
+            73: 'Moderate snow fall',
+            75: 'Heavy snow fall',
+            77: 'Snow grains',
+            80: 'Slight rain showers',
+            81: 'Moderate rain showers',
+            82: 'Violent rain showers',
+            85: 'Slight snow showers',
+            86: 'Heavy snow showers',
+            95: 'Thunderstorm',
+            96: 'Thunderstorm with slight hail',
+            99: 'Thunderstorm with heavy hail'
+        };
+
+        const weatherIcons = {
+            0: 'https://cdn-icons-png.flaticon.com/512/869/869869.png',
+            1: 'https://cdn-icons-png.flaticon.com/512/869/869869.png',
+            2: 'https://cdn-icons-png.flaticon.com/512/1163/1163624.png',
+            3: 'https://cdn-icons-png.flaticon.com/512/1163/1163624.png',
+            45: 'https://cdn-icons-png.flaticon.com/512/2917/2917242.png',
+            48: 'https://cdn-icons-png.flaticon.com/512/2917/2917242.png',
+            51: 'https://cdn-icons-png.flaticon.com/512/1163/1163628.png',
+            53: 'https://cdn-icons-png.flaticon.com/512/1163/1163628.png',
+            55: 'https://cdn-icons-png.flaticon.com/512/1163/1163628.png',
+            56: 'https://cdn-icons-png.flaticon.com/512/1163/1163628.png',
+            57: 'https://cdn-icons-png.flaticon.com/512/1163/1163628.png',
+            61: 'https://cdn-icons-png.flaticon.com/512/1163/1163634.png',
+            63: 'https://cdn-icons-png.flaticon.com/512/1163/1163634.png',
+            65: 'https://cdn-icons-png.flaticon.com/512/1163/1163634.png',
+            66: 'https://cdn-icons-png.flaticon.com/512/1163/1163634.png',
+            67: 'https://cdn-icons-png.flaticon.com/512/1163/1163634.png',
+            71: 'https://cdn-icons-png.flaticon.com/512/1163/1163636.png',
+            73: 'https://cdn-icons-png.flaticon.com/512/1163/1163636.png',
+            75: 'https://cdn-icons-png.flaticon.com/512/1163/1163636.png',
+            77: 'https://cdn-icons-png.flaticon.com/512/1163/1163636.png',
+            80: 'https://cdn-icons-png.flaticon.com/512/1163/1163634.png',
+            81: 'https://cdn-icons-png.flaticon.com/512/1163/1163634.png',
+            82: 'https://cdn-icons-png.flaticon.com/512/1163/1163634.png',
+            85: 'https://cdn-icons-png.flaticon.com/512/1163/1163636.png',
+            86: 'https://cdn-icons-png.flaticon.com/512/1163/1163636.png',
+            95: 'https://cdn-icons-png.flaticon.com/512/1163/1163641.png',
+            96: 'https://cdn-icons-png.flaticon.com/512/1163/1163641.png',
+            99: 'https://cdn-icons-png.flaticon.com/512/1163/1163641.png'
+        };
+
+        // Get user's current position
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                position => {
+                    const userLat = position.coords.latitude;
+                    const userLon = position.coords.longitude;
+
+                    const distance = calculateDistance(userLat, userLon, anderbyCreekCoords.latitude, anderbyCreekCoords.longitude);
+                    displayDistance(distance);
+                    document.getElementById('loading').style.display = 'none';
+
+                    // Fetch and display weather after getting distance
+                    fetchWeather();
+                },
+                error => {
+                    console.error('Error getting user location:', error);
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('error').style.display = 'block';
+
+                    // Fetch weather even if location not available
+                    fetchWeather();
+                }
+            );
+        } else {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('error').innerHTML = 'Geolocation is not supported by your browser.';
+            // Fetch weather even if location not available
+            fetchWeather();
+        }
+    </script>
+</body>
+</html>
