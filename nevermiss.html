@@ -1,0 +1,446 @@
+<html><head><base href="https://">    
+    <title>Station Warning App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Dark Theme and Stylish Enhancements */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 600px;
+            margin: 80px auto 50px auto;
+            text-align: center;
+            background-color: #1e1e1e;
+            padding: 40px 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+            border: 1px solid #333;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: #ffffff;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        p {
+            font-size: 1.1em;
+            color: #bbbbbb;
+            margin-bottom: 30px;
+        }
+
+        input[type="text"] {
+            width: 70%;
+            padding: 12px 15px;
+            font-size: 1em;
+            margin-right: 10px;
+            background-color: #2a2a2a;
+            color: #ffffff;
+            border: 1px solid #444;
+            border-radius: 5px;
+            outline: none;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        input[type="text"]::placeholder {
+            color: #888888;
+        }
+
+        input[type="text"]:focus {
+            border-color: #007BFF;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+
+        button {
+            padding: 12px;
+            font-size: 1.5em;
+            cursor: pointer;
+            background-color: #444444; /* Dark gray background */
+            color: #ffffff;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #555555; /* Slightly lighter gray on hover */
+            transform: scale(1.1);
+        }
+
+        .about-btn {
+            padding: 10px;
+            font-size: 1em;
+            cursor: pointer;
+            background-color: #444444; /* Dark gray background */
+            color: #ffffff;
+            border: none;
+            border-radius: 50%;
+            margin-top: 20px;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .about-btn:hover {
+            background-color: #555555; /* Slightly lighter gray on hover */
+        }
+
+        #status {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #00FF00;
+        }
+
+        #currentTown {
+            margin-top: 10px;
+            font-size: 1.1em;
+            color: #00FF00;
+        }
+
+        #gaugeContainer {
+            display: none;
+            margin-top: 30px;
+        }
+
+        #distanceGauge {
+            width: 100%;
+            height: 20px;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        #distanceGauge::-webkit-progress-bar {
+            background-color: #444;
+            border-radius: 10px;
+        }
+
+        #distanceGauge::-webkit-progress-value {
+            background-color: #007BFF;
+            border-radius: 10px;
+        }
+
+        #distanceGauge::-moz-progress-bar {
+            background-color: #007BFF;
+            border-radius: 10px;
+        }
+
+        .help-icon {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-size: 2.5em;
+            color: #ffffff;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .help-icon:hover {
+            color: #007BFF;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(18, 18, 18, 0.95);
+        }
+
+        .modal-content {
+            background-color: #1e1e1e;
+            margin: 10% auto;
+            padding: 30px;
+            border: 1px solid #333;
+            width: 80%;
+            max-width: 500px;
+            text-align: center;
+            position: relative;
+            border-radius: 10px;
+            color: #ffffff;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .close-btn {
+            color: #aaaaaa;
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close-btn:hover,
+        .close-btn:focus {
+            color: #ffffff;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+            color: #007BFF;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+
+        .modal-content p {
+            color: #cccccc;
+            line-height: 1.6;
+            font-size: 1em;
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1e1e1e;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px; /* Add this line to increase space above the icons */
+        }
+
+        .button-container button {
+            margin: 0 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="title">NeverMiss</h1>
+        <p id="subtitle">By @fintonlabs</p>
+        <p>Picture this. Its late at night and you are on a train.You are tired (probably had a big meal and some beers). This app will make a noise when you get within 5 miles of your station. Keep it open.</p>
+
+        <input type="text" id="townInput" placeholder="Enter UK Town">
+        <div class="button-container">
+            <button id="submitBtn">
+                <img src="https://img.icons8.com/ios-filled/50/ffffff/paper-plane.png" alt="Submit" width="30" height="30">
+            </button>
+            <button class="about-btn" id="aboutBtn">
+                <img src="https://img.icons8.com/ios-filled/50/ffffff/info.png" alt="About" width="30" height="30">
+            </button>
+        </div>
+
+        <div id="status"></div>
+        <div id="currentTown"></div>
+        <div id="gaugeContainer">
+            <progress id="distanceGauge" value="0" max="20"></progress>
+        </div>
+    </div>
+
+    <div class="help-icon" id="helpIcon">
+        <i class="fas fa-question-circle"></i>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeBtn">&times;</span>
+            <h2>About FintonLabs</h2>
+            <p>
+                FintonLabs produce AI Assisted content,<br> that are a bit like the toys in Bagpuss :-<br>
+                Content that was useful to someone, once.<br><br>
+                That someone, might not be you, but it's here in case it is.<br>
+                All Fintonlabs experiments are free, with no ads, they run <br>locally on your machine
+                just for humanity.<br>
+                Find anything useful? Tell us via <b>@fintonlabs</b> on X.<br>
+                Don't like something? Sorry, this is how it is.<br>
+                Have a great day!<br>
+                <b>@Fintonlabs</b>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        const submitBtn = document.getElementById('submitBtn');
+        const townInput = document.getElementById('townInput');
+        const statusDiv = document.getElementById('status');
+        const currentTownDisplay = document.getElementById('currentTown');
+        const gauge = document.getElementById('distanceGauge');
+        const title = document.getElementById('title');
+        const gaugeContainer = document.getElementById('gaugeContainer');
+        let watchId;
+        let targetLat, targetLon;
+
+        title.addEventListener('click', function() {
+            // Clear geolocation watch
+            if (watchId) {
+                navigator.geolocation.clearWatch(watchId);
+                watchId = null;
+            }
+            // Reset UI elements
+            townInput.value = ''; // clear the input field
+            townInput.style.display = 'inline-block';
+            submitBtn.style.display = 'inline-block';
+            statusDiv.innerHTML = '';
+            currentTownDisplay.innerHTML = '';
+            gauge.value = 0;
+            gaugeContainer.style.display = 'none';
+        });
+
+        submitBtn.addEventListener('click', function() {
+            const townName = townInput.value.trim();
+            if (!townName) {
+                alert('Please enter a UK town name.');
+                return;
+            }
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(townName)}, UK`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.length > 0) {
+                        targetLat = parseFloat(data[0].lat);
+                        targetLon = parseFloat(data[0].lon);
+                        statusDiv.innerHTML = `<p>Monitoring your location relative to ${townName}...</p>`;
+                        startMonitoring();
+                        
+                        // Hide the town input and submit button
+                        townInput.style.display = 'none';
+                        submitBtn.style.display = 'none';
+                        gaugeContainer.style.display = 'block'; // Show the gauge container
+                    } else {
+                        alert('Town not found. Please try another town.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching town coordinates:', error);
+                    alert('Error fetching town coordinates. Please try again later.');
+                });
+        });
+
+        function startMonitoring() {
+            if (navigator.geolocation) {
+                if (watchId) {
+                    navigator.geolocation.clearWatch(watchId);
+                }
+                watchId = navigator.geolocation.watchPosition(positionSuccess, positionError, {
+                    enableHighAccuracy: true,
+                    maximumAge: 10000,
+                    timeout: 5000
+                });
+            } else {
+                alert('Geolocation is not supported by this browser.');
+            }
+        }
+
+        function positionSuccess(position) {
+            const userLat = position.coords.latitude;
+            const userLon = position.coords.longitude;
+
+            const distance = getDistanceFromLatLonInMiles(userLat, userLon, targetLat, targetLon);
+            statusDiv.innerHTML = `<p>You are ${distance.toFixed(2)} miles from the target location.</p>`;
+
+            // Update the gauge
+            const maxDistance = 20;
+            gauge.max = maxDistance;
+            gauge.value = Math.min(distance, maxDistance);
+
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${userLat}&lon=${userLon}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.address && data.address.town) {
+                        const currentTown = data.address.town;
+                        currentTownDisplay.innerHTML = `Your current location: ${currentTown}`;
+                    } else {
+                        currentTownDisplay.innerHTML = `Your current location: Unknown`;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching current town:', error);
+                });
+
+            if (distance <= 5) {
+                makeAudibleWarning();
+            }
+        }
+
+        function positionError(error) {
+            console.warn(`ERROR(${error.code}): ${error.message}`);
+        }
+
+        function getDistanceFromLatLonInMiles(lat1, lon1, lat2, lon2) {
+            const R = 3958.8;
+            const dLat = deg2rad(lat2 - lat1);
+            const dLon = deg2rad(lon2 - lon1);
+            const a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            const d = R * c;
+            return d;
+        }
+
+        function deg2rad(deg) {
+            return deg * (Math.PI / 180);
+        }
+
+        function makeAudibleWarning() {
+            const context = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = context.createOscillator();
+            oscillator.type = 'sine';
+            oscillator.frequency.value = 440;
+            oscillator.connect(context.destination);
+            oscillator.start();
+            setTimeout(function() {
+                oscillator.stop();
+            }, 1000);
+
+            alert('You are within 5 miles of your target location!');
+            navigator.geolocation.clearWatch(watchId);
+        }
+
+        const modal = document.getElementById('modal');
+        const helpIcon = document.getElementById('helpIcon');
+        const closeBtn = document.getElementById('closeBtn');
+
+        helpIcon.addEventListener('click', function() {
+            modal.style.display = 'block';
+        });
+
+        closeBtn.addEventListener('click', function() {
+            modal.style.display = 'none';
+        });
+
+        window.addEventListener('click', function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
