@@ -14,11 +14,23 @@
         #header {
             background-color: #000000;
             padding: 20px;
+            position: relative;
         }
         #header h1 {
             margin: 0;
             font-size: 48px;
             font-weight: normal;
+        }
+        /* Question mark button */
+        #infoButton {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: transparent;
+            border: none;
+            color: #FFFFFF;
+            font-size: 32px;
+            cursor: pointer;
         }
         #distance-container {
             margin: 50px auto;
@@ -66,11 +78,54 @@
             from { opacity: 0; }
             to { opacity: 1; }
         }
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(20, 20, 20, 0.95);
+        }
+        .modal-content {
+            background-color: #141414;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            color: #FFFFFF;
+            font-family: 'Bebas Neue', cursive;
+        }
+        .close-btn {
+            color: #FFFFFF;
+            float: right;
+            font-size: 36px;
+            font-weight: normal;
+            cursor: pointer;
+        }
+        .close-btn:hover,
+        .close-btn:focus {
+            color: #e50914;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .modal-content h2 {
+            font-size: 48px;
+            margin-top: 0;
+        }
+        .modal-content p {
+            font-size: 24px;
+            line-height: 1.5;
+        }
     </style>
 </head>
 <body>
     <div id="header">
         <h1>Miles To Anderby Creek</h1>
+        <button id="infoButton">?</button>
     </div>
     <div id="loading">Calculating your distance...</div>
     <div id="distance-container" style="display:none;">
@@ -81,7 +136,23 @@
         <div id="temperature"></div>
     </div>
     <div id="error" style="display:none;">Unable to retrieve your location.</div>
-
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeBtn">&times;</span>
+            <h2>About FintonLabs</h2>
+            <p>
+                FintonLabs produce AI Assisted content,<br> that are a bit like the toys in Bagpuss :-<br>
+                Content that was useful to someone, once.<br><br>
+                That someone, might not be you, but it's here in case it is.<br>
+                All Fintonlabs experiments are free, with no ads, they run <br>locally on your machine
+                just for humanity.<br>
+                Find anything useful? Tell us via <b>@fintonlabs</b> on X.<br>
+                Don't like something? Sorry, this is how it is.<br>
+                Have a great day!<br>
+                <b>@Fintonlabs</b>
+            </p>
+        </div>
+    </div>
     <script>
         // Coordinates of Anderby Creek
         const anderbyCreekCoords = {
@@ -204,35 +275,76 @@
             99: 'https://cdn-icons-png.flaticon.com/512/1163/1163641.png'
         };
 
-        // Get user's current position
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                position => {
-                    const userLat = position.coords.latitude;
-                    const userLon = position.coords.longitude;
+        // Function to update distance
+        function updateDistance() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        const userLat = position.coords.latitude;
+                        const userLon = position.coords.longitude;
 
-                    const distance = calculateDistance(userLat, userLon, anderbyCreekCoords.latitude, anderbyCreekCoords.longitude);
-                    displayDistance(distance);
-                    document.getElementById('loading').style.display = 'none';
+                        const distance = calculateDistance(userLat, userLon, anderbyCreekCoords.latitude, anderbyCreekCoords.longitude);
+                        displayDistance(distance);
+                        document.getElementById('loading').style.display = 'none';
 
-                    // Fetch and display weather after getting distance
+                        // Fetch and display weather after getting distance if not already fetched
+                        if (!weatherFetched) {
+                            fetchWeather();
+                            weatherFetched = true;
+                        }
+                    },
+                    error => {
+                        console.error('Error getting user location:', error);
+                        document.getElementById('loading').style.display = 'none';
+                        document.getElementById('error').style.display = 'block';
+
+                        // Fetch weather even if location not available
+                        if (!weatherFetched) {
+                            fetchWeather();
+                            weatherFetched = true;
+                        }
+                    }
+                );
+            } else {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error').innerHTML = 'Geolocation is not supported by your browser.';
+                // Fetch weather even if location not available
+                if (!weatherFetched) {
                     fetchWeather();
-                },
-                error => {
-                    console.error('Error getting user location:', error);
-                    document.getElementById('loading').style.display = 'none';
-                    document.getElementById('error').style.display = 'block';
-
-                    // Fetch weather even if location not available
-                    fetchWeather();
+                    weatherFetched = true;
                 }
-            );
-        } else {
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('error').style.display = 'block';
-            document.getElementById('error').innerHTML = 'Geolocation is not supported by your browser.';
-            // Fetch weather even if location not available
-            fetchWeather();
+            }
+        }
+
+        let weatherFetched = false;
+
+        // Call updateDistance initially
+        updateDistance();
+
+        // Update distance every 20 seconds (20000 milliseconds)
+        setInterval(updateDistance, 20000);
+
+        // Modal functionality
+        const modal = document.getElementById('modal');
+        const infoButton = document.getElementById('infoButton');
+        const closeBtn = document.getElementById('closeBtn');
+
+        // When the user clicks the button, open the modal 
+        infoButton.onclick = function() {
+            modal.style.display = 'block';
+        }
+
+        // When the user clicks on close button (x), close the modal
+        closeBtn.onclick = function() {
+            modal.style.display = 'none';
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
         }
     </script>
 </body>
