@@ -1,0 +1,234 @@
+<html>
+<head>
+    <title>Speed Limit Finder</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #fff;
+            text-align: center;
+            padding-top: 50px;
+        }
+        #speedometer {
+            margin: 0 auto;
+            width: 200px;
+            height: 200px;
+            border: 10px solid #333;
+            border-radius: 50%;
+            position: relative;
+            background: radial-gradient(circle at center, #222, #000);
+            box-shadow: inset 0 0 30px #000;
+        }
+        #needle {
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 100px solid #e74c3c;
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            transform-origin: bottom center;
+            transform: rotate(0deg);
+        }
+        #speed-display {
+            font-size: 2em;
+            margin-top: 20px;
+        }
+        #warning {
+            color: #e74c3c;
+            font-size: 1.5em;
+            margin-top: 20px;
+            display: none;
+        }
+        #direction {
+            font-size: 1.2em;
+            margin-top: 10px;
+        }
+        #speed-limit {
+            font-size: 1.5em;
+            margin-top: 10px;
+        }
+        .spinner {
+            margin: 0 auto;
+            width: 50px;
+            height: 50px;
+            border: 5px solid #333;
+            border-top: 5px solid #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.9);
+        }
+        .modal-content {
+            background-color: #222;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            color: #fff;
+            border-radius: 10px;
+        }
+        .close-btn {
+            color: #fff;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close-btn:hover,
+        .close-btn:focus {
+            color: #e74c3c;
+            text-decoration: none;
+        }
+        /* Question mark icon */
+        #info-icon {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            margin-left: 10px;
+            cursor: pointer;
+            vertical-align: middle;
+        }
+        #info-icon svg {
+            fill: #fff;
+        }
+        #info-icon:hover svg {
+            fill: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <h1>Current Speed and Direction
+        <span id="info-icon">
+            <svg viewBox="0 0 64 64">
+                <circle cx="32" cy="32" r="30" stroke="#fff" stroke-width="4" fill="none"/>
+                <text x="32" y="44" text-anchor="middle" font-size="48" fill="#fff" font-family="Arial" dy=".35em">?</text>
+            </svg>
+        </span>
+    </h1>
+    <div class="spinner" id="spinner"></div>
+    <div id="speedometer">
+        <div id="needle"></div>
+    </div>
+    <p id="speed-display"></p>
+    <p id="speed-limit"></p>
+    <p id="direction"></p>
+    <p id="warning">You are exceeding the speed limit!</p>
+
+    <!-- Modal -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeBtn">&times;</span>
+            <h2>About FintonLabs</h2>
+            <p>
+                FintonLabs produce AI Assisted content,<br> that are a bit like the toys in Bagpuss :-<br>
+                Content that was useful to someone, once.<br><br>
+                That someone, might not be you, but it's here in case it is.<br>
+                All Fintonlabs experiments are free, with no ads, they run <br>locally on your machine
+                just for humanity.<br>
+                Find anything useful? Tell us via <b>@fintonlabs</b> on X.<br>
+                Don't like something? Sorry, this is how it is.<br>
+                Have a great day!<br>
+                <b>@Fintonlabs</b>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        var speedLimit = 0;
+        var maxSpeed = 120; // Maximum speed for speedometer in mph
+
+        function getSpeedLimit(lat, lon) {
+            var apiUrl = `https://api.speedlimit.io/?lat=${lat}&lon=${lon}`;
+
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    speedLimit = data.speedLimit ? data.speedLimit * 0.621371 : 50; // Convert to mph
+                    document.getElementById('speed-limit').innerText = `Speed Limit: ${speedLimit.toFixed(1)} mph`;
+                })
+                .catch(error => {
+                    speedLimit = 50;
+                    document.getElementById('speed-limit').innerText = `Speed Limit: ${speedLimit.toFixed(1)} mph`;
+                });
+        }
+
+        function updatePosition(position) {
+            var lat = position.coords.latitude;
+            var lon = position.coords.longitude;
+            var speed = position.coords.speed ? position.coords.speed * 2.23694 : 0; // Convert to mph
+            var heading = position.coords.heading;
+
+            getSpeedLimit(lat, lon);
+
+            document.getElementById('spinner').style.display = 'none';
+            document.getElementById('speed-display').innerText = `Speed: ${speed.toFixed(1)} mph`;
+
+            if (heading !== null && !isNaN(heading)) {
+                var directions = ['North', 'Northeast', 'East', 'Southeast', 'South', 'Southwest', 'West', 'Northwest'];
+                var index = Math.floor((heading / 45) + 0.5) % 8;
+                document.getElementById('direction').innerText = `Direction: ${directions[index]}`;
+            }
+
+            var angle = (speed / maxSpeed) * 180;
+            if (angle > 180) angle = 180;
+            document.getElementById('needle').style.transform = `rotate(${angle}deg)`;
+
+            if (speedLimit > 0 && speed > speedLimit) {
+                document.getElementById('warning').style.display = 'block';
+            } else {
+                document.getElementById('warning').style.display = 'none';
+            }
+        }
+
+        function handleError(error) {
+            document.getElementById('spinner').style.display = 'none';
+            document.getElementById('speed-display').innerText = 'Unable to retrieve location.';
+        }
+
+        if (navigator.geolocation) {
+            navigator.geolocation.watchPosition(updatePosition, handleError, {
+                enableHighAccuracy: true,
+                maximumAge: 0,
+                timeout: 5000
+            });
+        } else {
+            document.getElementById('spinner').style.display = 'none';
+            document.getElementById('speed-display').innerText = 'Geolocation is not supported by this browser.';
+        }
+
+        // Modal functionality
+        var modal = document.getElementById('modal');
+        var infoIcon = document.getElementById('info-icon');
+        var closeBtn = document.getElementById('closeBtn');
+
+        infoIcon.onclick = function() {
+            modal.style.display = 'block';
+        }
+
+        closeBtn.onclick = function() {
+            modal.style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
