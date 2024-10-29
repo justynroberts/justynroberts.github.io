@@ -440,8 +440,8 @@
                 // Get the first position immediately
                 getPositionAndUpdate();
 
-                // Set interval to update position every 10 seconds (10000 milliseconds)
-                positionIntervalId = setInterval(getPositionAndUpdate, 10000);
+                // Set interval to update position every 20 seconds (20000 milliseconds)
+                positionIntervalId = setInterval(getPositionAndUpdate, 20000);
             } else {
                 alert('Geolocation is not supported by this browser.');
             }
