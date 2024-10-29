@@ -135,7 +135,7 @@
 
         #gaugeContainer span {
             position: absolute;
-            bottom: 8px; /* Adjust this value if needed */
+            bottom: 0; /* Align emojis on the bottom */
             font-size: 24px;
         }
 
@@ -157,8 +157,34 @@
 
         #carEmoji {
             position: absolute;
-            bottom: 6px; /* Lowered by 2px */
+            bottom: 0; /* Align emoji on the bottom */
             transition: left 0.5s ease;
+        }
+
+        .tooltip {
+            position: absolute;
+            bottom: 40px; /* Adjust as needed to position above the emoji */
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: #ffffff;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            display: none; /* Hide by default */
+            white-space: nowrap;
+            z-index: 1000;
+        }
+
+        .tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%; /* Pointing downwards */
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 6px;
+            border-style: solid;
+            border-color: #333 transparent transparent transparent;
         }
 
         .modal {
@@ -276,9 +302,10 @@
             <div class="linear-gauge">
                 <div class="gauge-line">
                     <span id="startMarker">📍</span>
-                    <span id="halfwayMarker">▲</span>
+                    <span id="halfwayMarker" title="">▲</span>
                     <span id="endMarker">🏁</span>
                     <span id="carEmoji">🏃🏻‍♂️‍➡️</span>
+                    <span id="tooltip" class="tooltip">Distance to destination</span>
                 </div>
             </div>
         </div>
@@ -304,6 +331,11 @@
     </div>
 
     <script>
+        let townName;
+        let distance; // Declare at the top of your script
+        let totalDistance; // Declare at the top of your script
+        const startMarker = document.getElementById('startMarker');
+        const endMarker = document.getElementById('endMarker');
         const submitBtn = document.getElementById('submitBtn');
         const townInput = document.getElementById('townInput');
         const statusDiv = document.getElementById('status');
@@ -312,10 +344,10 @@
         const carEmoji = document.getElementById('carEmoji');
         const halfwayMarker = document.getElementById('halfwayMarker');
         const loadingIndicator = document.getElementById('loadingIndicator');
+        const tooltip = document.getElementById('tooltip');
 
         let positionIntervalId;
         let targetLat, targetLon;
-        let totalDistance;
 
         const title = document.getElementById('title');
         const aboutBtn = document.getElementById('aboutBtn');
@@ -331,6 +363,7 @@
             currentTownDisplay.innerHTML = '';
             carEmoji.style.left = '0%';
             gaugeContainer.style.display = 'none';
+            tooltip.style.display = 'none'; // Hide tooltip when resetting
 
             // Clear the position update interval
             if (positionIntervalId) {
@@ -340,7 +373,7 @@
         });
 
         submitBtn.addEventListener('click', function() {
-            const townName = townInput.value.trim();
+            townName = townInput.value.trim();
             if (!townName) {
                 alert('Please enter a UK town name.');
                 return;
@@ -358,6 +391,9 @@
                             const userLat = position.coords.latitude;
                             const userLon = position.coords.longitude;
                             totalDistance = getDistanceFromLatLonInMiles(userLat, userLon, targetLat, targetLon);
+
+                            const halfDistance = Math.ceil(totalDistance / 2);
+                            document.getElementById('halfwayMarker').title = `Halfway point: ${halfDistance} miles`;
 
                             // Start monitoring user location
                             statusDiv.innerHTML = `<p>Monitoring your location relative to ${townName}...</p>`;
@@ -415,14 +451,17 @@
             const userLat = position.coords.latitude;
             const userLon = position.coords.longitude;
 
-            const distance = getDistanceFromLatLonInMiles(userLat, userLon, targetLat, targetLon);
-            statusDiv.innerHTML = `<p>You are ${distance.toFixed(2)} miles from the target location.</p>`;
+            distance = getDistanceFromLatLonInMiles(userLat, userLon, targetLat, targetLon); // Update global distance variable
+            statusDiv.innerHTML = `<p>It's ${distance.toFixed(2)} miles to ${townName}.</p>`;
 
             const progress = (totalDistance - distance) / totalDistance;
             const percentage = Math.min(progress * 100, 100);
 
             // Update the position of the car emoji along the line
             carEmoji.style.left = `${percentage}%`;
+
+            // Update tooltip position to match car emoji
+            tooltip.style.left = `${percentage}%`;
 
             // Update halfway marker color if halfway point reached
             if (progress >= 0.5) {
@@ -506,7 +545,7 @@
             });
 
             // Visual alert
-            alert('You are within 5 miles of your target location!');
+            alert("It's within 5 miles to your target location!");
 
             // Clear the position update interval
             if (positionIntervalId) {
@@ -525,6 +564,64 @@
         window.addEventListener('click', function(event) {
             if (event.target == modal) {
                 modal.style.display = 'none';
+            }
+            if (
+                event.target !== carEmoji &&
+                event.target !== halfwayMarker &&
+                event.target !== tooltip
+            ) {
+                tooltip.style.display = 'none'; // Hide tooltip on click outside
+            }
+        });
+
+        carEmoji.addEventListener('click', function() {
+            // Update the tooltip content with the current distance
+            tooltip.textContent = `Distance to ${townName}: ${distance.toFixed(2)} miles`;
+            // Toggle the display of the tooltip
+            if (tooltip.style.display === 'none' || tooltip.style.display === '') {
+                tooltip.style.display = 'block';
+            } else {
+                tooltip.style.display = 'none';
+            }
+        });
+
+        halfwayMarker.addEventListener('click', function() {
+            // Update the tooltip content with the half distance
+            const halfDistance = Math.ceil(totalDistance / 2);
+            tooltip.textContent = `Halfway point to ${townName}: ${halfDistance} miles`;
+            // Position the tooltip at the halfway marker
+            tooltip.style.left = '50%'; // Halfway marker is at 50%
+            // Toggle the display of the tooltip
+            if (tooltip.style.display === 'none' || tooltip.style.display === '') {
+                tooltip.style.display = 'block';
+            } else {
+                tooltip.style.display = 'none';
+            }
+        });
+
+        startMarker.addEventListener('click', function() {
+            // Update the tooltip content to show "0 miles"
+            tooltip.textContent = "0 miles";
+            // Position the tooltip at the start marker
+            tooltip.style.left = '0%';
+            // Toggle the display of the tooltip
+            if (tooltip.style.display === 'none' || tooltip.style.display === '') {
+                tooltip.style.display = 'block';
+            } else {
+                tooltip.style.display = 'none';
+            }
+        });
+
+        endMarker.addEventListener('click', function() {
+            // Update the tooltip content to show total distance
+            tooltip.textContent = `Total distance to ${townName}: ${totalDistance.toFixed(2)} miles`;
+            // Position the tooltip at the end marker
+            tooltip.style.left = '100%';
+            // Toggle the display of the tooltip
+            if (tooltip.style.display === 'none' || tooltip.style.display === '') {
+                tooltip.style.display = 'block';
+            } else {
+                tooltip.style.display = 'none';
             }
         });
     </script>
