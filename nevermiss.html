@@ -115,38 +115,50 @@
 
         #gaugeContainer {
             display: none;
-            margin-top: 30px;
+            margin-top: 50px; /* Increased from 30px to 50px to position the gauge lower */
         }
 
-        /* Styles for the SVG circular progress bar */
-        #distanceGauge {
-            transform: rotate(-90deg);
+        .linear-gauge {
+            position: relative;
+            width: 80%;
+            height: 50px;
             margin: 0 auto;
         }
 
-        #progressCircle {
-            transition: stroke-dashoffset 0.5s ease;
+        .gauge-line {
+            position: absolute;
+            bottom: 6px; /* Increased by 3 pixels to move the line up */
+            width: 100%;
+            height: 4px;
+            background-color: green; /* Ensures the line remains green */
         }
 
-        #distanceText {
-            font-family: 'Roboto', sans-serif;
-            font-weight: bold;
-            text-shadow: 0 0 5px #000;
-            transform: rotate(90deg);
+        #gaugeContainer span {
+            position: absolute;
+            bottom: 8px; /* Adjust this value if needed */
+            font-size: 24px;
         }
 
-        .help-icon {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            font-size: 2.5em;
-            color: #ffffff;
-            cursor: pointer;
-            transition: color 0.3s ease;
+        #startMarker {
+            left: 0;
         }
 
-        .help-icon:hover {
-            color: #007BFF;
+        #halfwayMarker {
+            left: 50%;
+            transform: translateX(-50%);
+            top: -25px;
+            font-size: 16px;
+            color: #bbbbbb;
+        }
+
+        #endMarker {
+            right: 0;
+        }
+
+        #carEmoji {
+            position: absolute;
+            bottom: 6px; /* Lowered by 2px */
+            transition: left 0.5s ease;
         }
 
         .modal {
@@ -228,11 +240,17 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-top: 20px; /* Add this line to increase space above the icons */
+            margin-top: 20px; 
         }
 
         .button-container button {
             margin: 0 10px;
+        }
+
+        #loadingIndicator {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #00FF00; /* Adjust color as needed */
         }
     </style>
 </head>
@@ -254,18 +272,17 @@
 
         <div id="status"></div>
         <div id="currentTown"></div>
-        <div id="gaugeContainer" style="display: none; margin-top: 30px;">
-            <svg id="distanceGauge" width="150" height="150">
-                <circle id="backgroundCircle" cx="75" cy="75" r="70" stroke="#444" stroke-width="10" fill="none" />
-                <circle id="progressCircle" cx="75" cy="75" r="70" stroke="#007BFF" stroke-width="10" fill="none"
-                    stroke-dasharray="439.82" stroke-dashoffset="439.82" />
-                <text id="distanceText" x="75" y="80" font-size="20" fill="#ffffff" text-anchor="middle"></text>
-            </svg>
+        <div id="gaugeContainer" style="display: none; margin-top: 50px;">
+            <div class="linear-gauge">
+                <div class="gauge-line">
+                    <span id="startMarker">📍</span>
+                    <span id="halfwayMarker">▲</span>
+                    <span id="endMarker">🏁</span>
+                    <span id="carEmoji">🏃🏻‍♂️‍➡️</span>
+                </div>
+            </div>
         </div>
-    </div>
-
-    <div class="help-icon" id="helpIcon">
-        <i class="fas fa-question-circle"></i>
+        <div id="loadingIndicator" style="display: none;">Calculating distance...</div>
     </div>
 
     <div id="modal" class="modal">
@@ -292,34 +309,34 @@
         const statusDiv = document.getElementById('status');
         const currentTownDisplay = document.getElementById('currentTown');
         const gaugeContainer = document.getElementById('gaugeContainer');
-        const progressCircle = document.getElementById('progressCircle');
-        const distanceText = document.getElementById('distanceText');
-        const radius = progressCircle.r.baseVal.value;
-        const circumference = 2 * Math.PI * radius;
+        const carEmoji = document.getElementById('carEmoji');
+        const halfwayMarker = document.getElementById('halfwayMarker');
+        const loadingIndicator = document.getElementById('loadingIndicator');
 
-        progressCircle.style.strokeDasharray = `${circumference} ${circumference}`;
-        progressCircle.style.strokeDashoffset = circumference;
-
-        let watchId;
+        let positionIntervalId;
         let targetLat, targetLon;
+        let totalDistance;
 
         const title = document.getElementById('title');
+        const aboutBtn = document.getElementById('aboutBtn');
+        const modal = document.getElementById('modal');
+        const closeBtn = document.getElementById('closeBtn');
 
         title.addEventListener('click', function() {
-            // Clear geolocation watch
-            if (watchId) {
-                navigator.geolocation.clearWatch(watchId);
-                watchId = null;
-            }
             // Reset UI elements
             townInput.value = ''; // clear the input field
             townInput.style.display = 'inline-block';
             submitBtn.style.display = 'inline-block';
             statusDiv.innerHTML = '';
             currentTownDisplay.innerHTML = '';
-            progressCircle.style.strokeDashoffset = circumference;
-            distanceText.textContent = '';
+            carEmoji.style.left = '0%';
             gaugeContainer.style.display = 'none';
+
+            // Clear the position update interval
+            if (positionIntervalId) {
+                clearInterval(positionIntervalId);
+                positionIntervalId = null;
+            }
         });
 
         submitBtn.addEventListener('click', function() {
@@ -328,39 +345,67 @@
                 alert('Please enter a UK town name.');
                 return;
             }
+            loadingIndicator.style.display = 'block'; // Show loading indicator
             fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(townName)}, UK`)
                 .then(response => response.json())
                 .then(data => {
                     if (data && data.length > 0) {
                         targetLat = parseFloat(data[0].lat);
                         targetLon = parseFloat(data[0].lon);
-                        statusDiv.innerHTML = `<p>Monitoring your location relative to ${townName}...</p>`;
-                        startMonitoring();
-                        
-                        // Hide the town input and submit button
-                        townInput.style.display = 'none';
-                        submitBtn.style.display = 'none';
-                        gaugeContainer.style.display = 'block'; // Show the gauge container
+
+                        // Get current user position to calculate totalDistance
+                        navigator.geolocation.getCurrentPosition(function(position) {
+                            const userLat = position.coords.latitude;
+                            const userLon = position.coords.longitude;
+                            totalDistance = getDistanceFromLatLonInMiles(userLat, userLon, targetLat, targetLon);
+
+                            // Start monitoring user location
+                            statusDiv.innerHTML = `<p>Monitoring your location relative to ${townName}...</p>`;
+                            startMonitoring();
+
+                            // Hide the town input and submit button
+                            townInput.style.display = 'none';
+                            submitBtn.style.display = 'none';
+                            gaugeContainer.style.display = 'block'; // Show the gauge container
+                            loadingIndicator.style.display = 'none'; // Hide loading indicator
+                        }, function(error) {
+                            console.error('Error getting current position:', error);
+                            loadingIndicator.style.display = 'none'; // Hide loading indicator
+                            alert('Error getting current position. Please try again.');
+                        });
+
                     } else {
                         alert('Town not found. Please try another town.');
+                        loadingIndicator.style.display = 'none'; // Hide loading indicator
                     }
                 })
                 .catch(error => {
                     console.error('Error fetching town coordinates:', error);
                     alert('Error fetching town coordinates. Please try again later.');
+                    loadingIndicator.style.display = 'none'; // Hide loading indicator
                 });
         });
 
         function startMonitoring() {
+            // Clear any existing interval
+            if (positionIntervalId) {
+                clearInterval(positionIntervalId);
+            }
+
             if (navigator.geolocation) {
-                if (watchId) {
-                    navigator.geolocation.clearWatch(watchId);
+                function getPositionAndUpdate() {
+                    navigator.geolocation.getCurrentPosition(positionSuccess, positionError, {
+                        enableHighAccuracy: true,
+                        maximumAge: 0,
+                        timeout: 10000
+                    });
                 }
-                watchId = navigator.geolocation.watchPosition(positionSuccess, positionError, {
-                    enableHighAccuracy: true,
-                    maximumAge: 10000,
-                    timeout: 5000
-                });
+
+                // Get the first position immediately
+                getPositionAndUpdate();
+
+                // Set interval to update position every 10 seconds (10000 milliseconds)
+                positionIntervalId = setInterval(getPositionAndUpdate, 10000);
             } else {
                 alert('Geolocation is not supported by this browser.');
             }
@@ -373,15 +418,18 @@
             const distance = getDistanceFromLatLonInMiles(userLat, userLon, targetLat, targetLon);
             statusDiv.innerHTML = `<p>You are ${distance.toFixed(2)} miles from the target location.</p>`;
 
-            const maxDistance = 20; // Maximum displayable distance in miles
-            const percentage = Math.min((distance / maxDistance) * 100, 100);
+            const progress = (totalDistance - distance) / totalDistance;
+            const percentage = Math.min(progress * 100, 100);
 
-            // Calculate the stroke offset for the progress circle
-            const offset = circumference - (percentage / 100) * circumference;
-            progressCircle.style.strokeDashoffset = offset;
+            // Update the position of the car emoji along the line
+            carEmoji.style.left = `${percentage}%`;
 
-            // Update the distance text inside the circle
-            distanceText.textContent = `${distance.toFixed(2)} mi`;
+            // Update halfway marker color if halfway point reached
+            if (progress >= 0.5) {
+                halfwayMarker.style.color = '#FF0000'; // Change color to red
+            } else {
+                halfwayMarker.style.color = ''; // Reset to default color
+            }
 
             // Ensure the gauge is visible
             gaugeContainer.style.display = 'block';
@@ -430,20 +478,24 @@
             const context = new (window.AudioContext || window.webkitAudioContext)();
             const gainNode = context.createGain();
             gainNode.connect(context.destination);
+            gainNode.gain.value = 0.5; // Adjust the volume as needed
 
-            // Define a sequence of frequencies and durations
+            // Define a sequence of notes for the melody
             const notes = [
-                { frequency: 880, duration: 300 },  // A5
-                { frequency: 784, duration: 300 },  // G5
-                { frequency: 659, duration: 300 },  // E5
-                { frequency: 523, duration: 600 },  // C5
+                { frequency: 659.25, duration: 400 },  // E5
+                { frequency: 659.25, duration: 400 },  // E5
+                { frequency: 659.25, duration: 400 },  // E5
+                { frequency: 523.25, duration: 400 },  // C5
+                { frequency: 659.25, duration: 400 },  // E5
+                { frequency: 783.99, duration: 800 },  // G5
+                { frequency: 392.00, duration: 800 },  // G4
             ];
 
             let startTime = context.currentTime;
 
             notes.forEach(note => {
                 const oscillator = context.createOscillator();
-                oscillator.type = 'square';  // Use a square wave for a sharper sound
+                oscillator.type = 'sine';  // Use a sine wave for a smoother sound
                 oscillator.frequency.setValueAtTime(note.frequency, startTime);
                 oscillator.connect(gainNode);
 
@@ -453,15 +505,16 @@
                 startTime += note.duration / 1000;
             });
 
+            // Visual alert
             alert('You are within 5 miles of your target location!');
-            navigator.geolocation.clearWatch(watchId);
+
+            // Clear the position update interval
+            if (positionIntervalId) {
+                clearInterval(positionIntervalId);
+            }
         }
 
-        const modal = document.getElementById('modal');
-        const helpIcon = document.getElementById('helpIcon');
-        const closeBtn = document.getElementById('closeBtn');
-
-        helpIcon.addEventListener('click', function() {
+        aboutBtn.addEventListener('click', function() {
             modal.style.display = 'block';
         });
 
