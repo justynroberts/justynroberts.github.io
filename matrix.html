@@ -1,0 +1,195 @@
+<html>
+<head>
+    <title>News Updates</title>
+    <!-- Removed VT323 font -->
+    <!-- Added Open Sans font for a modern look -->
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0D0D0D;
+            color: #00FF00;
+            margin: 0;
+            overflow: hidden;
+            position: relative;
+            height: 100vh;
+            font-family: 'VT323', monospace;
+        }
+
+        .matrix {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            color: #00FF00;
+            background: black;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        #news {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -60%);
+            width: 80%;
+            color: #66FF66; /* Made color lighter */
+            font-size: 48px;
+            text-align: center;
+            opacity: 0;
+            animation: fadeInOut 13s infinite;
+            font-weight: bold;
+            font-family: 'Open Sans', sans-serif; /* Changed font */
+            text-shadow:
+                -5px 0 5px rgba(0, 0, 0, 0.5),
+                0 5px 5px rgba(0, 0, 0, 0.5),
+                5px 0 5px rgba(0, 0, 0, 0.5),
+                0 -5px 5px rgba(0, 0, 0, 0.5),
+                -5px -5px 5px rgba(0, 0, 0, 0.5),
+                5px -5px 5px rgba(0, 0, 0, 0.5),
+                5px 5px 5px rgba(0, 0, 0, 0.5),
+                -5px 5px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        #news a {
+            color: #66FF66; /* Made color lighter */
+            text-decoration: none;
+            font-family: 'Open Sans', sans-serif; /* Changed font */
+        }
+
+        #news a:hover {
+            text-decoration: underline;
+        }
+
+        #feed-name {
+            display: block;
+            margin-top: 5px;
+            font-size: 16px;
+            font-weight: normal;
+            opacity: 0.8;
+            text-align: right;
+            font-family: 'Open Sans', sans-serif; /* Changed font */
+            color: #66FF66; /* Made color lighter */
+        }
+
+        @keyframes fadeInOut {
+            0%, 6.2% { opacity: 0; }
+            12.4% { opacity: 1; }
+            75.4% { opacity: 1; }
+            81.5% { opacity: 0; }
+            100% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div id="news"></div>
+    <canvas class="matrix"></canvas>
+
+    <script>
+        // Matrix Rain Animation with Alphanumeric, Korean, and Chinese Characters
+        const canvas = document.querySelector('.matrix');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ㄱㄴㄷㄹㅁㅂㅅㅇㅈㅊㅋㅌㅍㅎ가나다라마바사아자차카타파하一二三四五六七八九十';
+
+        const fontSize = 16;
+        const columns = canvas.width / fontSize;
+
+        const drops = [];
+
+        for (let x = 0; x < columns; x++) {
+            drops[x] = canvas.height;
+        }
+
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#0F0';
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = characters.charAt(Math.floor(Math.random() * characters.length));
+                const x = i * fontSize;
+                const y = drops[i] * fontSize;
+                ctx.fillText(text, x, y);
+
+                if (y > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+
+                drops[i]++;
+            }
+        }
+
+        setInterval(draw, 38);
+
+        // Fetch News Updates from Multiple Feeds and Fade Them In and Out
+        const feeds = [
+            { name: "BBC UK News", url: "https://feeds.bbci.co.uk/news/uk/rss.xml" },
+            { name: "BBC World News", url: "https://feeds.bbci.co.uk/news/world/rss.xml" },
+            { name: "Reuters Top News", url: "http://feeds.reuters.com/reuters/topNews" },
+            { name: "CNN Top Stories", url: "http://rss.cnn.com/rss/edition.rss" }
+        ];
+
+        let newsItems = [];
+        let newsIndex = 0;
+
+        function fetchNews() {
+            const fetchPromises = feeds.map(feed => {
+                const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feed.url)}`;
+                return fetch(apiUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        const items = data.items.map(item => ({
+                            title: item.title,
+                            link: item.link,
+                            feedName: feed.name
+                        }));
+                        return items;
+                    })
+                    .catch(err => {
+                        console.log('Error fetching news from', feed.name, err);
+                        return [];
+                    });
+            });
+
+            Promise.all(fetchPromises).then(results => {
+                newsItems = results.flat();
+                newsItems = shuffleArray(newsItems);
+                newsIndex = 0;
+            });
+        }
+
+        function shuffleArray(array) {
+            let currentIndex = array.length, temporaryValue, randomIndex;
+
+            while (0 !== currentIndex) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex -= 1;
+
+                temporaryValue = array[currentIndex];
+                array[currentIndex] = array[randomIndex];
+                array[randomIndex] = temporaryValue;
+            }
+            return array;
+        }
+
+        function updateNews() {
+            if (newsItems.length > 0) {
+                const newsElement = document.getElementById('news');
+                const currentItem = newsItems[newsIndex];
+                newsElement.innerHTML = `<a href="${currentItem.link}" target="_blank">${currentItem.title}</a><span id="feed-name">${currentItem.feedName}</span>`;
+                newsIndex = (newsIndex + 1) % newsItems.length;
+            }
+        }
+
+        fetchNews();
+        setInterval(fetchNews, 60000);
+        setInterval(updateNews, 13000);
+    </script>
+</body>
+</html>
