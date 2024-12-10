@@ -1,0 +1,209 @@
+<html><base href="">
+<head>
+    <title>Creek Countdown</title>
+    <!-- Include web fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #ffffff;
+            background: linear-gradient(to bottom, #87CEEB, #ffffff); /* Sky blue to white */
+            position: relative;
+            height: 100vh;
+            overflow: hidden;
+        }
+        /* Sea animation using SVG */
+        .waves {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: auto;
+        }
+        .parallax > use {
+            animation: move-forever 25s cubic-bezier(0.55, 0.5, 0.45, 0.5) infinite;
+        }
+        .parallax > use:nth-child(1) {
+            animation-delay: -2s;
+            animation-duration: 7s;
+        }
+        .parallax > use:nth-child(2) {
+            animation-delay: -3s;
+            animation-duration: 10s;
+        }
+        .parallax > use:nth-child(3) {
+            animation-delay: -4s;
+            animation-duration: 13s;
+        }
+        .parallax > use:nth-child(4) {
+            animation-delay: -5s;
+            animation-duration: 20s;
+        }
+        @keyframes move-forever {
+            0% {
+                transform: translate3d(-90px, 0, 0);
+            }
+            100% {
+                transform: translate3d(85px, 0, 0);
+            }
+        }
+        /* Rest of your styles */
+        #timer-container {
+            text-align: center;
+            padding-top: 10%;
+            position: relative;
+            z-index: 1;
+        }
+        h1 {
+            font-size: 50px;
+            margin-bottom: 50px;
+            animation: fadeInDown 2s;
+            color: #FF9900; /* Amazon's signature orange */
+            font-weight: bold;
+        }
+        #timer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: zoomIn 2s;
+            color: #FFFFFF;
+            text-shadow: 2px 2px #000000;
+        }
+        .time-segment {
+            margin: 0 20px;
+            text-align: center;
+        }
+        .time-segment span {
+            display: block;
+        }
+        .time-segment .number {
+            font-size: 80px;
+            font-weight: bold;
+            animation: bounce 2s infinite;
+        }
+        .time-segment .label {
+            font-size: 24px;
+            margin-top: 10px;
+            animation: fadeInUp 2s;
+        }
+        /* Animations */
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-30px);}
+            60% {transform: translateY(-15px);}
+        }
+        @keyframes fadeInDown {
+            from {opacity: 0; transform: translateY(-50px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
+        @keyframes fadeInUp {
+            from {opacity: 0; transform: translateY(50px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
+        @keyframes zoomIn {
+            from {opacity: 0; transform: scale(0.5);}
+            to {opacity: 1; transform: scale(1);}
+        }
+    </style>
+</head>
+<body>
+    <div id="timer-container">
+        <h1>Creek Countdown</h1>
+        <div id="timer">
+            <div class="time-segment">
+                <span id="months" class="number">0</span>
+                <span class="label">Months</span>
+            </div>
+            <div class="time-segment">
+                <span id="weeks" class="number">0</span>
+                <span class="label">Weeks</span>
+            </div>
+            <div class="time-segment">
+                <span id="days" class="number">0</span>
+                <span class="label">Days</span>
+            </div>
+            <div class="time-segment">
+                <span id="hours" class="number">0</span>
+                <span class="label">Hours</span>
+            </div>
+        </div>
+    </div>
+    <!-- Realistic Sea Animation using SVG -->
+    <svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+        viewBox="0 24 150 28" preserveAspectRatio="none">
+        <defs>
+            <path id="gentle-wave" d="
+                M-160 44
+                c30 0 58-18 88-18s
+                58 18 88 18
+                58-18 88-18
+                58 18 88 18
+                v44h-352z">
+            </path>
+        </defs>
+        <g class="parallax">
+            <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(255,255,255,0.7"/>
+            <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(255,255,255,0.5)"/>
+            <use xlink:href="#gentle-wave" x="48" y="5" fill="rgba(255,255,255,0.3)"/>
+            <use xlink:href="#gentle-wave" x="48" y="7" fill="#015871"/>
+        </g>
+    </svg>
+    <script>
+        function updateTimer() {
+            const now = new Date();
+            let targetDate = new Date(now.getFullYear(), 2, 1, 12, 0, 0); // 1st March at 12:00 PM
+
+            // If the target date has already passed this year, set it for the next year
+            if (now >= targetDate) {
+                targetDate = new Date(now.getFullYear() + 1, 2, 1, 12, 0, 0);
+            }
+
+            // Calculate total months
+            let totalMonths = (targetDate.getFullYear() - now.getFullYear()) * 12 + (targetDate.getMonth() - now.getMonth());
+            if (targetDate.getDate() < now.getDate()) {
+                totalMonths -= 1;
+            }
+
+            // Months date
+            let monthsDate = new Date(now.getFullYear(), now.getMonth() + totalMonths, now.getDate(), now.getHours(), now.getMinutes(), now.getSeconds());
+
+            // Difference after months
+            let diff = targetDate - monthsDate;
+
+            // Weeks
+            let totalWeeks = Math.floor(diff / (1000 * 60 * 60 * 24 * 7));
+            let weeksDate = new Date(monthsDate.getTime() + totalWeeks * 7 * 24 * 60 * 60 * 1000);
+
+            // Difference after weeks
+            diff = targetDate - weeksDate;
+
+            // Days
+            let totalDays = Math.floor(diff / (1000 * 60 * 60 * 24));
+            let daysDate = new Date(weeksDate.getTime() + totalDays * 24 * 60 * 60 * 1000);
+
+            // Difference after days
+            diff = targetDate - daysDate;
+
+            // Hours
+            let totalHours = Math.floor(diff / (1000 * 60 * 60));
+
+            // Update the HTML elements
+            document.getElementById('months').textContent = totalMonths;
+            document.getElementById('weeks').textContent = totalWeeks;
+            document.getElementById('days').textContent = totalDays;
+            document.getElementById('hours').textContent = totalHours;
+
+            // If target date has passed, display a message
+            if (now >= targetDate) {
+                document.getElementById('timer').innerHTML = '<h2>The time has arrived!</h2>';
+                clearInterval(timerInterval);
+            }
+        }
+
+        updateTimer();
+        const timerInterval = setInterval(updateTimer, 1000 * 60 * 60); // Update every hour
+    </script>
+</body>
+</html>
