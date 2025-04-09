@@ -1,479 +1,62 @@
-<html><head><base href=" ">
-    <title>Your Board Title</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Roboto&family=Staatliches&display=swap" rel="stylesheet">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulletin Board</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            padding: 0;
-            position: relative;
-            overflow: hidden;  
-            background: linear-gradient(to bottom, #ffffff, #8ecae6); 
-        }
-        @keyframes gradientAnimation {
-            0% {
-                background-position: 0% 50%;
-            }
-            50% {
-                background-position: 100% 50%;
-            }
-            100% {
-                background-position: 0% 50%;
-            }
-        }
-        #app {
-            width: 1400px;
-            margin: 20px auto;
-            position: relative;
-            z-index: 1; 
-        }
-        h2 {
-            font-family: 'Staatliches', sans-serif;
-            text-align: center;
-            color: #333;
-            font-size: 36px;
-            margin-top: 10px;
-            cursor: text;
-        }
-        h2[contenteditable="true"] {
-            outline: none;
-            border-bottom: 1px dashed #888;
-        }
-        #notes-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            position: relative;
-        }
-        .note {
-            position: relative; 
-            width: 200px;
-            height: 150px;
-            background-color: #fffb7d; 
-            margin: 10px;
-            padding: 10px;
-            box-shadow: 3px 3px 5px rgba(0,0,0,0.3);
-            font-size: 16px;
-            line-height: 1.5;
-            overflow: hidden;
-            word-break: break-word;
-            border-radius: 0;
-            cursor: pointer;
-            z-index: 1; 
-        }
-        .pin {
-            position: absolute;
-            font-size: 24px;
-            color: #d00;
-            z-index: 3; 
-            pointer-events: none; 
-        }
-        .note .note-text {
-            font-size: 14px;
-            color: #333;
-        }
-        .note .note-tag {
-            display: none;
-            position: absolute;
-            bottom: 5px;
-            right: 10px;
-            font-size: 12px;
-            color: #555;
-        }
-        .note:hover .note-tag {
-            display: block;
-        }
-        #add-note {
-            position: fixed;
-            right: 30px;
-            bottom: 30px;
-            width: 60px;
-            height: 60px;
-            background-color: #007BFF;
-            color: #fff;
-            border: none;
-            border-radius: 50%;
-            font-size: 24px;
-            cursor: pointer;
-            box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
-            z-index: 3;
-        }
-        #add-note:hover {
-            background-color: #0056b3;
-        }
-        #config-button {
-            position: fixed;
-            right: 30px;
-            bottom: 110px;
-            width: 50px;
-            height: 50px;
-            background-color: #6c757d;
-            color: #fff;
-            border: none;
-            border-radius: 50%;
-            font-size: 20px;
-            cursor: pointer;
-            box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
-            z-index: 3;
-        }
-        #config-button:hover {
-            background-color: #5a6268;
-        }
-        .modal {
-            display: none;
-            position: fixed; 
-            z-index: 4; 
-            left: 0;
-            top: 0;
-            width: 100%; 
-            height: 100%; 
-            overflow: auto; 
-            background-color: rgba(0,0,0,0.5); 
-        }
-        .modal-content {
-            padding: 0;
-            background-color: #fff;
-            margin: 5% auto; 
-            border: 1px solid #888;
-            width: 90%;
-            max-width: 700px;
-            position: relative;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            animation: modalopen 0.5s;
-        }
-        @keyframes modalopen {
-            from {opacity: 0; transform: translateY(-50px);}
-            to {opacity: 1; transform: translateY(0);}
-        }
-        .modal-content h2 {
-            margin: 0;
-            padding: 30px;
-            font-size: 24px;
-            color: #333;
-            display: flex;
-            align-items: center;
-        }
-        .modal-content h2 i {
-            margin-right: 10px;
-        }
-        .close {
-            color: #aaa;
-            position: absolute;
-            right: 20px;
-            top: 20px;
-            font-size: 24px;
-            cursor: pointer;
-        }
-        .close:hover {
-            color: #000;
-        }
-        .modal-body {
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-        }
-        #note-content {
-            width: 100%;
-            height: 300px;
-            resize: none;
-            margin: 0 0 10px 0;
-            font-size: 16px;
-            border: 1px solid #eee;
-            padding: 10px;
-            box-sizing: border-box;
-        }
-        .modal-controls {
-            display: flex;
-            align-items: center;
-            margin-top: 10px;
-        }
-        .color-icons {
-            display: flex;
-            align-items: center;
-        }
-        .color-icons i {
-            margin-right: 10px;
-            font-size: 18px;
-            color: #555;
-        }
-        .color-options {
-            display: flex;
-            gap: 5px;
-        }
-        .modal-buttons {
-            display: flex;
-            gap: 10px;
-            margin-left: auto;
-        }
-        .modal-buttons button {
-            margin: 0;
-            padding: 10px 15px;
-            font-size: 16px;
-            cursor: pointer;
-            border: none;
-            border-radius: 5px;
-        }
-        #save-note {
-            background-color: #28a745;
-            color: #fff;
-        }
-        #save-note:hover {
-            background-color: #218838;
-        }
-        #delete-note {
-            background-color: #dc3545;
-            color: #fff;
-        }
-        #delete-note:hover {
-            background-color: #c82333;
-        }
-        .config-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        .config-buttons button {
-            padding: 10px 15px;
-            font-size: 16px;
-            cursor: pointer;
-            border: none;
-            border-radius: 5px;
-        }
-        #save-config {
-            background-color: #28a745;
-            color: #fff;
-        }
-        #save-config:hover {
-            background-color: #218838;
-        }
-        #download-notes {
-            background-color: #17a2b8;
-            color: #fff;
-        }
-        #download-notes:hover {
-            background-color: #138496;
-        }
-        .color-option {
-            width: 30px;
-            height: 30px;
-            cursor: pointer;
-            border: 2px solid #fff;
-            box-shadow: 0 0 2px rgba(0,0,0,0.3);
-            border-radius: 50%;
-            margin: 0;
-        }
-        .color-option.selected {
-            border: 2px solid #000;
-        }
-        .note.dragging {
-            opacity: 0.5;
-        }
-        .cloud {
-            position: absolute;
-            background: #fff;
-            border-radius: 50%;
-            z-index: 0; 
-        }
-
-        .cloud:before,
-        .cloud:after {
-            content: '';
-            position: absolute;
-            background: #fff;
-            border-radius: 50%;
-        }
-
-        /* Cloud 1 */
-        .cloud.x1 {
-            width: 120px;
-            height: 40px;
-            top: 100px;
-            left: -150px;
-            opacity: 0.8;
-            animation: moveClouds 200s linear infinite;
-        }
-
-        .cloud.x1:before {
-            width: 60px;
-            height: 60px;
-            top: -30px;
-            left: 30px;
-        }
-
-        .cloud.x1:after {
-            width: 80px;
-            height: 80px;
-            top: -40px;
-            left: 60px;
-        }
-
-        /* Cloud 2 */
-        .cloud.x2 {
-            width: 180px;
-            height: 60px;
-            top: 200px;
-            left: -200px;
-            opacity: 0.6;
-            animation: moveClouds 250s linear infinite;
-        }
-
-        .cloud.x2:before {
-            width: 90px;
-            height: 90px;
-            top: -45px;
-            left: 45px;
-        }
-
-        .cloud.x2:after {
-            width: 120px;
-            height: 120px;
-            top: -60px;
-            left: 90px;
-        }
-
-        /* Cloud 3 */
-        .cloud.x3 {
-            width: 240px;
-            height: 80px;
-            top: 300px;
-            left: -250px;
-            opacity: 0.7;
-            animation: moveClouds 300s linear infinite;
-        }
-
-        .cloud.x3:before {
-            width: 120px;
-            height: 120px;
-            top: -60px;
-            left: 60px;
-        }
-
-        .cloud.x3:after {
-            width: 160px;
-            height: 160px;
-            top: -80px;
-            left: 120px;
-        }
-
-        /* Cloud 4 */
-        .cloud.x4 {
-            width: 180px;
-            height: 60px;
-            top: 50px;
-            left: -200px;
-            opacity: 0.5;
-            animation: moveClouds 220s linear infinite;
-        }
-
-        .cloud.x4:before {
-            width: 90px;
-            height: 90px;
-            top: -45px;
-            left: 45px;
-        }
-
-        .cloud.x4:after {
-            width: 120px;
-            height: 120px;
-            top: -60px;
-            left: 90px;
-        }
-
-        /* Cloud 5 */
-        .cloud.x5 {
-            width: 200px;
-            height: 70px;
-            top: 250px;
-            left: -300px;
-            opacity: 0.4;
-            animation: moveClouds 240s linear infinite;
-        }
-
-        .cloud.x5:before {
-            width: 100px;
-            height: 100px;
-            top: -50px;
-            left: 50px;
-        }
-
-        .cloud.x5:after {
-            width: 140px;
-            height: 140px;
-            top: -70px;
-            left: 100px;
-        }
-
-        /* Cloud 6 */
-        .cloud.x6 {
-            width: 220px;
-            height: 80px;
-            top: 400px;
-            left: -350px;
-            opacity: 0.3;
-            animation: moveClouds 260s linear infinite;
-        }
-
-        .cloud.x6:before {
-            width: 110px;
-            height: 110px;
-            top: -55px;
-            left: 55px;
-        }
-
-        .cloud.x6:after {
-            width: 150px;
-            height: 150px;
-            top: -75px;
-            left: 110px;
-        }
-
-        /* Slower cloud movement */
-        @keyframes moveClouds {
-            0% {
-                transform: translateX(0);
-            }
-            100% {
-                transform: translateX(2000px);
-            }
-        }
-        .cloud-icon {
-            position: absolute;
-            color: rgba(255, 255, 255, 0.8);
-            z-index: 0; 
-        }
-        .cloud-icon.x1 {
-            font-size: 100px;
-            top: 50px;
-            left: -100px;
-            animation: moveClouds 60s linear infinite;
-        }
-        .cloud-icon.x2 {
-            font-size: 150px;
-            top: 200px;
-            left: -150px;
-            animation: moveClouds 80s linear infinite;
-        }
-        .cloud-icon.x3 {
-            font-size: 200px;
-            top: 350px;
-            left: -200px;
-            animation: moveClouds 100s linear infinite;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
+    <script type="importmap">
+    {
+        "imports": {
+            "confetti": "https://cdn.skypack.dev/canvas-confetti@1.6.0"
+        }
+    }
+    </script>
 </head>
-<body>
-    <i class="fas fa-cloud cloud-icon x1"></i>
-    <i class="fas fa-cloud cloud-icon x2"></i>
-    <i class="fas fa-cloud cloud-icon x3"></i>
+<body class="dark-mode">
+    <div class="background-scene">
+        
+    </div>
+    
+    <header class="app-header">
+        <div class="logo">
+            <i class="fas fa-thumbtack"></i>
+            <h1>Bulletin</h1>
+        </div>
+        <div class="toolbar">
+            <button class="toolbar-btn" id="add-note-toolbar">
+                <i class="fas fa-plus"></i>
+                <span>New Note</span>
+            </button>
+            <button class="toolbar-btn" id="download-notes-toolbar">
+                <i class="fas fa-download"></i>
+                <span>Export</span>
+            </button>
+            <button class="toolbar-btn" id="theme-toggle">
+                <i class="fas fa-moon"></i>
+                <span>Theme</span>
+            </button>
+            <button class="toolbar-btn" id="config-button-toolbar">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </button>
+        </div>
+        <div class="user-profile">
+            <span id="board-title">Your Board Title</span>
+            <div class="avatar">
+                <i class="fas fa-user"></i>
+            </div>
+        </div>
+    </header>
+    
     <div id="app">
-        <h2 id="board-title">Your Board Title</h2>
         <div id="notes-container">
             <!-- Existing Notes Will Follow -->
         </div>
         <button id="add-note"><i class="fas fa-plus"></i></button>
         <button id="config-button"><i class="fas fa-cog"></i></button>
+        
         <!-- Note Modal -->
         <div id="note-modal" class="modal">
             <div class="modal-content">
@@ -482,10 +65,24 @@
                 </span>
                 <h2>
                     <i class="fas fa-sticky-note" title="Add/Edit Note"></i>
-                    Note it!
+                    Create Note
                 </h2>
                 <div class="modal-body">
+                    <div class="note-edit-header">
+                        <div class="note-edit-title">What's on your mind?</div>
+                        <div class="note-edit-date" id="note-edit-date"></div>
+                    </div>
+                    
+                    <div class="note-tags">
+                        <div class="note-tag-item" data-tag="idea">Idea</div>
+                        <div class="note-tag-item" data-tag="task">Task</div>
+                        <div class="note-tag-item" data-tag="reminder">Reminder</div>
+                        <div class="note-tag-item" data-tag="quote">Quote</div>
+                        <div class="note-tag-item" data-tag="personal">Personal</div>
+                    </div>
+                    
                     <textarea id="note-content" placeholder="Enter your note here..."></textarea>
+                    <div class="char-counter">0/250 characters</div>
                     <div class="modal-controls">
                         <div class="color-icons">
                             <div>
@@ -501,28 +98,43 @@
                             </div>
                         </div>
                         <div class="modal-buttons">
-                            <button id="save-note">
-                                <i class="fas fa-save" title="Save"></i>
+                            <button id="save-note" title="Save Note">
+                                <i class="fas fa-save"></i>
                             </button>
-                            <button id="delete-note">
-                                <i class="fas fa-trash" title="Delete"></i>
+                            <button id="delete-note" title="Delete Note">
+                                <i class="fas fa-trash"></i>
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        
         <!-- Config Modal -->
         <div id="config-modal" class="modal">
             <div class="modal-content">
                 <span class="close" id="config-modal-close">
                     <i class="fas fa-times" title="Close"></i>
                 </span>
+                <h2>
+                    <i class="fas fa-cog" title="Settings"></i>
+                    Settings
+                </h2>
                 <div class="modal-body">
-                    <div>
-                        <i class="fas fa-user" title="Set Your Name"></i>
+                    <div class="form-group">
+                        <label for="user-name"><i class="fas fa-user" title="Set Your Name"></i> Your Name</label>
+                        <input type="text" id="user-name" placeholder="Enter your name">
                     </div>
-                    <input type="text" id="user-name" placeholder="Enter your name">
+                    
+                    <div class="form-group">
+                        <label for="background-select"><i class="fas fa-image" title="Background"></i> Background</label>
+                        <select id="background-select">
+                            <option value="clouds">Clouds</option>
+                            <option value="stars">Starry Night</option>
+                            <option value="cork">Cork Board</option>
+                        </select>
+                    </div>
+                    
                     <div class="config-buttons">
                         <button id="save-config">
                             <i class="fas fa-save" title="Save"></i> Save
@@ -530,362 +142,53 @@
                         <button id="download-notes">
                             <i class="fas fa-download" title="Download Notes"></i> Download Notes
                         </button>
+                        <button id="clear-all">
+                            <i class="fas fa-trash-alt" title="Clear All"></i> Clear All Notes
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
+        
         <!-- Name Prompt Modal -->
         <div id="name-modal" class="modal">
             <div class="modal-content">
-                <div>
-                    <i class="fas fa-user" title="Please enter your name to tag your notes"></i>
+                <h2>
+                    <i class="fas fa-user" title="Welcome"></i>
+                    Welcome!
+                </h2>
+                <div class="modal-body">
+                    <p>Please enter your name to tag your notes:</p>
+                    <input type="text" id="prompt-user-name" placeholder="Enter your name">
+                    <button id="save-user-name">
+                        <i class="fas fa-save" title="Save"></i> Continue
+                    </button>
                 </div>
-                <input type="text" id="prompt-user-name" placeholder="Enter your name">
-                <button id="save-user-name">
-                    <i class="fas fa-save" title="Save"></i>
-                </button>
+            </div>
+        </div>
+        
+        <!-- Confirmation Modal -->
+        <div id="confirm-modal" class="modal">
+            <div class="modal-content">
+                <h2>
+                    <i class="fas fa-exclamation-triangle" title="Warning"></i>
+                    Confirm Action
+                </h2>
+                <div class="modal-body">
+                    <p id="confirm-message">Are you sure you want to proceed?</p>
+                    <div class="config-buttons">
+                        <button id="confirm-yes" class="danger-button">
+                            <i class="fas fa-check" title="Yes"></i> Yes
+                        </button>
+                        <button id="confirm-no">
+                            <i class="fas fa-times" title="No"></i> No
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    <div class="cloud x1"></div>
-    <div class="cloud x2"></div>
-    <div class="cloud x3"></div>
-    <div class="cloud x4"></div>
-    <div class="cloud x5"></div>
-    <div class="cloud x6"></div>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            let notes = JSON.parse(localStorage.getItem('notes')) || [];
-            let userName = localStorage.getItem('userName') || '';
-            let selectedNoteId = null;
-            let selectedColor = '#fff9c4'; // Light Yellow
-            let dragSrcEl = null;
-
-            const boardTitleElement = document.getElementById('board-title');
-            const savedBoardTitle = localStorage.getItem('boardTitle') || 'Your Board Title';
-            boardTitleElement.textContent = savedBoardTitle;
-
-            // Make board title clickable to edit
-            boardTitleElement.addEventListener('click', function() {
-                this.setAttribute('contenteditable', 'true');
-                this.focus();
-            });
-
-            // Save the board title on blur
-            boardTitleElement.addEventListener('blur', function() {
-                this.removeAttribute('contenteditable');
-                const newBoardTitle = this.textContent.trim() || 'Your Board Title';
-                this.textContent = newBoardTitle;
-                localStorage.setItem('boardTitle', newBoardTitle);
-            });
-
-            // Allow 'Enter' key to save and exit editing
-            boardTitleElement.addEventListener('keydown', function(event) {
-                if (event.key === 'Enter') {
-                    event.preventDefault();
-                    this.blur();
-                }
-            });
-
-            notes.forEach(function(note) {
-                switch (note.color) {
-                    case '#ffeb3b': // Original Yellow
-                        note.color = '#fff9c4'; // Light Yellow
-                        break;
-                    case '#ff9800': // Original Orange
-                        note.color = '#ffe0b2'; // Light Orange
-                        break;
-                    case '#f44336': // Original Red
-                        note.color = '#ffcdd2'; // Light Red
-                        break;
-                    case '#4caf50': // Original Green
-                        note.color = '#c8e6c9'; // Light Green
-                        break;
-                    case '#2196f3': // Original Blue
-                        note.color = '#bbdefb'; // Light Blue
-                        break;
-                    case '#9c27b0': // Original Purple
-                        note.color = '#e1bee7'; // Light Purple
-                        break;
-                    default:
-                        break;
-                }
-            });
-            localStorage.setItem('notes', JSON.stringify(notes));
-
-            if (!userName) {
-                showNamePromptModal();
-            }
-
-            displayNotes();
-
-            document.getElementById('add-note').addEventListener('click', function() {
-                selectedNoteId = null;
-                document.getElementById('note-content').value = '';
-                selectColor('#fff9c4');
-                showModal('note-modal');
-                document.getElementById('delete-note').style.display = 'none';
-            });
-
-            document.getElementById('config-button').addEventListener('click', function() {
-                document.getElementById('user-name').value = userName;
-                showModal('config-modal');
-            });
-
-            document.getElementById('save-config').addEventListener('click', function() {
-                userName = document.getElementById('user-name').value.trim();
-                if (userName) {
-                    localStorage.setItem('userName', userName);
-                    closeModal('config-modal');
-                }
-            });
-
-            document.getElementById('note-modal-close').addEventListener('click', function() {
-                closeModal('note-modal');
-            });
-
-            document.getElementById('config-modal-close').addEventListener('click', function() {
-                closeModal('config-modal');
-            });
-
-            document.getElementById('save-note').addEventListener('click', function() {
-                saveNote();
-            });
-
-            document.getElementById('delete-note').addEventListener('click', function() {
-                deleteNote();
-            });
-
-            document.getElementById('save-user-name').addEventListener('click', function() {
-                userName = document.getElementById('prompt-user-name').value.trim();
-                if (userName) {
-                    localStorage.setItem('userName', userName);
-                    closeModal('name-modal');
-                }
-            });
-
-            document.getElementById('download-notes').addEventListener('click', function() {
-                downloadNotes();
-            });
-
-            const colorOptions = document.querySelectorAll('.color-option');
-            colorOptions.forEach(function(option) {
-                option.addEventListener('click', function() {
-                    selectColor(option.getAttribute('data-color'));
-                });
-            });
-
-            function hexToRGBA(hex, alpha) {
-                var c;
-                if(/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)){
-                    c= hex.substring(1).split('');
-                    if(c.length== 3){
-                        c= [c[0], c[0], c[1], c[1], c[2], c[2]];
-                    }
-                    c= '0x'+c.join('');
-                    return 'rgba('+[(c>>16)&255, (c>>8)&255, c&255].join(',')+','+alpha+')';
-                }
-                throw new Error('Bad Hex');
-            }
-
-            function selectColor(color) {
-                selectedColor = color;
-                colorOptions.forEach(function(option) {
-                    option.classList.remove('selected');
-                    if (option.getAttribute('data-color') === color) {
-                        option.classList.add('selected');
-                    }
-                });
-            }
-
-            function displayNotes() {
-                const notesContainer = document.getElementById('notes-container');
-                notesContainer.innerHTML = '';
-                notes.forEach(function(note) {
-                    const noteDiv = document.createElement('div');
-                    noteDiv.classList.add('note');
-                    noteDiv.style.backgroundColor = hexToRGBA(note.color, 0.9);
-                    noteDiv.setAttribute('data-id', note.id);
-                    noteDiv.setAttribute('draggable', 'true');
-
-                    const pinDiv = document.createElement('div');
-                    pinDiv.classList.add('pin');
-                    noteDiv.appendChild(pinDiv);
-
-                    let rotationDegree = note.rotationDegree !== undefined ? note.rotationDegree : Math.floor(Math.random() * 5) - 2;
-                    note.rotationDegree = rotationDegree; 
-                    noteDiv.style.transform = `rotate(${rotationDegree}deg)`;
-
-                    let pinTop = note.pinTop !== undefined ? note.pinTop : Math.floor(Math.random() * 10) - 15; 
-                    let pinLeft = note.pinLeft !== undefined ? note.pinLeft : Math.floor(Math.random() * (noteDiv.offsetWidth - 30)) + 15;
-                    note.pinTop = pinTop;
-                    note.pinLeft = pinLeft;
-                    pinDiv.style.top = `${pinTop}px`;
-                    pinDiv.style.left = `${pinLeft}px`;
-                    
-                    let pinRotation = note.pinRotation !== undefined ? note.pinRotation : Math.floor(Math.random() * 30) - 15; 
-                    note.pinRotation = pinRotation;
-                    pinDiv.style.transform = `rotate(${pinRotation}deg)`;
-
-                    noteDiv.addEventListener('dragstart', handleDragStart);
-                    noteDiv.addEventListener('dragover', handleDragOver);
-                    noteDiv.addEventListener('drop', handleDrop);
-                    noteDiv.addEventListener('dragend', handleDragEnd);
-
-                    const noteContentDiv = document.createElement('div');
-                    noteContentDiv.classList.add('note-text');
-                    noteContentDiv.textContent = note.content;
-                    noteDiv.appendChild(noteContentDiv);
-
-                    const noteTagDiv = document.createElement('div');
-                    noteTagDiv.classList.add('note-tag');
-                    noteTagDiv.textContent = note.tag || '';
-                    noteDiv.appendChild(noteTagDiv);
-
-                    noteDiv.addEventListener('click', function() {
-                        openNoteModal(note.id);
-                    });
-                    notesContainer.appendChild(noteDiv);
-                });
-                localStorage.setItem('notes', JSON.stringify(notes));
-            }
-
-            function handleDragStart(e) {
-                dragSrcEl = this;
-                e.dataTransfer.effectAllowed = 'move';
-                e.dataTransfer.setData('text/plain', this.getAttribute('data-id'));
-                this.classList.add('dragging');
-            }
-
-            function handleDragOver(e) {
-                e.preventDefault();
-                e.dataTransfer.dropEffect = 'move';
-                return false;
-            }
-
-            function handleDrop(e) {
-                e.stopPropagation();
-
-                if (dragSrcEl !== this) {
-                    const srcId = dragSrcEl.getAttribute('data-id');
-                    const destId = this.getAttribute('data-id');
-
-                    const srcIndex = notes.findIndex(note => note.id == srcId);
-                    const destIndex = notes.findIndex(note => note.id == destId);
-
-                    const [movedNote] = notes.splice(srcIndex, 1);
-
-                    notes.splice(destIndex, 0, movedNote);
-
-                    localStorage.setItem('notes', JSON.stringify(notes));
-
-                    displayNotes();
-                }
-                return false;
-            }
-
-            function handleDragEnd(e) {
-                this.classList.remove('dragging');
-            }
-
-            function openNoteModal(id) {
-                selectedNoteId = id;
-                const note = notes.find(n => n.id === id);
-                if (note) {
-                    document.getElementById('note-content').value = note.content;
-                    selectColor(note.color);
-                    showModal('note-modal');
-                    document.getElementById('delete-note').style.display = 'inline-block';
-                }
-            }
-
-            function saveNote() {
-                const content = document.getElementById('note-content').value.trim();
-                if (!userName) {
-                    showNamePromptModal();
-                    return;
-                }
-                if (selectedNoteId) {
-                    notes = notes.map(function(note) {
-                        if (note.id === selectedNoteId) {
-                            return {
-                                ...note,
-                                content: content,
-                                color: selectedColor,
-                                tag: userName
-                            };
-                        }
-                        return note;
-                    });
-                } else {
-                    const rotationDegree = Math.floor(Math.random() * 5) - 2;
-                    const pinTop = Math.floor(Math.random() * 10) - 15; 
-                    const pinLeft = Math.floor(Math.random() * (200 - 30)) + 15; 
-                    const pinRotation = Math.floor(Math.random() * 30) - 15; 
-
-                    const note = {
-                        id: Date.now(),
-                        content: content,
-                        color: selectedColor,
-                        tag: userName,
-                        rotationDegree: rotationDegree,
-                        pinTop: pinTop,
-                        pinLeft: pinLeft,
-                        pinRotation: pinRotation 
-                    };
-                    notes.push(note);
-                }
-                localStorage.setItem('notes', JSON.stringify(notes));
-                closeModal('note-modal');
-                displayNotes();
-            }
-
-            function deleteNote() {
-                if (selectedNoteId) {
-                    notes = notes.filter(note => note.id !== selectedNoteId);
-                    localStorage.setItem('notes', JSON.stringify(notes));
-                    closeModal('note-modal');
-                    displayNotes();
-                }
-            }
-
-            function downloadNotes() {
-                if (notes.length === 0) {
-                    alert('No notes to download.');
-                    return;
-                }
-                let content = 'Tag,Text\n';
-                notes.forEach(function(note) {
-                    let tag = note.tag ? note.tag.replace(/"/g, '""') : '';
-                    let text = note.content.replace(/"/g, '""');
-                    content += `"${tag}","${text}"\n`;
-                });
-                let blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
-                let link = document.createElement('a');
-                if (navigator.msSaveBlob) {
-                    navigator.msSaveBlob(blob, 'notes.csv');
-                } else {
-                    let url = URL.createObjectURL(blob);
-                    link.setAttribute('href', url);
-                    link.setAttribute('download', 'notes.csv');
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                }
-            }
-
-            function showModal(modalId) {
-                document.getElementById(modalId).style.display = 'block';
-            }
-
-            function closeModal(modalId) {
-                document.getElementById(modalId).style.display = 'none';
-            }
-
-            function showNamePromptModal() {
-                showModal('name-modal');
-            }
-        });
-    </script>
+    
+    <script type="module" src="script.js"></script>
 </body>
 </html>
