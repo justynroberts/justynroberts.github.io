@@ -12,7 +12,7 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/addon/lint/lint.min.css">
     
         <style>
-            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+            @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
     
             :root {
                 --primary-color: #1a1a2e;
@@ -21,16 +21,17 @@
                 --danger-color: #e94560;
                 --success-color: #06d6a0;
                 --warning-color: #ffd166;
-                --bg-dark: #0f0f1a;
+                --bg-dark: #0a0a0f;
                 --bg-card: #16213e;
-                --bg-sidebar: #121229;
+                --bg-sidebar: #0d0d1a;
                 --text-primary: #f8f9fa;
                 --text-secondary: #adb5bd;
-                --border-radius: 12px;
+                --border-radius: 16px;
                 --transition-speed: 0.3s;
-                --card-shadow: 0 8px 16px rgba(0,0,0,0.3);
-                --hover-shadow: 0 12px 24px rgba(0,0,0,0.4);
-                --neon-glow: 0 0 10px rgba(123, 104, 238, 0.4);
+                --card-shadow: 0 10px 20px rgba(0,0,0,0.4);
+                --hover-shadow: 0 15px 30px rgba(0,0,0,0.5);
+                --neon-glow: 0 0 20px rgba(123, 104, 238, 0.5);
+                --timeline-glow: 0 0 30px rgba(123, 104, 238, 0.6);
             }
     
             * {
@@ -39,13 +40,36 @@
             }
     
             body {
-                font-family: 'Inter', sans-serif;
+                font-family: 'Space Grotesk', sans-serif;
                 background-color: var(--bg-dark);
-                background-image: radial-gradient(circle at top right, rgba(123, 104, 238, 0.1), transparent 60%),
-                                  radial-gradient(circle at bottom left, rgba(233, 69, 96, 0.05), transparent 60%);
+                background-image: 
+                    radial-gradient(circle at 20% 80%, rgba(123, 104, 238, 0.15) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 20%, rgba(233, 69, 96, 0.1) 0%, transparent 50%),
+                    radial-gradient(circle at 40% 40%, rgba(6, 214, 160, 0.08) 0%, transparent 50%);
                 color: var(--text-primary);
                 line-height: 1.6;
                 min-height: 100vh;
+                position: relative;
+                overflow-x: hidden;
+            }
+            
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: 
+                    repeating-linear-gradient(
+                        90deg,
+                        transparent,
+                        transparent 2px,
+                        rgba(123, 104, 238, 0.03) 2px,
+                        rgba(123, 104, 238, 0.03) 4px
+                    );
+                pointer-events: none;
+                z-index: 1;
             }
     
             .sidenav {
@@ -57,38 +81,118 @@
             }
     
             .sidenav .user-view {
-                background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
-                padding: 24px 15px;
-                margin-bottom: 20px;
+                background: linear-gradient(145deg, rgba(26, 26, 46, 0.95), rgba(77, 77, 140, 0.95));
+                padding: 32px 15px;
+                margin-bottom: 30px;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 position: relative;
-                border-radius: 0 0 12px 12px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-                border-bottom: 1px solid rgba(123, 104, 238, 0.2);
+                border-radius: 0 0 20px 20px;
+                box-shadow: 
+                    0 10px 30px rgba(0,0,0,0.4),
+                    inset 0 1px 0 rgba(255,255,255,0.1);
+                border-bottom: 2px solid rgba(123, 104, 238, 0.3);
+                overflow: hidden;
+            }
+            
+            .sidenav .user-view::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 100%;
+                background: radial-gradient(circle at center, rgba(123, 104, 238, 0.2) 0%, transparent 70%);
+                animation: pulse 4s ease infinite;
             }
     
             .sidenav .user-view a.brand-logo {
                 display: block;
                 color: white;
                 text-align: center;
-                text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                text-shadow: none;
+                position: relative;
             }
-    
-            .sidenav .user-view a.brand-logo i.logo-icon {
-                font-size: 60px;
+
+            .logo-wrapper {
+                position: relative;
+                display: inline-block;
                 margin-bottom: 12px;
-                filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
-                color: var(--accent-color);
-                animation: pulse 3s infinite alternate;
             }
-    
+
+            .logo-glow {
+                position: absolute;
+                inset: -20px;
+                background: radial-gradient(circle, rgba(123, 104, 238, 0.3), transparent 65%);
+                border-radius: 50%;
+                animation: logoGlow 3s ease infinite;
+                filter: blur(2px);
+            }
+
+            @keyframes logoGlow {
+                0%, 100% {
+                    transform: scale(0.9);
+                    opacity: 0.4;
+                }
+                50% {
+                    transform: scale(1.1);
+                    opacity: 0.8;
+                }
+            }
+
+            .sidenav .user-view a.brand-logo i.logo-icon {
+                font-size: 72px;
+                margin-bottom: 0;
+                background: linear-gradient(135deg, #7b68ee 0%, #e94560 50%, #06d6a0 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                position: relative;
+                z-index: 2;
+                animation: logoShine 4s linear infinite;
+                filter: drop-shadow(0 6px 20px rgba(123, 104, 238, 0.6));
+            }
+
+            @keyframes logoShine {
+                0% {
+                    filter: hue-rotate(0deg) drop-shadow(0 6px 20px rgba(123, 104, 238, 0.6));
+                }
+                33% {
+                    filter: hue-rotate(120deg) drop-shadow(0 6px 20px rgba(233, 69, 96, 0.6));
+                }
+                66% {
+                    filter: hue-rotate(240deg) drop-shadow(0 6px 20px rgba(6, 214, 160, 0.6));
+                }
+                100% {
+                    filter: hue-rotate(360deg) drop-shadow(0 6px 20px rgba(123, 104, 238, 0.6));
+                }
+            }
+
             .sidenav .user-view a.brand-logo span.logo-text {
-                font-size: 18px;
-                font-weight: 600;
+                font-size: 15px;
+                font-weight: 700;
                 display: block;
-                letter-spacing: 0.5px;
+                letter-spacing: 1.5px;
+                text-transform: uppercase;
+                margin-top: 8px;
+                position: relative;
+                background: linear-gradient(90deg, #ffffff, #adb5bd);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .logo-text::after {
+                content: '';
+                position: absolute;
+                bottom: -6px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 80%;
+                height: 2px;
+                background: linear-gradient(90deg, transparent, #7b68ee, transparent);
+                animation: pulse 2s ease infinite;
             }
     
             .sidenav .user-view .help-icon {
@@ -206,45 +310,72 @@
             }
             
             .trigger-button-container .btn {
-                background: linear-gradient(135deg, var(--danger-color), #c81d4e);
-                border-radius: 8px;
-                box-shadow: 0 4px 12px rgba(233, 69, 96, 0.4);
-                padding: 10px 24px;
-                font-weight: 600;
-                letter-spacing: 0.8px;
+                background: linear-gradient(135deg, #ff416c, #ff4b2b);
+                border-radius: 12px;
+                box-shadow: 
+                    0 6px 20px rgba(255, 65, 108, 0.4),
+                    inset 0 1px 0 rgba(255,255,255,0.2);
+                padding: 14px 32px;
+                font-weight: 700;
+                letter-spacing: 1.2px;
                 text-transform: uppercase;
-                transition: all 0.3s;
-                font-size: 13px;
+                transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                font-size: 14px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                border: none;
+                border: 2px solid rgba(255, 65, 108, 0.3);
                 position: relative;
                 overflow: hidden;
+                transform-style: preserve-3d;
+                font-family: 'Space Grotesk', sans-serif;
             }
             
             .trigger-button-container .btn::before {
                 content: '';
                 position: absolute;
-                top: 0;
-                left: -100%;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-                transition: all 0.6s;
+                top: 50%;
+                left: 50%;
+                width: 0;
+                height: 0;
+                border-radius: 50%;
+                background: rgba(255,255,255,0.3);
+                transform: translate(-50%, -50%);
+                transition: width 0.6s, height 0.6s;
             }
             
             .trigger-button-container .btn:hover::before {
-                left: 100%;
+                width: 300px;
+                height: 300px;
             }
             
             .trigger-button-container .btn:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 8px 24px rgba(233, 69, 96, 0.5);
+                transform: translateY(-4px) rotateX(10deg);
+                box-shadow: 
+                    0 12px 40px rgba(255, 65, 108, 0.6),
+                    0 0 80px rgba(255, 65, 108, 0.3),
+                    inset 0 1px 0 rgba(255,255,255,0.3);
+                background: linear-gradient(135deg, #ff4b2b, #ff416c);
             }
             
             .trigger-button-container .btn:active {
-                transform: translateY(1px);
+                transform: translateY(0) rotateX(0);
+                box-shadow: 
+                    0 4px 20px rgba(255, 65, 108, 0.4),
+                    inset 0 2px 4px rgba(0,0,0,0.2);
+            }
+            
+            .trigger-button-container .btn i {
+                margin-right: 10px;
+                font-size: 18px;
+                animation: fireFlicker 2s ease infinite;
+            }
+            
+            @keyframes fireFlicker {
+                0%, 100% { transform: scale(1) rotate(0deg); }
+                25% { transform: scale(1.1) rotate(-3deg); }
+                50% { transform: scale(0.95) rotate(3deg); }
+                75% { transform: scale(1.05) rotate(-2deg); }
             }
     
             main {
@@ -253,23 +384,26 @@
             }
     
             .card {
-                background-color: var(--bg-card);
-                background-image: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0) 100%);
-                border-radius: 12px;
+                background: linear-gradient(145deg, rgba(22, 33, 62, 0.9) 0%, rgba(16, 24, 44, 0.9) 100%);
+                border-radius: var(--border-radius);
                 overflow: hidden;
-                box-shadow: var(--card-shadow);
-                transition: transform 0.3s ease, box-shadow 0.3s ease;
-                border: 1px solid rgba(255,255,255,0.05);
+                box-shadow: var(--card-shadow), inset 0 1px 0 rgba(255,255,255,0.05);
+                transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                border: 1px solid rgba(123, 104, 238, 0.15);
                 height: 100%;
-                max-height: 160px;
+                max-height: 180px;
                 position: relative;
-                backdrop-filter: blur(10px);
+                backdrop-filter: blur(20px);
+                transform-style: preserve-3d;
             }
             
             .card:hover {
-                transform: translateY(-5px);
-                box-shadow: var(--hover-shadow);
-                border-color: rgba(123, 104, 238, 0.2);
+                transform: translateY(-8px) rotateX(2deg);
+                box-shadow: 
+                    0 20px 40px rgba(123, 104, 238, 0.3),
+                    0 0 60px rgba(123, 104, 238, 0.1),
+                    inset 0 1px 0 rgba(255,255,255,0.1);
+                border-color: rgba(123, 104, 238, 0.4);
             }
             
             .card::before {
@@ -278,8 +412,30 @@
                 top: 0;
                 left: 0;
                 width: 100%;
-                height: 4px;
-                background: linear-gradient(90deg, var(--accent-color), var(--danger-color));
+                height: 5px;
+                background: linear-gradient(90deg, 
+                    var(--accent-color) 0%, 
+                    var(--danger-color) 50%, 
+                    var(--success-color) 100%);
+                animation: gradientShift 4s ease infinite;
+            }
+            
+            .card::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, 
+                    transparent, 
+                    rgba(255,255,255,0.05), 
+                    transparent);
+                transition: left 0.6s ease;
+            }
+            
+            .card:hover::after {
+                left: 100%;
             }
     
             .card-content {
@@ -352,50 +508,63 @@
     
             .modal .modal-content {
                 color: var(--text-primary);
-                padding: 24px;
-                max-height: calc(85vh - 120px);
+                padding: 32px 32px 24px 32px;
+                max-height: calc(85vh - 140px);
                 overflow-y: auto;
             }
-            
+
             .modal .modal-content h4 {
                 font-weight: 600;
-                margin-bottom: 16px;
+                margin-bottom: 24px;
                 color: white;
-                font-size: 18px;
+                font-size: 20px;
+                letter-spacing: 0.5px;
             }
-            
+
             .modal .modal-footer {
                 background-color: rgba(0,0,0,0.1);
-                padding: 16px 24px;
+                padding: 20px 32px 24px 32px;
                 border-top: 1px solid rgba(255,255,255,0.05);
                 position: sticky;
                 bottom: 0;
                 z-index: 1004;
+                display: flex;
+                justify-content: flex-end;
+                align-items: center;
+                gap: 12px;
             }
-            
+
             .modal .modal-footer .btn {
-                border-radius: 4px;
+                border-radius: 8px;
                 font-weight: 500;
                 text-transform: uppercase;
                 letter-spacing: 0.5px;
-                padding: 8px 15px;
-                margin-left: 8px;
+                padding: 10px 20px;
+                margin: 0;
                 font-size: 12px;
                 position: relative;
                 z-index: 1005;
+                transition: all 0.3s ease;
+            }
+
+            .modal .modal-footer .btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(0,0,0,0.4);
             }
     
             .CodeMirror {
                 background-color: rgba(0,0,0,0.3);
                 color: var(--text-primary);
                 height: auto !important;
-                min-height: 300px;
+                min-height: 350px;
                 max-height: calc(70vh - 180px);
                 border-radius: 8px;
-                border: 1px solid rgba(123, 104, 238, 0.1);
+                border: 1px solid rgba(123, 104, 238, 0.2);
                 font-family: 'JetBrains Mono', monospace;
                 font-size: 13px;
                 line-height: 1.5;
+                padding: 4px;
+                box-shadow: inset 0 2px 8px rgba(0,0,0,0.3);
                 box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
             }
             
@@ -578,6 +747,479 @@
                 to { transform: rotate(360deg); }
             }
             
+            /* Timeline Animation Styles */
+            .timeline-container {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: 10000;
+                display: none;
+                align-items: center;
+                justify-content: center;
+                background: rgba(0, 0, 0, 0.85);
+                backdrop-filter: blur(10px);
+                animation: fadeIn 0.3s ease;
+            }
+
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+
+            .timeline-letterbox {
+                width: 90%;
+                max-width: 1200px;
+                max-height: 70vh;
+                background: linear-gradient(135deg, #0f0f1e 0%, #1a1a3e 100%);
+                border-radius: 20px;
+                box-shadow:
+                    0 50px 100px rgba(0,0,0,0.9),
+                    0 0 100px rgba(123, 104, 238, 0.3),
+                    inset 0 1px 0 rgba(255,255,255,0.1);
+                border: 1px solid rgba(123, 104, 238, 0.4);
+                position: relative;
+                overflow: hidden;
+                animation: slideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            }
+
+            @keyframes slideUp {
+                from {
+                    transform: translateY(100px) scale(0.9);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateY(0) scale(1);
+                    opacity: 1;
+                }
+            }
+
+            .timeline-inner {
+                padding: 40px;
+                height: 100%;
+                overflow-y: auto;
+                overflow-x: hidden;
+                position: relative;
+            }
+
+            .timeline-inner::-webkit-scrollbar {
+                width: 8px;
+            }
+
+            .timeline-inner::-webkit-scrollbar-track {
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 4px;
+            }
+
+            .timeline-inner::-webkit-scrollbar-thumb {
+                background: rgba(123, 104, 238, 0.5);
+                border-radius: 4px;
+            }
+
+            .timeline-inner::-webkit-scrollbar-thumb:hover {
+                background: rgba(123, 104, 238, 0.7);
+            }
+            
+            .timeline-header {
+                font-size: 28px;
+                font-weight: 700;
+                color: white;
+                margin-bottom: 30px;
+                text-transform: uppercase;
+                letter-spacing: 3px;
+                text-align: center;
+                background: linear-gradient(90deg, #7b68ee, #e94560, #06d6a0);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                animation: gradientShift 3s ease infinite;
+                position: relative;
+                padding-bottom: 20px;
+            }
+
+            .timeline-header::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 100px;
+                height: 2px;
+                background: linear-gradient(90deg, transparent, #7b68ee, transparent);
+                animation: pulse 2s ease infinite;
+            }
+            
+            @keyframes gradientShift {
+                0%, 100% { filter: hue-rotate(0deg); }
+                50% { filter: hue-rotate(30deg); }
+            }
+            
+            .timeline-track {
+                position: relative;
+                width: 100%;
+                height: 6px;
+                background: linear-gradient(90deg,
+                    rgba(123, 104, 238, 0.1) 0%,
+                    rgba(123, 104, 238, 0.4) 50%,
+                    rgba(123, 104, 238, 0.1) 100%);
+                border-radius: 3px;
+                margin: 30px 0;
+                overflow: visible;
+                box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+            }
+
+            .timeline-track::before {
+                content: '';
+                position: absolute;
+                top: -1px;
+                left: 0;
+                height: 8px;
+                width: 0;
+                background: linear-gradient(90deg, #7b68ee, #e94560, #06d6a0);
+                border-radius: 4px;
+                animation: fillTrack 3s ease-out forwards;
+                box-shadow:
+                    0 0 30px rgba(123, 104, 238, 0.8),
+                    0 4px 12px rgba(123, 104, 238, 0.4);
+            }
+
+            @keyframes fillTrack {
+                0% {
+                    width: 0%;
+                    filter: hue-rotate(0deg);
+                }
+                50% {
+                    width: 50%;
+                    filter: hue-rotate(60deg);
+                }
+                100% {
+                    width: 100%;
+                    filter: hue-rotate(120deg);
+                }
+            }
+            
+            .timeline-events {
+                position: relative;
+                width: 100%;
+                display: flex;
+                flex-direction: row;
+                gap: 30px;
+                margin-top: 40px;
+                padding: 20px 0;
+                overflow-x: auto;
+                overflow-y: hidden;
+                min-height: 280px;
+                align-items: center;
+            }
+
+            .timeline-events::-webkit-scrollbar {
+                height: 8px;
+            }
+
+            .timeline-events::-webkit-scrollbar-track {
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 4px;
+            }
+
+            .timeline-events::-webkit-scrollbar-thumb {
+                background: rgba(123, 104, 238, 0.5);
+                border-radius: 4px;
+            }
+            
+            .timeline-event {
+                opacity: 0;
+                transform: translateY(50px) scale(0.8);
+                min-width: 250px;
+                max-width: 250px;
+                height: 200px;
+                padding: 20px;
+                background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%);
+                border-radius: 16px;
+                border: 1px solid rgba(123, 104, 238, 0.2);
+                box-shadow:
+                    0 20px 40px rgba(0,0,0,0.4),
+                    inset 0 1px 0 rgba(255,255,255,0.1);
+                position: relative;
+                overflow: hidden;
+                backdrop-filter: blur(10px);
+                transition: all 0.3s ease;
+                display: flex;
+                flex-direction: column;
+                flex-shrink: 0;
+            }
+
+            .timeline-event::before {
+                content: '';
+                position: absolute;
+                top: -2px;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: linear-gradient(90deg, #7b68ee, #e94560);
+                border-radius: 16px 16px 0 0;
+                animation: shimmer 2s ease infinite;
+            }
+
+            @keyframes shimmer {
+                0%, 100% { opacity: 0.8; }
+                50% { opacity: 1; }
+            }
+
+            .timeline-event::after {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 0;
+                height: 0;
+                background: radial-gradient(circle, rgba(123, 104, 238, 0.6), transparent);
+                border-radius: 50%;
+                transform: translate(-50%, -50%);
+                animation: rippleExpand 0.8s ease forwards;
+                animation-delay: inherit;
+                pointer-events: none;
+            }
+
+            @keyframes rippleExpand {
+                0% {
+                    width: 0;
+                    height: 0;
+                    opacity: 0.8;
+                }
+                50% {
+                    width: 300px;
+                    height: 300px;
+                    opacity: 0.4;
+                }
+                100% {
+                    width: 400px;
+                    height: 400px;
+                    opacity: 0;
+                }
+            }
+
+            .timeline-event:hover {
+                transform: translateY(-10px) scale(1.05);
+                box-shadow:
+                    0 30px 60px rgba(0,0,0,0.5),
+                    0 0 50px rgba(123, 104, 238, 0.4),
+                    inset 0 1px 0 rgba(255,255,255,0.15);
+                border-color: rgba(123, 104, 238, 0.4);
+            }
+            
+            .timeline-event.show {
+                animation: slideInFromBottom 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            }
+
+            @keyframes slideInFromBottom {
+                0% {
+                    opacity: 0;
+                    transform: translateY(50px) scale(0.8) rotateX(20deg);
+                }
+                50% {
+                    opacity: 1;
+                    transform: translateY(-5px) scale(1.02) rotateX(0deg);
+                }
+                100% {
+                    opacity: 1;
+                    transform: translateY(0) scale(1) rotateX(0deg);
+                }
+            }
+
+            .timeline-connector {
+                position: absolute;
+                top: 50%;
+                left: 0;
+                right: 0;
+                height: 2px;
+                background: linear-gradient(90deg,
+                    transparent 0%,
+                    rgba(123, 104, 238, 0.2) 10%,
+                    rgba(123, 104, 238, 0.2) 90%,
+                    transparent 100%);
+                z-index: -1;
+                transform: translateY(-50%);
+            }
+
+            .timeline-connector::before {
+                content: '';
+                position: absolute;
+                top: -1px;
+                left: 0;
+                height: 4px;
+                width: 0;
+                background: linear-gradient(90deg, #7b68ee, #e94560);
+                box-shadow: 0 0 20px rgba(123, 104, 238, 0.8);
+                animation: fillConnector 4s linear forwards;
+            }
+
+            @keyframes fillConnector {
+                to { width: 100%; }
+            }
+            
+            .timeline-event-header {
+                display: flex;
+                align-items: flex-start;
+                gap: 12px;
+                margin-bottom: 12px;
+            }
+
+            .timeline-event-icon {
+                font-size: 32px;
+                filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+                flex-shrink: 0;
+                margin-top: 2px;
+            }
+
+            .timeline-event-title {
+                font-size: 16px;
+                font-weight: 600;
+                color: white;
+                letter-spacing: 0.5px;
+                line-height: 1.2;
+                flex: 1;
+            }
+
+            .timeline-event-description {
+                color: var(--text-secondary);
+                font-size: 13px;
+                line-height: 1.5;
+                flex: 1;
+                overflow: hidden;
+                display: -webkit-box;
+                -webkit-line-clamp: 4;
+                -webkit-box-orient: vertical;
+            }
+            
+            .timeline-event-status {
+                position: absolute;
+                bottom: 16px;
+                left: 20px;
+                right: 20px;
+                padding: 6px 12px;
+                background: linear-gradient(135deg, #06d6a0, rgba(6, 214, 160, 0.9));
+                color: white;
+                font-size: 11px;
+                font-weight: 600;
+                border-radius: 20px;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                box-shadow:
+                    0 4px 12px rgba(6, 214, 160, 0.5),
+                    inset 0 1px 0 rgba(255,255,255,0.3);
+                animation: statusPulse 2s infinite;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 4px;
+            }
+
+            @keyframes statusPulse {
+                0%, 100% {
+                    transform: scale(1);
+                    box-shadow:
+                        0 4px 12px rgba(6, 214, 160, 0.5),
+                        inset 0 1px 0 rgba(255,255,255,0.3);
+                }
+                50% {
+                    transform: scale(1.05);
+                    box-shadow:
+                        0 6px 20px rgba(6, 214, 160, 0.7),
+                        0 0 30px rgba(6, 214, 160, 0.4),
+                        inset 0 1px 0 rgba(255,255,255,0.3);
+                }
+            }
+            
+            .timeline-close {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                width: 44px;
+                height: 44px;
+                background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+                border: 1px solid rgba(255,255,255,0.2);
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                z-index: 10001;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            }
+
+            .timeline-close:hover {
+                background: linear-gradient(135deg, rgba(233, 69, 96, 0.3), rgba(233, 69, 96, 0.2));
+                border-color: #e94560;
+                transform: rotate(90deg) scale(1.1);
+                box-shadow: 0 6px 20px rgba(233, 69, 96, 0.4);
+            }
+
+            .timeline-close i {
+                color: #ffffff;
+                font-size: 22px;
+                transition: transform 0.3s ease;
+            }
+            
+            .timeline-progress {
+                display: flex;
+                justify-content: center;
+                gap: 12px;
+                margin-top: 30px;
+                padding: 20px;
+            }
+
+            .timeline-dot {
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                background: rgba(255,255,255,0.15);
+                border: 2px solid rgba(255,255,255,0.2);
+                transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+                position: relative;
+            }
+
+            .timeline-dot.active {
+                background: linear-gradient(135deg, #7b68ee, #e94560);
+                border-color: #7b68ee;
+                box-shadow:
+                    0 0 20px rgba(123, 104, 238, 0.8),
+                    0 0 40px rgba(123, 104, 238, 0.4);
+                transform: scale(1.6);
+                animation: dotPulse 1s ease;
+            }
+
+            @keyframes dotPulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(2); }
+                100% { transform: scale(1.6); }
+            }
+
+            .timeline-dot.active::after {
+                content: '';
+                position: absolute;
+                inset: -8px;
+                border-radius: 50%;
+                background: radial-gradient(circle, rgba(123, 104, 238, 0.3), transparent);
+                animation: ripple 1s ease;
+            }
+
+            @keyframes ripple {
+                from {
+                    transform: scale(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: scale(1);
+                    opacity: 0;
+                }
+            }
+            
+            @keyframes spin {
+                to { transform: rotate(360deg); }
+            }
+            
             /* Responsive adjustments */
             @media (max-width: 992px) {
                 main {
@@ -603,8 +1245,11 @@
             <li>
                 <div class="user-view center-align">
                     <a href="#!" class="brand-logo center">
-                        <i class="material-icons logo-icon">flash_on</i>
-                        <span class="logo-text">TriggerIncident.com</span>
+                        <div class="logo-wrapper">
+                            <div class="logo-glow"></div>
+                            <i class="material-icons logo-icon">flash_on</i>
+                        </div>
+                        <span class="logo-text">TriggerIncident</span>
                     </a>
                     <i class="material-icons help-icon" id="helpIcon">info_outline</i>
                 </div>
@@ -657,6 +1302,23 @@
             </div>
         </div>
     
+        <!-- Timeline Container -->
+        <div class="timeline-container" id="timelineContainer">
+            <div class="timeline-letterbox">
+                <div class="timeline-close" onclick="closeTimeline()">
+                    <i class="material-icons">close</i>
+                </div>
+                <div class="timeline-inner">
+                    <div class="timeline-header">Triggering Incidents</div>
+                    <div class="timeline-track"></div>
+                    <div class="timeline-events" id="timelineEvents">
+                        <div class="timeline-connector"></div>
+                    </div>
+                    <div class="timeline-progress" id="timelineProgress"></div>
+                </div>
+            </div>
+        </div>
+        
         <!-- Scripts -->
         <script src="https://code.jquery.com/jquery-3.6.0.min.js" ></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
@@ -1312,6 +1974,128 @@
         `;
         document.body.appendChild(loadingOverlay);
         
+        function closeTimeline() {
+            const timelineContainer = document.getElementById('timelineContainer');
+            const letterbox = timelineContainer.querySelector('.timeline-letterbox');
+
+            // Animate out
+            letterbox.style.animation = 'slideDown 0.4s ease forwards';
+            timelineContainer.style.animation = 'fadeOut 0.4s ease forwards';
+
+            setTimeout(() => {
+                timelineContainer.style.display = 'none';
+                // Clear timeline events
+                document.getElementById('timelineEvents').innerHTML = '';
+                document.getElementById('timelineProgress').innerHTML = '';
+                // Reset animations
+                letterbox.style.animation = '';
+                timelineContainer.style.animation = '';
+            }, 400);
+        }
+
+        // Add the slideDown and fadeOut animations
+        const animationStyles = document.createElement('style');
+        animationStyles.textContent = `
+            @keyframes slideDown {
+                to {
+                    transform: translateY(100px) scale(0.9);
+                    opacity: 0;
+                }
+            }
+            @keyframes fadeOut {
+                to { opacity: 0; }
+            }
+        `;
+        document.head.appendChild(animationStyles);
+
+        function showTimeline(events) {
+            const timelineContainer = document.getElementById('timelineContainer');
+            const timelineEvents = document.getElementById('timelineEvents');
+            const timelineProgress = document.getElementById('timelineProgress');
+
+            // Clear previous content
+            timelineEvents.innerHTML = '';
+            timelineProgress.innerHTML = '';
+
+            // Show container with flexbox for centering
+            timelineContainer.style.display = 'flex';
+
+            // Create progress dots
+            events.forEach((_, index) => {
+                const dot = document.createElement('div');
+                dot.className = 'timeline-dot';
+                timelineProgress.appendChild(dot);
+            });
+
+            // Batch create all event elements first
+            const eventElements = events.map((event, index) => {
+                const eventDiv = document.createElement('div');
+                eventDiv.className = 'timeline-event';
+
+                const category = categories.find(c => c.name === event.category);
+
+                // Create a more visually appealing horizontal event card
+                eventDiv.innerHTML = `
+                    <div class="timeline-event-header">
+                        <span class="timeline-event-icon">${category ? category.icon : '🔔'}</span>
+                        <div>
+                            <div class="timeline-event-title">${event.title}</div>
+                        </div>
+                    </div>
+                    <div class="timeline-event-description">${event.description}</div>
+                    <span class="timeline-event-status">
+                        <i class="material-icons" style="font-size: 12px; vertical-align: middle; margin-right: 4px;">check_circle</i>
+                        Triggered
+                    </span>
+                `;
+
+                timelineEvents.appendChild(eventDiv);
+                return eventDiv;
+            });
+
+            // Animate events sequentially from left to right
+            let delay = 500; // Initial delay
+            eventElements.forEach((eventDiv, index) => {
+                setTimeout(() => {
+                    eventDiv.classList.add('show');
+                    eventDiv.style.animationDelay = `${index * 0.3}s`;
+
+                    // Activate progress dot
+                    const dots = timelineProgress.querySelectorAll('.timeline-dot');
+                    if (dots[index]) {
+                        dots[index].classList.add('active');
+                    }
+
+                    // Enhanced visual feedback with glow effect and ripple
+                    eventDiv.style.boxShadow = '0 0 60px rgba(123, 104, 238, 0.9), 0 30px 60px rgba(0,0,0,0.5)';
+
+                    // Trigger the ripple effect
+                    eventDiv.style.setProperty('--ripple-delay', `${index * 0.2}s`);
+
+                    setTimeout(() => {
+                        eventDiv.style.boxShadow = '0 20px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)';
+                    }, 600);
+
+                    // Smooth horizontal scroll to show the latest event
+                    const timelineEventsContainer = document.getElementById('timelineEvents');
+                    if (timelineEventsContainer && index > 2) { // Start scrolling after 3 events
+                        const scrollPosition = (index - 2) * 280; // 250px width + 30px gap
+                        timelineEventsContainer.scrollTo({
+                            left: scrollPosition,
+                            behavior: 'smooth'
+                        });
+                    }
+                }, delay);
+
+                delay += 1000; // 1 second delay between events for cinematic effect
+            });
+
+            // Auto-close timeline after all events are shown + 2.5 seconds
+            setTimeout(() => {
+                closeTimeline();
+            }, delay + 2500);
+        }
+        
         triggerBtn.onclick = () => {
             const routingKey = routingKeyInput.value.trim();
             if (!routingKey) {
@@ -1329,10 +2113,23 @@
                 M.toast({html: 'Please select at least one event to trigger.', classes: 'red'});
                 return;
             }
-
-            // Show loading overlay
-            loadingOverlay.style.display = 'flex';
             
+            // Prepare event data for timeline
+            const selectedEvents = selectedCards.map(card => {
+                const category = card.dataset.category;
+                const index = card.dataset.index;
+                const item = payloads[category][index];
+                return {
+                    title: item.title,
+                    description: item.description,
+                    category: item.category
+                };
+            });
+            
+            // Show timeline animation
+            showTimeline(selectedEvents);
+            
+            // Prepare payloads
             const selectedPayloads = selectedCards.map(card => {
                 const category = card.dataset.category;
                 const index = card.dataset.index;
@@ -1342,45 +2139,33 @@
                 return payloadClone;
             });
 
-            let completedRequests = 0;
-            const totalRequests = selectedPayloads.length;
-            
-            selectedPayloads.forEach(payload => {
-                fetch('https://events.pagerduty.com/v2/enqueue', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(payload)
-                })
-                .then(response => {
-                    if (response.ok) {
-                        return response.json().then(data => {
-                            console.log('Success:', data);
-                            M.toast({html: 'Event triggered successfully!', classes: 'green'});
-                        });
-                    } else {
-                        return response.text().then(text => {
-                            throw new Error(text || 'Unknown error occurred');
-                        });
-                    }
-                })
-                .catch((error) => {
-                    console.error('Error:', error.message);
-                    M.toast({html: `Failed to trigger event: ${error.message}`, classes: 'red'});
-                })
-                .finally(() => {
-                    completedRequests++;
-                    if (completedRequests === totalRequests) {
-                        // Hide loading overlay when all requests are complete
-                        setTimeout(() => {
-                            loadingOverlay.style.display = 'none';
-                        }, 500);
-                    }
-                });
+            // Send events with 2-second delay between each
+            selectedPayloads.forEach((payload, index) => {
+                setTimeout(() => {
+                    fetch('https://events.pagerduty.com/v2/enqueue', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            return response.json().then(data => {
+                                console.log('Success:', data);
+                            });
+                        } else {
+                            return response.text().then(text => {
+                                throw new Error(text || 'Unknown error occurred');
+                            });
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error.message);
+                        M.toast({html: `Failed to trigger event: ${error.message}`, classes: 'red'});
+                    });
+                }, index * 2000);
             });
-
-            M.toast({html: `Triggering ${selectedPayloads.length} event(s)`, classes: 'blue'});
         };
     
         // Removed the findItemByTitle function since it's no longer needed
