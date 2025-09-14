@@ -1388,7 +1388,7 @@
                                 }
                             },
                             "routing_key": "DYNAMIC",
-                            "dedup_key": "web-server-1/cpu",
+                            "dedup_key": "web-server-1-cpu",
                             "event_action": "trigger",
                             "client": "Datadog",
                             "client_url": "https://www.datadoghq.com",
@@ -1416,7 +1416,7 @@
                                 }
                             },
                             "routing_key": "DYNAMIC",
-                            "dedup_key": "app-server-2/memory",
+                            "dedup_key": "app-server-2-memory",
                             "event_action": "trigger",
                             "client": "Datadog",
                             "client_url": "https://www.datadoghq.com",
@@ -1446,7 +1446,7 @@
                                 }
                             },
                             "routing_key": "DYNAMIC",
-                            "dedup_key": "checkout-service/transaction",
+                            "dedup_key": "checkout-service-transaction",
                             "event_action": "trigger",
                             "client": "New Relic",
                             "client_url": "https://www.newrelic.com",
@@ -1474,7 +1474,7 @@
                                 }
                             },
                             "routing_key": "DYNAMIC",
-                            "dedup_key": "user-service/error-rate",
+                            "dedup_key": "user-service-error-rate",
                             "event_action": "trigger",
                             "client": "New Relic",
                             "client_url": "https://www.newrelic.com",
@@ -1504,7 +1504,7 @@
                                 }
                             },
                             "routing_key": "DYNAMIC",
-                            "dedup_key": "/v1/orders/latency",
+                            "dedup_key": "v1-orders-latency",
                             "event_action": "trigger",
                             "client": "Prometheus",
                             "client_url": "https://prometheus.io",
@@ -1532,7 +1532,7 @@
                                 }
                             },
                             "routing_key": "DYNAMIC",
-                            "dedup_key": "db-server-3/disk",
+                            "dedup_key": "db-server-3-disk",
                             "event_action": "trigger",
                             "client": "Prometheus",
                             "client_url": "https://prometheus.io",
@@ -1563,7 +1563,7 @@
                                 }
                             },
                             "routing_key": "DYNAMIC",
-                            "dedup_key": "switch-5/outage",
+                            "dedup_key": "switch-5-outage",
                             "event_action": "trigger",
                             "client": "SolarWinds",
                             "client_url": "https://www.solarwinds.com",
@@ -1591,7 +1591,7 @@
                                 }
                             },
                             "routing_key": "DYNAMIC",
-                            "dedup_key": "router-3/bandwidth",
+                            "dedup_key": "router-3-bandwidth",
                             "event_action": "trigger",
                             "client": "SolarWinds",
                             "client_url": "https://www.solarwinds.com",
@@ -1621,7 +1621,7 @@
                                 }
                             },
                             "routing_key": "DYNAMIC",
-                            "dedup_key": "laptop-4/malware",
+                            "dedup_key": "laptop-4-malware",
                             "event_action": "trigger",
                             "client": "CrowdStrike",
                             "client_url": "https://www.crowdstrike.com",
@@ -1649,7 +1649,7 @@
                                 }
                             },
                             "routing_key": "DYNAMIC",
-                            "dedup_key": "desktop-7/suspicious",
+                            "dedup_key": "desktop-7-suspicious",
                             "event_action": "trigger",
                             "client": "CrowdStrike",
                             "client_url": "https://www.crowdstrike.com",
@@ -1679,7 +1679,7 @@
                                 }
                             },
                             "routing_key": "DYNAMIC",
-                            "dedup_key": "web/feedback",
+                            "dedup_key": "web-feedback",
                             "event_action": "trigger",
                             "client": "Sentiment Analysis",
                             "client_url": "https://example.com",
@@ -1708,7 +1708,7 @@
                                 }
                             },
                             "routing_key": "DYNAMIC",
-                            "dedup_key": "customer/12345/churn",
+                            "dedup_key": "customer-churn",
                             "event_action": "trigger",
                             "client": "Sentiment Analysis",
                             "client_url": "https://example.com",
@@ -1742,7 +1742,7 @@
                     }
                 },
                 "routing_key": "DYNAMIC",
-                "dedup_key": "12345j233423j4k52345bk24k3j534erqwrtasdfasdfhgjhghjsdefefedjgedjef",
+                "dedup_key": "database-upgrade-failure",
                 "event_action": "trigger",
                 "client": "Bugsnag",
                 "client_url": "https://app.bugsnag.com/pagerduty-1/pd-ui-container/errors/abcdefghijklmnop",
@@ -1761,7 +1761,7 @@
                     "summary": "[CRITICAL] Kubernetes Pod CrashLoopBackOff - web-api deployment",
                     "timestamp": "2024-09-14T15:21:00Z",
                     "severity": "critical",
-                    "source": "prometheus-k8s-cluster",
+                    "source": "web-api-cluster",
                     "component": "web-api",
                     "group": "kubernetes",
                     "class": "deployment",
@@ -1778,7 +1778,7 @@
                     }
                 },
                 "routing_key": "DYNAMIC",
-                "dedup_key": "k8s/production/web-api/crashloop",
+                "dedup_key": "web-api-crashloop",
                 "event_action": "trigger",
                 "client": "Prometheus",
                 "client_url": "https://prometheus.example.com/alerts",
@@ -1795,7 +1795,7 @@
                     "summary": "[ERROR] Kubernetes ImagePullBackOff - web-api deployment",
                     "timestamp": "2024-09-14T15:21:00Z",
                     "severity": "error",
-                    "source": "datadog-k8s-monitor",
+                    "source": "web-api-deployment",
                     "component": "web-api",
                     "group": "kubernetes",
                     "class": "deployment",
@@ -1803,17 +1803,16 @@
                         "deployment": "web-api",
                         "namespace": "production",
                         "image": "nginx:1.25-alpine",
-                        "error": "Failed to pull image nginx:1.25-alpine: rpc error: code = Unknown desc = Error response from daemon: manifest for nginx:1.25-alpine not found",
-                        "pod_name": "web-api-deployment-7d9f8c6b5-xj2kl",
-                        "environment": "production",
-                        "registry": "docker.io"
+                        "error": "Failed to pull image",
+                        "pod_name": "web-api-deployment-xj2kl",
+                        "environment": "production"
                     }
                 },
                 "routing_key": "DYNAMIC",
-                "dedup_key": "k8s/production/web-api/imagepull",
+                "dedup_key": "web-api-imagepull",
                 "event_action": "trigger",
-                "client": "Datadog",
-                "client_url": "https://app.datadoghq.com/monitors",
+                "client": "Prometheus",
+                "client_url": "https://prometheus.example.com/alerts",
                 "links": [],
                 "images": []
             }
@@ -1827,7 +1826,7 @@
                     "summary": "[WARNING] Kubernetes Liveness Probe Failed - web-api",
                     "timestamp": "2024-09-14T15:21:00Z",
                     "severity": "warning",
-                    "source": "prometheus-k8s-cluster",
+                    "source": "web-api-health",
                     "component": "web-api",
                     "group": "kubernetes",
                     "class": "health",
@@ -1843,7 +1842,7 @@
                     }
                 },
                 "routing_key": "DYNAMIC",
-                "dedup_key": "k8s/production/web-api/liveness",
+                "dedup_key": "web-api-liveness",
                 "event_action": "trigger",
                 "client": "Prometheus",
                 "client_url": "https://prometheus.example.com/alerts",
@@ -1860,28 +1859,27 @@
                     "summary": "[CRITICAL] Kubernetes Pod OOMKilled - web-api exceeding memory limits",
                     "timestamp": "2024-09-14T15:21:00Z",
                     "severity": "critical",
-                    "source": "datadog-k8s-monitor",
+                    "source": "web-api-pod",
                     "component": "web-api",
                     "group": "kubernetes",
                     "class": "resources",
                     "custom_details": {
                         "deployment": "web-api",
                         "namespace": "production",
-                        "pod": "web-api-deployment-7d9f8c6b5-k3j4h",
+                        "pod": "web-api-deployment-k3j4h",
                         "container": "nginx",
                         "memory_limit": "512Mi",
                         "memory_used": "768Mi",
-                        "exit_code": 137,
+                        "exit_code": "137",
                         "reason": "OOMKilled",
-                        "environment": "production",
-                        "node": "ip-10-0-2-145.us-west-2.compute.internal"
+                        "environment": "production"
                     }
                 },
                 "routing_key": "DYNAMIC",
-                "dedup_key": "k8s/production/web-api/oom",
+                "dedup_key": "web-api-oom",
                 "event_action": "trigger",
-                "client": "Datadog",
-                "client_url": "https://app.datadoghq.com/monitors",
+                "client": "Prometheus",
+                "client_url": "https://prometheus.example.com/alerts",
                 "links": [],
                 "images": []
             }
@@ -1895,7 +1893,7 @@
                     "summary": "[ERROR] Kubernetes Service has no ready endpoints - web-api",
                     "timestamp": "2024-09-14T15:21:00Z",
                     "severity": "error",
-                    "source": "prometheus-k8s-cluster",
+                    "source": "web-api-service",
                     "component": "web-api-service",
                     "group": "kubernetes",
                     "class": "networking",
@@ -1914,7 +1912,7 @@
                     }
                 },
                 "routing_key": "DYNAMIC",
-                "dedup_key": "k8s/production/web-api/endpoints",
+                "dedup_key": "web-api-endpoints",
                 "event_action": "trigger",
                 "client": "Prometheus",
                 "client_url": "https://prometheus.example.com/alerts",
@@ -2292,7 +2290,10 @@
         }
         
         triggerBtn.onclick = () => {
+            console.log('=== TRIGGER BUTTON CLICKED ===');
             const routingKey = routingKeyInput.value.trim();
+            console.log('Routing key:', routingKey);
+
             if (!routingKey) {
                 M.toast({html: 'Please enter a routing key', classes: 'red'});
                 return;
@@ -2303,6 +2304,8 @@
                     const checkbox = card.querySelector('input[type="checkbox"]');
                     return checkbox && checkbox.checked;
                 });
+
+            console.log('Number of selected cards:', selectedCards.length);
 
             if (selectedCards.length === 0) {
                 M.toast({html: 'Please select at least one event to trigger.', classes: 'red'});
@@ -2331,12 +2334,21 @@
                 const item = payloads[category][index];
                 const payloadClone = JSON.parse(JSON.stringify(item.payload));
                 payloadClone.routing_key = routingKey;
+                // Generate unique dedup_key with timestamp to ensure new incidents
+                const timestamp = Date.now();
+                const randomId = Math.random().toString(36).substring(2, 15);
+                payloadClone.dedup_key = `${payloadClone.dedup_key}_${timestamp}_${randomId}`;
                 return payloadClone;
             });
 
             // Send events with 2-second delay between each
+            console.log('Payloads to send:', selectedPayloads);
+
             selectedPayloads.forEach((payload, index) => {
                 setTimeout(() => {
+                    console.log(`Sending event ${index + 1}/${selectedPayloads.length}:`, payload);
+                    console.log('Payload JSON:', JSON.stringify(payload, null, 2));
+
                     fetch('https://events.pagerduty.com/v2/enqueue', {
                         method: 'POST',
                         headers: {
@@ -2345,19 +2357,22 @@
                         body: JSON.stringify(payload)
                     })
                     .then(response => {
+                        console.log(`Response ${index + 1}: Status ${response.status}`);
                         if (response.ok) {
                             return response.json().then(data => {
-                                console.log('Success:', data);
+                                console.log(`Success ${index + 1}:`, data);
+                                M.toast({html: `✓ Event ${index + 1} sent`, classes: 'green'});
                             });
                         } else {
                             return response.text().then(text => {
+                                console.error(`Error response ${index + 1}:`, text);
                                 throw new Error(text || 'Unknown error occurred');
                             });
                         }
                     })
                     .catch((error) => {
-                        console.error('Error:', error.message);
-                        M.toast({html: `Failed to trigger event: ${error.message}`, classes: 'red'});
+                        console.error(`Error ${index + 1}:`, error);
+                        M.toast({html: `✗ Event ${index + 1}: ${error.message}`, classes: 'red'});
                     });
                 }, index * 2000);
             });
