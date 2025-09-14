@@ -82,14 +82,14 @@
     
             .sidenav .user-view {
                 background: linear-gradient(145deg, rgba(26, 26, 46, 0.95), rgba(77, 77, 140, 0.95));
-                padding: 32px 15px;
-                margin-bottom: 30px;
+                padding: 20px 15px;
+                margin-bottom: 15px;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 position: relative;
                 border-radius: 0 0 20px 20px;
-                box-shadow: 
+                box-shadow:
                     0 10px 30px rgba(0,0,0,0.4),
                     inset 0 1px 0 rgba(255,255,255,0.1);
                 border-bottom: 2px solid rgba(123, 104, 238, 0.3);
@@ -118,12 +118,12 @@
             .logo-wrapper {
                 position: relative;
                 display: inline-block;
-                margin-bottom: 12px;
+                margin-bottom: 8px;
             }
 
             .logo-glow {
                 position: absolute;
-                inset: -20px;
+                inset: -15px;
                 background: radial-gradient(circle, rgba(123, 104, 238, 0.3), transparent 65%);
                 border-radius: 50%;
                 animation: logoGlow 3s ease infinite;
@@ -142,7 +142,7 @@
             }
 
             .sidenav .user-view a.brand-logo i.logo-icon {
-                font-size: 72px;
+                font-size: 48px;
                 margin-bottom: 0;
                 background: linear-gradient(135deg, #7b68ee 0%, #e94560 50%, #06d6a0 100%);
                 -webkit-background-clip: text;
@@ -151,7 +151,7 @@
                 position: relative;
                 z-index: 2;
                 animation: logoShine 4s linear infinite;
-                filter: drop-shadow(0 6px 20px rgba(123, 104, 238, 0.6));
+                filter: drop-shadow(0 4px 12px rgba(123, 104, 238, 0.6));
             }
 
             @keyframes logoShine {
@@ -170,12 +170,12 @@
             }
 
             .sidenav .user-view a.brand-logo span.logo-text {
-                font-size: 15px;
+                font-size: 13px;
                 font-weight: 700;
                 display: block;
-                letter-spacing: 1.5px;
+                letter-spacing: 1px;
                 text-transform: uppercase;
-                margin-top: 8px;
+                margin-top: 4px;
                 position: relative;
                 background: linear-gradient(90deg, #ffffff, #adb5bd);
                 -webkit-background-clip: text;
@@ -186,11 +186,11 @@
             .logo-text::after {
                 content: '';
                 position: absolute;
-                bottom: -6px;
+                bottom: -4px;
                 left: 50%;
                 transform: translateX(-50%);
-                width: 80%;
-                height: 2px;
+                width: 60%;
+                height: 1px;
                 background: linear-gradient(90deg, transparent, #7b68ee, transparent);
                 animation: pulse 2s ease infinite;
             }
@@ -228,11 +228,11 @@
             .categories li a {
                 color: var(--text-primary);
                 display: block;
-                padding: 12px 16px;
+                padding: 8px 14px;
                 cursor: pointer;
-                font-size: 14px;
+                font-size: 13px;
                 border-radius: var(--border-radius);
-                margin-bottom: 6px;
+                margin-bottom: 2px;
                 font-weight: 500;
                 display: flex;
                 align-items: center;
@@ -697,9 +697,29 @@
                 background-color: var(--accent-color);
                 transition: width 0.3s ease;
             }
-            
+
             .categories li a:hover::after {
                 width: 100%;
+            }
+
+            /* Ensure Material Icons display properly in sidebar */
+            .categories li a i.material-icons {
+                font-family: 'Material Icons' !important;
+                font-weight: normal;
+                font-style: normal;
+                font-size: 20px !important;
+                line-height: 1;
+                letter-spacing: normal;
+                text-transform: none;
+                display: inline-block !important;
+                white-space: nowrap;
+                word-wrap: normal;
+                direction: ltr;
+                -webkit-font-feature-settings: 'liga';
+                -webkit-font-smoothing: antialiased;
+                vertical-align: middle !important;
+                margin-right: 12px !important;
+                color: var(--accent-color) !important;
             }
             
             .categories li:nth-child(1) a { animation: slideIn 0.3s ease 0.1s both; }
@@ -1334,14 +1354,15 @@
         
         <script>
             const categories = [
-                { name: "Alert Storm", icon: "🌐" },
-                { name: "AWS:Reinvent", icon: "♦️" },
-                { name: "Datadog", icon: "🐶" },
-                { name: "New Relic", icon: "🔍" },
-                { name: "Prometheus", icon: "🔥" },
-                { name: "SolarWinds", icon: "☀️" },
-                { name: "CrowdStrike", icon: "🦅" },
-                { name: "Customer Sentiment", icon: "😊" }
+                { name: "Alert Storm", icon: "storm" },
+                { name: "AWS:Reinvent", icon: "cloud" },
+                { name: "Datadog", icon: "pets" },
+                { name: "New Relic", icon: "search" },
+                { name: "Prometheus", icon: "local_fire_department" },
+                { name: "SolarWinds", icon: "wb_sunny" },
+                { name: "CrowdStrike", icon: "security" },
+                { name: "Customer Sentiment", icon: "sentiment_satisfied" },
+                { name: "Kubernetes Scenario", icon: "hub" }
 
             ];
         
@@ -1729,8 +1750,180 @@
                 "images": []
             }
         }
+    ],
+    "Kubernetes Scenario": [
+        {
+            title: "Pod CrashLoopBackOff",
+            description: "web-api pods failing to start after deployment",
+            category: "Kubernetes Scenario",
+            payload: {
+                "payload": {
+                    "summary": "[CRITICAL] Kubernetes Pod CrashLoopBackOff - web-api deployment",
+                    "timestamp": "2024-09-14T15:21:00Z",
+                    "severity": "critical",
+                    "source": "prometheus-k8s-cluster",
+                    "component": "web-api",
+                    "group": "kubernetes",
+                    "class": "deployment",
+                    "custom_details": {
+                        "deployment": "web-api",
+                        "namespace": "production",
+                        "image": "nginx:1.25-alpine",
+                        "replicas_desired": 3,
+                        "replicas_ready": 0,
+                        "error": "container web-api is waiting to start: CrashLoopBackOff",
+                        "restart_count": 12,
+                        "environment": "production",
+                        "cluster": "us-west-2a"
+                    }
+                },
+                "routing_key": "DYNAMIC",
+                "dedup_key": "k8s/production/web-api/crashloop",
+                "event_action": "trigger",
+                "client": "Prometheus",
+                "client_url": "https://prometheus.example.com/alerts",
+                "links": [],
+                "images": []
+            }
+        },
+        {
+            title: "ImagePullBackOff Error",
+            description: "Unable to pull nginx:1.25-alpine image",
+            category: "Kubernetes Scenario",
+            payload: {
+                "payload": {
+                    "summary": "[ERROR] Kubernetes ImagePullBackOff - web-api deployment",
+                    "timestamp": "2024-09-14T15:21:00Z",
+                    "severity": "error",
+                    "source": "datadog-k8s-monitor",
+                    "component": "web-api",
+                    "group": "kubernetes",
+                    "class": "deployment",
+                    "custom_details": {
+                        "deployment": "web-api",
+                        "namespace": "production",
+                        "image": "nginx:1.25-alpine",
+                        "error": "Failed to pull image nginx:1.25-alpine: rpc error: code = Unknown desc = Error response from daemon: manifest for nginx:1.25-alpine not found",
+                        "pod_name": "web-api-deployment-7d9f8c6b5-xj2kl",
+                        "environment": "production",
+                        "registry": "docker.io"
+                    }
+                },
+                "routing_key": "DYNAMIC",
+                "dedup_key": "k8s/production/web-api/imagepull",
+                "event_action": "trigger",
+                "client": "Datadog",
+                "client_url": "https://app.datadoghq.com/monitors",
+                "links": [],
+                "images": []
+            }
+        },
+        {
+            title: "Liveness Probe Failed",
+            description: "Health check failing on new pods",
+            category: "Kubernetes Scenario",
+            payload: {
+                "payload": {
+                    "summary": "[WARNING] Kubernetes Liveness Probe Failed - web-api",
+                    "timestamp": "2024-09-14T15:21:00Z",
+                    "severity": "warning",
+                    "source": "prometheus-k8s-cluster",
+                    "component": "web-api",
+                    "group": "kubernetes",
+                    "class": "health",
+                    "custom_details": {
+                        "deployment": "web-api",
+                        "namespace": "production",
+                        "pod": "web-api-deployment-7d9f8c6b5-m8n9p",
+                        "probe_type": "liveness",
+                        "failure_threshold": 3,
+                        "consecutive_failures": 5,
+                        "error": "Get http://10.2.14.37:8080/health: dial tcp 10.2.14.37:8080: connect: connection refused",
+                        "environment": "production"
+                    }
+                },
+                "routing_key": "DYNAMIC",
+                "dedup_key": "k8s/production/web-api/liveness",
+                "event_action": "trigger",
+                "client": "Prometheus",
+                "client_url": "https://prometheus.example.com/alerts",
+                "links": [],
+                "images": []
+            }
+        },
+        {
+            title: "OOMKilled - Memory Limit",
+            description: "Pods terminated due to memory limits",
+            category: "Kubernetes Scenario",
+            payload: {
+                "payload": {
+                    "summary": "[CRITICAL] Kubernetes Pod OOMKilled - web-api exceeding memory limits",
+                    "timestamp": "2024-09-14T15:21:00Z",
+                    "severity": "critical",
+                    "source": "datadog-k8s-monitor",
+                    "component": "web-api",
+                    "group": "kubernetes",
+                    "class": "resources",
+                    "custom_details": {
+                        "deployment": "web-api",
+                        "namespace": "production",
+                        "pod": "web-api-deployment-7d9f8c6b5-k3j4h",
+                        "container": "nginx",
+                        "memory_limit": "512Mi",
+                        "memory_used": "768Mi",
+                        "exit_code": 137,
+                        "reason": "OOMKilled",
+                        "environment": "production",
+                        "node": "ip-10-0-2-145.us-west-2.compute.internal"
+                    }
+                },
+                "routing_key": "DYNAMIC",
+                "dedup_key": "k8s/production/web-api/oom",
+                "event_action": "trigger",
+                "client": "Datadog",
+                "client_url": "https://app.datadoghq.com/monitors",
+                "links": [],
+                "images": []
+            }
+        },
+        {
+            title: "Service Endpoints Not Ready",
+            description: "No healthy endpoints for web-api service",
+            category: "Kubernetes Scenario",
+            payload: {
+                "payload": {
+                    "summary": "[ERROR] Kubernetes Service has no ready endpoints - web-api",
+                    "timestamp": "2024-09-14T15:21:00Z",
+                    "severity": "error",
+                    "source": "prometheus-k8s-cluster",
+                    "component": "web-api-service",
+                    "group": "kubernetes",
+                    "class": "networking",
+                    "custom_details": {
+                        "service": "web-api-service",
+                        "namespace": "production",
+                        "deployment": "web-api",
+                        "ready_endpoints": 0,
+                        "total_endpoints": 3,
+                        "selector": "app=web-api,version=1.25",
+                        "rollout_status": "RollingUpdate in progress",
+                        "maxUnavailable": 1,
+                        "maxSurge": 1,
+                        "environment": "production",
+                        "load_balancer": "alb.us-west-2.elb.amazonaws.com"
+                    }
+                },
+                "routing_key": "DYNAMIC",
+                "dedup_key": "k8s/production/web-api/endpoints",
+                "event_action": "trigger",
+                "client": "Prometheus",
+                "client_url": "https://prometheus.example.com/alerts",
+                "links": [],
+                "images": []
+            }
+        }
     ]
-                
+
             };
         
             const categoriesList = document.getElementById('categories');
@@ -1791,7 +1984,7 @@
                 const li = document.createElement('li');
                 const a = document.createElement('a');
                 a.href = '#!';
-                a.innerHTML = `${category.icon} ${category.name}`;
+                a.innerHTML = `<i class="material-icons" style="font-size: 18px; vertical-align: middle; margin-right: 10px; display: inline-block; color: var(--accent-color);">${category.icon}</i><span style="vertical-align: middle;">${category.name}</span>`;
                 a.onclick = () => switchCategory(category.name);
                 if (currentCategory === category.name) a.classList.add('active');
                 li.appendChild(a);
@@ -1852,8 +2045,10 @@
                 const cardIcon = document.createElement('span');
                 cardIcon.className = 'card-title';
     
-                const iconSpan = document.createElement('span');
-                iconSpan.textContent = categories.find(c => c.name === item.category).icon + ' ';
+                const iconSpan = document.createElement('i');
+                iconSpan.className = 'material-icons';
+                iconSpan.style.cssText = 'font-size: 24px; vertical-align: middle; margin-right: 8px; color: var(--accent-color);';
+                iconSpan.textContent = categories.find(c => c.name === item.category).icon;
     
                 const titleSpan = document.createElement('span');
                 titleSpan.textContent = item.title;
@@ -2037,7 +2232,7 @@
                 // Create a more visually appealing horizontal event card
                 eventDiv.innerHTML = `
                     <div class="timeline-event-header">
-                        <span class="timeline-event-icon">${category ? category.icon : '🔔'}</span>
+                        <i class="material-icons timeline-event-icon">${category ? category.icon : 'notifications'}</i>
                         <div>
                             <div class="timeline-event-title">${event.title}</div>
                         </div>
