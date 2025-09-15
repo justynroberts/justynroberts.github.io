@@ -314,15 +314,10 @@ curl -s https://alb.us-west-2.elb.amazonaws.com/health
 
 ---
 
-## Escalation Contacts
+## Key Customers
 
-| Role | Contact | When to Escalate |
-|------|---------|------------------|
-| Platform Team Lead | @platform-lead | Cluster-wide issues |
-| DevOps Manager | @devops-manager | Multiple service impact |
-| Security Team | @security-oncall | Image security concerns |
-| Network Team | @network-oncall | Connectivity issues |
-| Database Team | @db-oncall | Data layer problems |
+Blue Carpet - SLA 99.9
+
 
 ---
 
