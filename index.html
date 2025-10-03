@@ -2339,11 +2339,24 @@
         // Removed the findItemByTitle function since it's no longer needed
     
         function setRoutingKeyLocalStorage(value) {
-            localStorage.setItem('routingKey', value);
+            try {
+                localStorage.setItem('routingKey', value);
+                console.log('✓ Saved to localStorage:', value);
+                console.log('✓ Verify read back:', localStorage.getItem('routingKey'));
+            } catch (e) {
+                console.error('✗ Error saving to localStorage:', e);
+            }
         }
 
         function getRoutingKeyLocalStorage() {
-            return localStorage.getItem('routingKey') || '';
+            try {
+                const value = localStorage.getItem('routingKey') || '';
+                console.log('✓ Retrieved from localStorage:', value);
+                return value;
+            } catch (e) {
+                console.error('✗ Error reading from localStorage:', e);
+                return '';
+            }
         }
 
         toggleRoutingKeyBtn.onclick = () => {
@@ -2356,20 +2369,30 @@
             }
         };
 
-        routingKeyInput.addEventListener('input', () => {
-            setRoutingKeyLocalStorage(routingKeyInput.value);
-            console.log('Routing key saved to localStorage:', routingKeyInput.value);
-        });
+        // Set up event listeners after DOM is loaded
+        if (routingKeyInput) {
+            routingKeyInput.addEventListener('input', (e) => {
+                console.log('Input event fired, value:', e.target.value);
+                setRoutingKeyLocalStorage(e.target.value);
+            });
 
-        routingKeyInput.addEventListener('change', () => {
-            setRoutingKeyLocalStorage(routingKeyInput.value);
-            console.log('Routing key saved on change:', routingKeyInput.value);
-        });
+            routingKeyInput.addEventListener('change', (e) => {
+                console.log('Change event fired, value:', e.target.value);
+                setRoutingKeyLocalStorage(e.target.value);
+            });
 
-        routingKeyInput.addEventListener('blur', () => {
-            setRoutingKeyLocalStorage(routingKeyInput.value);
-            console.log('Routing key saved on blur:', routingKeyInput.value);
-        });
+            routingKeyInput.addEventListener('blur', (e) => {
+                console.log('Blur event fired, value:', e.target.value);
+                setRoutingKeyLocalStorage(e.target.value);
+            });
+
+            routingKeyInput.addEventListener('keyup', (e) => {
+                console.log('Keyup event fired, value:', e.target.value);
+                setRoutingKeyLocalStorage(e.target.value);
+            });
+        } else {
+            console.error('✗ routingKeyInput element not found!');
+        }
     
         helpIcon.onclick = () => {
             if (!helpPopup.classList.contains('show')) {
