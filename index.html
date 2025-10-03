@@ -1897,6 +1897,13 @@
             M.AutoInit();
             populateCategories();
             renderCards();
+
+            // Load saved routing key
+            const savedRoutingKey = getRoutingKeyLocalStorage();
+            if (savedRoutingKey) {
+                routingKeyInput.value = savedRoutingKey;
+                routingKeyInput.type = "password";
+            }
     
             // Add pulse animation style
             const style = document.createElement('style');
@@ -2351,19 +2358,18 @@
 
         routingKeyInput.addEventListener('input', () => {
             setRoutingKeyLocalStorage(routingKeyInput.value);
+            console.log('Routing key saved to localStorage:', routingKeyInput.value);
         });
 
         routingKeyInput.addEventListener('change', () => {
             setRoutingKeyLocalStorage(routingKeyInput.value);
+            console.log('Routing key saved on change:', routingKeyInput.value);
         });
 
-        window.onload = () => {
-            const savedRoutingKey = getRoutingKeyLocalStorage();
-            if (savedRoutingKey) {
-                routingKeyInput.value = savedRoutingKey;
-                routingKeyInput.type = "password";
-            }
-        };
+        routingKeyInput.addEventListener('blur', () => {
+            setRoutingKeyLocalStorage(routingKeyInput.value);
+            console.log('Routing key saved on blur:', routingKeyInput.value);
+        });
     
         helpIcon.onclick = () => {
             if (!helpPopup.classList.contains('show')) {
