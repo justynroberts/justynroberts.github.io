@@ -12,26 +12,25 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/addon/lint/lint.min.css">
     
         <style>
-            @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+            /* Using system fonts for professional appearance */
     
             :root {
-                --primary-color: #1a1a2e;
-                --primary-light: #4d4d8c;
-                --accent-color: #7b68ee;
-                --danger-color: #e94560;
-                --success-color: #06d6a0;
-                --warning-color: #ffd166;
-                --bg-dark: #0a0a0f;
-                --bg-card: #16213e;
-                --bg-sidebar: #0d0d1a;
-                --text-primary: #f8f9fa;
-                --text-secondary: #adb5bd;
-                --border-radius: 16px;
-                --transition-speed: 0.3s;
-                --card-shadow: 0 10px 20px rgba(0,0,0,0.4);
-                --hover-shadow: 0 15px 30px rgba(0,0,0,0.5);
-                --neon-glow: 0 0 20px rgba(123, 104, 238, 0.5);
-                --timeline-glow: 0 0 30px rgba(123, 104, 238, 0.6);
+                --primary-color: #1e1e1e;
+                --primary-light: #2d2d2d;
+                --accent-color: #4a90e2;
+                --danger-color: #dc3545;
+                --success-color: #28a745;
+                --warning-color: #ffc107;
+                --bg-dark: #121212;
+                --bg-card: #1e1e1e;
+                --bg-sidebar: #161616;
+                --text-primary: #e0e0e0;
+                --text-secondary: #9e9e9e;
+                --border-radius: 8px;
+                --transition-speed: 0.2s;
+                --card-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                --hover-shadow: 0 4px 8px rgba(0,0,0,0.3);
+                --border-color: #333333;
             }
     
             * {
@@ -42,34 +41,11 @@
             body {
                 font-family: 'Space Grotesk', sans-serif;
                 background-color: var(--bg-dark);
-                background-image: 
-                    radial-gradient(circle at 20% 80%, rgba(123, 104, 238, 0.15) 0%, transparent 50%),
-                    radial-gradient(circle at 80% 20%, rgba(233, 69, 96, 0.1) 0%, transparent 50%),
-                    radial-gradient(circle at 40% 40%, rgba(6, 214, 160, 0.08) 0%, transparent 50%);
                 color: var(--text-primary);
-                line-height: 1.6;
+                line-height: 1.5;
                 min-height: 100vh;
                 position: relative;
                 overflow-x: hidden;
-            }
-            
-            body::before {
-                content: '';
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: 
-                    repeating-linear-gradient(
-                        90deg,
-                        transparent,
-                        transparent 2px,
-                        rgba(123, 104, 238, 0.03) 2px,
-                        rgba(123, 104, 238, 0.03) 4px
-                    );
-                pointer-events: none;
-                z-index: 1;
             }
     
             .sidenav {
@@ -81,18 +57,14 @@
             }
     
             .sidenav .user-view {
-                background: linear-gradient(145deg, rgba(26, 26, 46, 0.95), rgba(77, 77, 140, 0.95));
+                background: var(--primary-light);
                 padding: 20px 15px;
                 margin-bottom: 15px;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 position: relative;
-                border-radius: 0 0 20px 20px;
-                box-shadow:
-                    0 10px 30px rgba(0,0,0,0.4),
-                    inset 0 1px 0 rgba(255,255,255,0.1);
-                border-bottom: 2px solid rgba(123, 104, 238, 0.3);
+                border-bottom: 1px solid var(--border-color);
                 overflow: hidden;
             }
             
@@ -103,8 +75,7 @@
                 left: 0;
                 right: 0;
                 height: 100%;
-                background: radial-gradient(circle at center, rgba(123, 104, 238, 0.2) 0%, transparent 70%);
-                animation: pulse 4s ease infinite;
+                display: none;
             }
     
             .sidenav .user-view a.brand-logo {
@@ -121,78 +92,38 @@
                 margin-bottom: 8px;
             }
 
-            .logo-glow {
-                position: absolute;
-                inset: -15px;
-                background: radial-gradient(circle, rgba(123, 104, 238, 0.3), transparent 65%);
-                border-radius: 50%;
-                animation: logoGlow 3s ease infinite;
-                filter: blur(2px);
-            }
-
-            @keyframes logoGlow {
-                0%, 100% {
-                    transform: scale(0.9);
-                    opacity: 0.4;
-                }
-                50% {
-                    transform: scale(1.1);
-                    opacity: 0.8;
-                }
-            }
-
             .sidenav .user-view a.brand-logo i.logo-icon {
                 font-size: 48px;
                 margin-bottom: 0;
-                background: linear-gradient(135deg, #7b68ee 0%, #e94560 50%, #06d6a0 100%);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                background-clip: text;
+                color: var(--accent-color);
                 position: relative;
                 z-index: 2;
-                animation: logoShine 4s linear infinite;
-                filter: drop-shadow(0 4px 12px rgba(123, 104, 238, 0.6));
-            }
-
-            @keyframes logoShine {
-                0% {
-                    filter: hue-rotate(0deg) drop-shadow(0 6px 20px rgba(123, 104, 238, 0.6));
-                }
-                33% {
-                    filter: hue-rotate(120deg) drop-shadow(0 6px 20px rgba(233, 69, 96, 0.6));
-                }
-                66% {
-                    filter: hue-rotate(240deg) drop-shadow(0 6px 20px rgba(6, 214, 160, 0.6));
-                }
-                100% {
-                    filter: hue-rotate(360deg) drop-shadow(0 6px 20px rgba(123, 104, 238, 0.6));
-                }
             }
 
             .sidenav .user-view a.brand-logo span.logo-text {
                 font-size: 13px;
-                font-weight: 700;
+                font-weight: 600;
                 display: block;
-                letter-spacing: 1px;
+                color: white;
+                letter-spacing: 0.5px;
                 text-transform: uppercase;
                 margin-top: 4px;
                 position: relative;
-                background: linear-gradient(90deg, #ffffff, #adb5bd);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                background-clip: text;
+                animation: logoShine 3s ease-in-out infinite;
             }
 
-            .logo-text::after {
-                content: '';
-                position: absolute;
-                bottom: -4px;
-                left: 50%;
-                transform: translateX(-50%);
-                width: 60%;
-                height: 1px;
-                background: linear-gradient(90deg, transparent, #7b68ee, transparent);
-                animation: pulse 2s ease infinite;
+            @keyframes logoGlow {
+                from {
+                    text-shadow: 0 0 20px var(--accent-color), 0 0 30px var(--accent-color), 0 0 40px var(--accent-color);
+                }
+                to {
+                    text-shadow: 0 0 10px var(--accent-color), 0 0 20px var(--accent-color), 0 0 30px var(--accent-color);
+                }
+            }
+
+            @keyframes logoShine {
+                0%, 100% { opacity: 0.8; }
+                50% { opacity: 1; }
             }
     
             .sidenav .user-view .help-icon {
@@ -226,34 +157,54 @@
             }
     
             .categories li a {
-                color: var(--text-primary);
+                color: rgba(255, 255, 255, 0.8);
                 display: block;
                 padding: 8px 14px;
                 cursor: pointer;
                 font-size: 13px;
-                border-radius: var(--border-radius);
+                border-radius: 8px;
                 margin-bottom: 2px;
-                font-weight: 500;
+                font-weight: 600;
                 display: flex;
                 align-items: center;
-                background-color: rgba(255,255,255,0.02);
+                background: rgba(255, 255, 255, 0.05);
                 border-left: 3px solid transparent;
-                backdrop-filter: blur(5px);
+                backdrop-filter: blur(10px);
+                transition: all 0.3s ease;
+                position: relative;
+                overflow: hidden;
             }
     
             .categories li a:hover {
-                background-color: rgba(123, 104, 238, 0.1);
-                color: var(--accent-color);
-                transform: translateX(5px);
+                background: linear-gradient(90deg, rgba(138, 43, 226, 0.3), rgba(255, 107, 157, 0.2));
+                color: white;
                 border-left: 3px solid var(--accent-color);
-                box-shadow: var(--neon-glow);
+                transform: translateX(5px);
+                box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);
+            }
+
+            .categories li a:hover::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+                animation: slideEffect 0.5s ease;
+            }
+
+            @keyframes slideEffect {
+                0% { left: -100%; }
+                100% { left: 100%; }
             }
             
             .categories li a.active {
-                background-color: var(--primary-color);
-                color: var(--accent-color);
-                box-shadow: 0 4px 12px rgba(123, 104, 238, 0.2);
+                background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+                color: white;
                 border-left: 3px solid var(--accent-color);
+                box-shadow: 0 4px 20px rgba(138, 43, 226, 0.4);
+                font-weight: 700;
             }
     
             .routing-key-container {
@@ -316,7 +267,7 @@
                     0 6px 20px rgba(255, 65, 108, 0.4),
                     inset 0 1px 0 rgba(255,255,255,0.2);
                 padding: 14px 32px;
-                font-weight: 700;
+                font-weight: 600;
                 letter-spacing: 1.2px;
                 text-transform: uppercase;
                 transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -443,7 +394,7 @@
             }
     
             .card-content .card-title {
-                font-weight: 600;
+                font-weight: 500;
                 color: white;
                 margin-bottom: 6px;
                 font-size: 14px;
@@ -514,7 +465,7 @@
             }
 
             .modal .modal-content h4 {
-                font-weight: 600;
+                font-weight: 500;
                 margin-bottom: 24px;
                 color: white;
                 font-size: 20px;
@@ -650,7 +601,7 @@
             }
             
             .help-popup .card-title {
-                font-weight: 600;
+                font-weight: 500;
                 margin-bottom: 10px;
                 color: white;
                 font-size: 14px;
@@ -709,7 +660,7 @@
                 font-style: normal;
                 font-size: 20px !important;
                 line-height: 1;
-                letter-spacing: normal;
+                letter-spacing: 0.5px;
                 text-transform: none;
                 display: inline-block !important;
                 white-space: nowrap;
@@ -843,7 +794,7 @@
             
             .timeline-header {
                 font-size: 28px;
-                font-weight: 700;
+                font-weight: 600;
                 color: white;
                 margin-bottom: 30px;
                 text-transform: uppercase;
@@ -1094,7 +1045,7 @@
 
             .timeline-event-title {
                 font-size: 16px;
-                font-weight: 600;
+                font-weight: 500;
                 color: white;
                 letter-spacing: 0.5px;
                 line-height: 1.2;
@@ -1121,7 +1072,7 @@
                 background: linear-gradient(135deg, #06d6a0, rgba(6, 214, 160, 0.9));
                 color: white;
                 font-size: 11px;
-                font-weight: 600;
+                font-weight: 500;
                 border-radius: 20px;
                 text-transform: uppercase;
                 letter-spacing: 1px;
@@ -2380,23 +2331,14 @@
     
         // Removed the findItemByTitle function since it's no longer needed
     
-        function setRoutingKeyCookie(value) {
-            document.cookie = `routingKey=${encodeURIComponent(value)}; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/; SameSite=Strict`;
+        function setRoutingKeyLocalStorage(value) {
+            localStorage.setItem('routingKey', value);
         }
-    
-        function getRoutingKeyCookie() {
-            const name = "routingKey=";
-            const decodedCookie = decodeURIComponent(document.cookie);
-            const cookieArray = decodedCookie.split(';');
-            for(let i = 0; i < cookieArray.length; i++) {
-                let cookie = cookieArray[i].trim();
-                if (cookie.indexOf(name) === 0) {
-                    return cookie.substring(name.length, cookie.length);
-                }
-            }
-            return "";
+
+        function getRoutingKeyLocalStorage() {
+            return localStorage.getItem('routingKey') || '';
         }
-    
+
         toggleRoutingKeyBtn.onclick = () => {
             if (routingKeyInput.type === "password") {
                 routingKeyInput.type = "text";
@@ -2406,13 +2348,17 @@
                 toggleRoutingKeyBtn.innerHTML = '<i class="material-icons">visibility</i>';
             }
         };
-    
-        routingKeyInput.onchange = () => {
-            setRoutingKeyCookie(routingKeyInput.value);
-        };
-    
+
+        routingKeyInput.addEventListener('input', () => {
+            setRoutingKeyLocalStorage(routingKeyInput.value);
+        });
+
+        routingKeyInput.addEventListener('change', () => {
+            setRoutingKeyLocalStorage(routingKeyInput.value);
+        });
+
         window.onload = () => {
-            const savedRoutingKey = getRoutingKeyCookie();
+            const savedRoutingKey = getRoutingKeyLocalStorage();
             if (savedRoutingKey) {
                 routingKeyInput.value = savedRoutingKey;
                 routingKeyInput.type = "password";
