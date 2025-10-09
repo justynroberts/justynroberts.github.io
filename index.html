@@ -1902,17 +1902,26 @@
             renderCards();
 
             // Load saved routing key on page load
+            console.log('🔵 PAGE LOAD STARTING');
+            console.log('🔵 All localStorage keys:', Object.keys(localStorage));
+            console.log('🔵 All localStorage values:', JSON.stringify(localStorage));
+
             setTimeout(() => {
                 try {
                     const savedRoutingKey = localStorage.getItem('routingKey');
-                    console.log('PAGE LOAD - Retrieved routing key:', savedRoutingKey);
+                    console.log('🔵 PAGE LOAD - Retrieved from localStorage:', savedRoutingKey);
+                    console.log('🔵 Current input value BEFORE load:', routingKeyInput.value);
+
                     if (savedRoutingKey && savedRoutingKey.trim() !== '') {
                         routingKeyInput.value = savedRoutingKey;
                         routingKeyInput.type = "password";
-                        console.log('PAGE LOAD - Set input value to:', routingKeyInput.value);
+                        console.log('🔵 PAGE LOAD - Set input value to:', routingKeyInput.value);
+                        console.log('🔵 SUCCESS - Key loaded');
+                    } else {
+                        console.log('🔵 NO KEY FOUND in localStorage');
                     }
                 } catch (e) {
-                    console.error('PAGE LOAD - Error loading routing key:', e);
+                    console.error('🔴 PAGE LOAD ERROR:', e);
                 }
             }, 100);
 
