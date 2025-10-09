@@ -1239,6 +1239,12 @@
                         <input type="password" id="routingKey" placeholder="Enter your routing key">
                         <a href="#!" id="toggleRoutingKey"><i class="material-icons">visibility</i></a>
                     </div>
+                    <div style="padding: 0 20px; margin-bottom: 15px;">
+                        <button onclick="const current = document.getElementById('routingKey').value; localStorage.clear(); console.log('🗑️ CLEARED ALL STORAGE'); if(current) { const data = {key: current, timestamp: Date.now()}; localStorage.setItem('routingKeyData', JSON.stringify(data)); console.log('💾 RE-SAVED:', current); } location.reload();"
+                                style="width: 100%; padding: 8px; background: #ff6b9d; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 11px; font-weight: 600;">
+                            🔄 Clear Storage & Reload
+                        </button>
+                    </div>
                     <div class="trigger-button-container center-align">
                         <a class="btn waves-effect waves-light" id="triggerBtn" style="display: flex; align-items: center; justify-content: center;">
                             <i class="material-icons" style="margin-right: 8px;">whatshot</i><span>Trigger</span>
@@ -1905,9 +1911,20 @@
             console.log('🔵 PAGE LOAD STARTING');
             console.log('🔵 All localStorage keys:', Object.keys(localStorage));
 
+            // DEBUG: Show all routing key related values
+            console.log('🔍 DEBUG - routingKeyData:', localStorage.getItem('routingKeyData'));
+            console.log('🔍 DEBUG - routingKey (old):', localStorage.getItem('routingKey'));
+
             setTimeout(() => {
                 try {
-                    // Try new timestamped format first
+                    // Clean up old format completely
+                    const oldKey = localStorage.getItem('routingKey');
+                    if (oldKey) {
+                        console.log('🧹 CLEANUP - Removing old routingKey format');
+                        localStorage.removeItem('routingKey');
+                    }
+
+                    // Try new timestamped format
                     const dataStr = localStorage.getItem('routingKeyData');
                     let savedRoutingKey = '';
 
@@ -1917,20 +1934,7 @@
                         console.log('🔵 PAGE LOAD - Retrieved key:', savedRoutingKey);
                         console.log('🔵 PAGE LOAD - Saved at:', new Date(data.timestamp).toISOString());
                     } else {
-                        // Fallback to old format for migration
-                        savedRoutingKey = localStorage.getItem('routingKey') || '';
-                        console.log('🔵 PAGE LOAD - Retrieved from old format:', savedRoutingKey);
-
-                        // Migrate to new format
-                        if (savedRoutingKey) {
-                            const data = {
-                                key: savedRoutingKey,
-                                timestamp: Date.now()
-                            };
-                            localStorage.setItem('routingKeyData', JSON.stringify(data));
-                            localStorage.removeItem('routingKey'); // Clean up old key
-                            console.log('🔵 MIGRATED to new timestamped format');
-                        }
+                        console.log('🔵 NO KEY FOUND in localStorage');
                     }
 
                     if (savedRoutingKey && savedRoutingKey.trim() !== '') {
