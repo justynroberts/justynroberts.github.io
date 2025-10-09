@@ -1901,22 +1901,42 @@
             populateCategories();
             renderCards();
 
-            // Load saved routing key on page load
+            // Load saved routing key on page load - ALWAYS USE LATEST TIMESTAMP
             console.log('🔵 PAGE LOAD STARTING');
             console.log('🔵 All localStorage keys:', Object.keys(localStorage));
-            console.log('🔵 All localStorage values:', JSON.stringify(localStorage));
 
             setTimeout(() => {
                 try {
-                    const savedRoutingKey = localStorage.getItem('routingKey');
-                    console.log('🔵 PAGE LOAD - Retrieved from localStorage:', savedRoutingKey);
-                    console.log('🔵 Current input value BEFORE load:', routingKeyInput.value);
+                    // Try new timestamped format first
+                    const dataStr = localStorage.getItem('routingKeyData');
+                    let savedRoutingKey = '';
+
+                    if (dataStr) {
+                        const data = JSON.parse(dataStr);
+                        savedRoutingKey = data.key;
+                        console.log('🔵 PAGE LOAD - Retrieved key:', savedRoutingKey);
+                        console.log('🔵 PAGE LOAD - Saved at:', new Date(data.timestamp).toISOString());
+                    } else {
+                        // Fallback to old format for migration
+                        savedRoutingKey = localStorage.getItem('routingKey') || '';
+                        console.log('🔵 PAGE LOAD - Retrieved from old format:', savedRoutingKey);
+
+                        // Migrate to new format
+                        if (savedRoutingKey) {
+                            const data = {
+                                key: savedRoutingKey,
+                                timestamp: Date.now()
+                            };
+                            localStorage.setItem('routingKeyData', JSON.stringify(data));
+                            localStorage.removeItem('routingKey'); // Clean up old key
+                            console.log('🔵 MIGRATED to new timestamped format');
+                        }
+                    }
 
                     if (savedRoutingKey && savedRoutingKey.trim() !== '') {
                         routingKeyInput.value = savedRoutingKey;
                         routingKeyInput.type = "password";
-                        console.log('🔵 PAGE LOAD - Set input value to:', routingKeyInput.value);
-                        console.log('🔵 SUCCESS - Key loaded');
+                        console.log('🔵 SUCCESS - Key loaded into input');
                     } else {
                         console.log('🔵 NO KEY FOUND in localStorage');
                     }
@@ -1925,14 +1945,16 @@
                 }
             }, 100);
 
-            // Setup event listeners for saving - CRITICAL SAVE FUNCTION
+            // Setup event listeners for saving - CRITICAL SAVE FUNCTION WITH TIMESTAMP
             const saveKey = (val) => {
                 try {
-                    localStorage.setItem('routingKey', val);
-                    const verify = localStorage.getItem('routingKey');
-                    console.log('✅ SAVED:', val);
-                    console.log('✅ VERIFIED READ BACK:', verify);
-                    console.log('✅ MATCH:', val === verify);
+                    const timestamp = Date.now();
+                    const data = {
+                        key: val,
+                        timestamp: timestamp
+                    };
+                    localStorage.setItem('routingKeyData', JSON.stringify(data));
+                    console.log('✅ SAVED:', val, 'at', new Date(timestamp).toISOString());
                 } catch (e) {
                     console.error('❌ SAVE ERROR:', e);
                 }
@@ -1953,7 +1975,44 @@
             routingKeyInput.addEventListener('keyup', function(e) {
                 saveKey(e.target.value);
             });
-    
+
+            // Listen for storage changes from other tabs - SYNC ACROSS TABS
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'routingKeyData' && e.newValue) {
+                    try {
+                        const data = JSON.parse(e.newValue);
+                        const currentValue = routingKeyInput.value;
+
+                        if (data.key !== currentValue) {
+                            routingKeyInput.value = data.key;
+                            console.log('🔄 SYNCED from another tab:', data.key);
+                            console.log('🔄 Updated at:', new Date(data.timestamp).toISOString());
+                        }
+                    } catch (err) {
+                        console.error('🔴 Storage sync error:', err);
+                    }
+                }
+            });
+
+            // Periodic check for updates (backup for same-tab updates)
+            setInterval(() => {
+                try {
+                    const dataStr = localStorage.getItem('routingKeyData');
+                    if (dataStr) {
+                        const data = JSON.parse(dataStr);
+                        const currentValue = routingKeyInput.value;
+
+                        // Only update if value is different and we're not focused on the input
+                        if (data.key !== currentValue && document.activeElement !== routingKeyInput) {
+                            routingKeyInput.value = data.key;
+                            console.log('🔄 AUTO-SYNCED:', data.key);
+                        }
+                    }
+                } catch (err) {
+                    // Silent fail for periodic check
+                }
+            }, 2000); // Check every 2 seconds
+
             // Add pulse animation style
             const style = document.createElement('style');
             style.textContent = `
