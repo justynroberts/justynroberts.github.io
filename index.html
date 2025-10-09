@@ -1,6 +1,9 @@
 <html><head><base href="">
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+        <meta http-equiv="Pragma" content="no-cache">
+        <meta http-equiv="Expires" content="0">
         <title>TriggerIncident.com</title>
         <!-- Import Google Material Icons and Materialize CSS -->
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -1898,12 +1901,49 @@
             populateCategories();
             renderCards();
 
-            // Load saved routing key
-            const savedRoutingKey = getRoutingKeyLocalStorage();
-            if (savedRoutingKey) {
-                routingKeyInput.value = savedRoutingKey;
-                routingKeyInput.type = "password";
-            }
+            // Load saved routing key on page load
+            setTimeout(() => {
+                try {
+                    const savedRoutingKey = localStorage.getItem('routingKey');
+                    console.log('PAGE LOAD - Retrieved routing key:', savedRoutingKey);
+                    if (savedRoutingKey && savedRoutingKey.trim() !== '') {
+                        routingKeyInput.value = savedRoutingKey;
+                        routingKeyInput.type = "password";
+                        console.log('PAGE LOAD - Set input value to:', routingKeyInput.value);
+                    }
+                } catch (e) {
+                    console.error('PAGE LOAD - Error loading routing key:', e);
+                }
+            }, 100);
+
+            // Setup event listeners for saving - CRITICAL SAVE FUNCTION
+            const saveKey = (val) => {
+                try {
+                    localStorage.setItem('routingKey', val);
+                    const verify = localStorage.getItem('routingKey');
+                    console.log('✅ SAVED:', val);
+                    console.log('✅ VERIFIED READ BACK:', verify);
+                    console.log('✅ MATCH:', val === verify);
+                } catch (e) {
+                    console.error('❌ SAVE ERROR:', e);
+                }
+            };
+
+            routingKeyInput.addEventListener('input', function(e) {
+                saveKey(e.target.value);
+            });
+
+            routingKeyInput.addEventListener('change', function(e) {
+                saveKey(e.target.value);
+            });
+
+            routingKeyInput.addEventListener('blur', function(e) {
+                saveKey(e.target.value);
+            });
+
+            routingKeyInput.addEventListener('keyup', function(e) {
+                saveKey(e.target.value);
+            });
     
             // Add pulse animation style
             const style = document.createElement('style');
@@ -2338,27 +2378,6 @@
     
         // Removed the findItemByTitle function since it's no longer needed
     
-        function setRoutingKeyLocalStorage(value) {
-            try {
-                localStorage.setItem('routingKey', value);
-                console.log('✓ Saved to localStorage:', value);
-                console.log('✓ Verify read back:', localStorage.getItem('routingKey'));
-            } catch (e) {
-                console.error('✗ Error saving to localStorage:', e);
-            }
-        }
-
-        function getRoutingKeyLocalStorage() {
-            try {
-                const value = localStorage.getItem('routingKey') || '';
-                console.log('✓ Retrieved from localStorage:', value);
-                return value;
-            } catch (e) {
-                console.error('✗ Error reading from localStorage:', e);
-                return '';
-            }
-        }
-
         toggleRoutingKeyBtn.onclick = () => {
             if (routingKeyInput.type === "password") {
                 routingKeyInput.type = "text";
@@ -2368,31 +2387,6 @@
                 toggleRoutingKeyBtn.innerHTML = '<i class="material-icons">visibility</i>';
             }
         };
-
-        // Set up event listeners after DOM is loaded
-        if (routingKeyInput) {
-            routingKeyInput.addEventListener('input', (e) => {
-                console.log('Input event fired, value:', e.target.value);
-                setRoutingKeyLocalStorage(e.target.value);
-            });
-
-            routingKeyInput.addEventListener('change', (e) => {
-                console.log('Change event fired, value:', e.target.value);
-                setRoutingKeyLocalStorage(e.target.value);
-            });
-
-            routingKeyInput.addEventListener('blur', (e) => {
-                console.log('Blur event fired, value:', e.target.value);
-                setRoutingKeyLocalStorage(e.target.value);
-            });
-
-            routingKeyInput.addEventListener('keyup', (e) => {
-                console.log('Keyup event fired, value:', e.target.value);
-                setRoutingKeyLocalStorage(e.target.value);
-            });
-        } else {
-            console.error('✗ routingKeyInput element not found!');
-        }
     
         helpIcon.onclick = () => {
             if (!helpPopup.classList.contains('show')) {
