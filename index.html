@@ -1323,7 +1323,6 @@
                 { name: "CrowdStrike", icon: "security" },
                 { name: "Customer Sentiment", icon: "sentiment_satisfied" },
                 { name: "Kubernetes Scenario", icon: "hub" }
-
             ];
         
             const payloads = {
@@ -1344,7 +1343,8 @@
                                 "custom_details": {
                                     "cpu_percent": "95.2%",
                                     "environment": "production",
-                                    "team": "backend"
+                                    "team": "backend",
+                                    "service": "payment-processor"
                                 }
                             },
                             "routing_key": "DYNAMIC",
@@ -1372,7 +1372,8 @@
                                 "custom_details": {
                                     "memory_percent": "80.5%",
                                     "environment": "staging",
-                                    "team": "backend"
+                                    "team": "backend",
+                                    "service": "payment-api"
                                 }
                             },
                             "routing_key": "DYNAMIC",
@@ -1402,7 +1403,8 @@
                                 "custom_details": {
                                     "transaction_time_ms": "5100",
                                     "environment": "production",
-                                    "team": "frontend"
+                                    "team": "frontend",
+                                    "service": "payment-api"
                                 }
                             },
                             "routing_key": "DYNAMIC",
@@ -1430,7 +1432,8 @@
                                 "custom_details": {
                                     "error_rate": "0.05",
                                     "environment": "production",
-                                    "team": "api"
+                                    "team": "api",
+                                    "service": "payment-processor"
                                 }
                             },
                             "routing_key": "DYNAMIC",
@@ -1460,7 +1463,8 @@
                                 "custom_details": {
                                     "latency_ms": "1200",
                                     "environment": "production",
-                                    "team": "api"
+                                    "team": "api",
+                                    "service": "payment-api"
                                 }
                             },
                             "routing_key": "DYNAMIC",
@@ -1488,7 +1492,8 @@
                                 "custom_details": {
                                     "disk_percent": "87.3%",
                                     "environment": "production",
-                                    "team": "infrastructure"
+                                    "team": "infrastructure",
+                                    "service": "payment-reconciliation"
                                 }
                             },
                             "routing_key": "DYNAMIC",
@@ -1519,7 +1524,8 @@
                                     "device": "switch-5",
                                     "location": "datacenter-1",
                                     "environment": "datacenter",
-                                    "team": "network"
+                                    "team": "network",
+                                    "service": "payment-processor"
                                 }
                             },
                             "routing_key": "DYNAMIC",
@@ -1547,7 +1553,8 @@
                                 "custom_details": {
                                     "bandwidth_percent": "95.5%",
                                     "environment": "datacenter",
-                                    "team": "network"
+                                    "team": "network",
+                                    "service": "payment-reconciliation"
                                 }
                             },
                             "routing_key": "DYNAMIC",
@@ -1577,7 +1584,8 @@
                                 "custom_details": {
                                     "malware_name": "Trojan.Generic",
                                     "environment": "corporate",
-                                    "team": "security"
+                                    "team": "security",
+                                    "service": "payment-api"
                                 }
                             },
                             "routing_key": "DYNAMIC",
@@ -1605,7 +1613,8 @@
                                 "custom_details": {
                                     "process_name": "unknown.exe",
                                     "environment": "corporate",
-                                    "team": "security"
+                                    "team": "security",
+                                    "service": "payment-reconciliation"
                                 }
                             },
                             "routing_key": "DYNAMIC",
@@ -1635,7 +1644,8 @@
                                 "custom_details": {
                                     "negative_feedback_percent": "80.1%",
                                     "environment": "production",
-                                    "team": "support"
+                                    "team": "support",
+                                    "service": "payment-api"
                                 }
                             },
                             "routing_key": "DYNAMIC",
@@ -1664,7 +1674,8 @@
                                     "churn_score": "0.85",
                                     "environment": "production",
                                     "team": "marketing",
-                                    "customer_id": "12345"
+                                    "customer_id": "12345",
+                                    "service": "payment-reconciliation"
                                 }
                             },
                             "routing_key": "DYNAMIC",
@@ -1676,212 +1687,216 @@
                             "images": []
                         }
                     }
-                    
                 ],
-              "AWS:Reinvent": [
-        { 
-            title: "DB Upgrade", 
-            description: "Bad code update", 
-            category: "AWS:Reinvent",
-            payload: { 
-                "payload":  {
-                    "summary": "Database upgrade failure",
-                    "timestamp": "2023-07-24T15:10:00Z",
-                    "severity": "error",
-                    "source": "Bugsnag",
-                    "class": "AttributeError",
-                    "component": "Database",
-                    "group": "core-database",
-                    "custom_details": {
-                        "message": "Database upgrade failure",
-                        "handled": false,
-                        "project": "core-database",
-                        "releaseStage": "production",
-                        "stackTrace": "app.clients.data_fetcher.DataFetcherError: DataFetcherClient request failure: GET: /v1/incident/Q3S5XEGJVJ921R/context Message: False",
-                        "url": "https://app.bugsnag.com/pagerduty-1/pd-ui-container/errors/abcdefghijklmnop"
+                "AWS:Reinvent": [
+                    { 
+                        title: "DB Upgrade", 
+                        description: "Bad code update", 
+                        category: "AWS:Reinvent",
+                        payload: { 
+                            "payload":  {
+                                "summary": "Database upgrade failure",
+                                "timestamp": "2023-07-24T15:10:00Z",
+                                "severity": "error",
+                                "source": "Bugsnag",
+                                "class": "AttributeError",
+                                "component": "Database",
+                                "group": "core-database",
+                                "custom_details": {
+                                    "message": "Database upgrade failure",
+                                    "handled": false,
+                                    "project": "core-database",
+                                    "releaseStage": "production",
+                                    "stackTrace": "app.clients.data_fetcher.DataFetcherError: DataFetcherClient request failure: GET: /v1/incident/Q3S5XEGJVJ921R/context Message: False",
+                                    "url": "https://app.bugsnag.com/pagerduty-1/pd-ui-container/errors/abcdefghijklmnop",
+                                    "service": "payment-processor"
+                                }
+                            },
+                            "routing_key": "DYNAMIC",
+                            "dedup_key": "database-upgrade-failure",
+                            "event_action": "trigger",
+                            "client": "Bugsnag",
+                            "client_url": "https://app.bugsnag.com/pagerduty-1/pd-ui-container/errors/abcdefghijklmnop",
+                            "links": [],
+                            "images": []
+                        }
                     }
-                },
-                "routing_key": "DYNAMIC",
-                "dedup_key": "database-upgrade-failure",
-                "event_action": "trigger",
-                "client": "Bugsnag",
-                "client_url": "https://app.bugsnag.com/pagerduty-1/pd-ui-container/errors/abcdefghijklmnop",
-                "links": [],
-                "images": []
-            }
-        }
-    ],
-    "Kubernetes Scenario": [
-        {
-            title: "Pod CrashLoopBackOff",
-            description: "web-api pods failing to start after deployment",
-            category: "Kubernetes Scenario",
-            payload: {
-                "payload": {
-                    "summary": "[CRITICAL] Kubernetes Pod CrashLoopBackOff - web-api deployment",
-                    "timestamp": "2024-09-14T15:21:00Z",
-                    "severity": "critical",
-                    "source": "web-api-cluster",
-                    "component": "web-api",
-                    "group": "kubernetes",
-                    "class": "deployment",
-                    "custom_details": {
-                        "deployment": "web-api",
-                        "namespace": "production",
-                        "image": "nginx:1.25-alpine",
-                        "replicas_desired": 3,
-                        "replicas_ready": 0,
-                        "error": "container web-api is waiting to start: CrashLoopBackOff",
-                        "restart_count": 12,
-                        "environment": "production",
-                        "cluster": "us-west-2a"
+                ],
+                "Kubernetes Scenario": [
+                    {
+                        title: "Pod CrashLoopBackOff",
+                        description: "web-api pods failing to start after deployment",
+                        category: "Kubernetes Scenario",
+                        payload: {
+                            "payload": {
+                                "summary": "[CRITICAL] Kubernetes Pod CrashLoopBackOff - web-api deployment",
+                                "timestamp": "2024-09-14T15:21:00Z",
+                                "severity": "critical",
+                                "source": "web-api-cluster",
+                                "component": "web-api",
+                                "group": "kubernetes",
+                                "class": "deployment",
+                                "custom_details": {
+                                    "deployment": "web-api",
+                                    "namespace": "production",
+                                    "image": "nginx:1.25-alpine",
+                                    "replicas_desired": 3,
+                                    "replicas_ready": 0,
+                                    "error": "container web-api is waiting to start: CrashLoopBackOff",
+                                    "restart_count": 12,
+                                    "environment": "production",
+                                    "cluster": "us-west-2a",
+                                    "service": "payment-api"
+                                }
+                            },
+                            "routing_key": "DYNAMIC",
+                            "dedup_key": "web-api-crashloop",
+                            "event_action": "trigger",
+                            "client": "Prometheus",
+                            "client_url": "https://prometheus.example.com/alerts",
+                            "links": [],
+                            "images": []
+                        }
+                    },
+                    {
+                        title: "ImagePullBackOff Error",
+                        description: "Unable to pull nginx:1.25-alpine image",
+                        category: "Kubernetes Scenario",
+                        payload: {
+                            "payload": {
+                                "summary": "[ERROR] Kubernetes ImagePullBackOff - web-api deployment",
+                                "timestamp": "2024-09-14T15:21:00Z",
+                                "severity": "error",
+                                "source": "web-api-deployment",
+                                "component": "web-api",
+                                "group": "kubernetes",
+                                "class": "deployment",
+                                "custom_details": {
+                                    "deployment": "web-api",
+                                    "namespace": "production",
+                                    "image": "nginx:1.25-alpine",
+                                    "error": "Failed to pull image",
+                                    "pod_name": "web-api-deployment-xj2kl",
+                                    "environment": "production",
+                                    "service": "payment-api"
+                                }
+                            },
+                            "routing_key": "DYNAMIC",
+                            "dedup_key": "web-api-imagepull",
+                            "event_action": "trigger",
+                            "client": "Prometheus",
+                            "client_url": "https://prometheus.example.com/alerts",
+                            "links": [],
+                            "images": []
+                        }
+                    },
+                    {
+                        title: "Liveness Probe Failed",
+                        description: "Health check failing on new pods",
+                        category: "Kubernetes Scenario",
+                        payload: {
+                            "payload": {
+                                "summary": "[WARNING] Kubernetes Liveness Probe Failed - web-api",
+                                "timestamp": "2024-09-14T15:21:00Z",
+                                "severity": "warning",
+                                "source": "web-api-health",
+                                "component": "web-api",
+                                "group": "kubernetes",
+                                "class": "health",
+                                "custom_details": {
+                                    "deployment": "web-api",
+                                    "namespace": "production",
+                                    "pod": "web-api-deployment-7d9f8c6b5-m8n9p",
+                                    "probe_type": "liveness",
+                                    "failure_threshold": 3,
+                                    "consecutive_failures": 5,
+                                    "error": "Get http://10.2.14.37:8080/health: dial tcp 10.2.14.37:8080: connect: connection refused",
+                                    "environment": "production",
+                                    "service": "payment-processor"
+                                }
+                            },
+                            "routing_key": "DYNAMIC",
+                            "dedup_key": "web-api-liveness",
+                            "event_action": "trigger",
+                            "client": "Prometheus",
+                            "client_url": "https://prometheus.example.com/alerts",
+                            "links": [],
+                            "images": []
+                        }
+                    },
+                    {
+                        title: "OOMKilled - Memory Limit",
+                        description: "Pods terminated due to memory limits",
+                        category: "Kubernetes Scenario",
+                        payload: {
+                            "payload": {
+                                "summary": "[CRITICAL] Kubernetes Pod OOMKilled - web-api exceeding memory limits",
+                                "timestamp": "2024-09-14T15:21:00Z",
+                                "severity": "critical",
+                                "source": "web-api-pod",
+                                "component": "web-api",
+                                "group": "kubernetes",
+                                "class": "resources",
+                                "custom_details": {
+                                    "deployment": "web-api",
+                                    "namespace": "production",
+                                    "pod": "web-api-deployment-k3j4h",
+                                    "container": "nginx",
+                                    "memory_limit": "512Mi",
+                                    "memory_used": "768Mi",
+                                    "exit_code": "137",
+                                    "reason": "OOMKilled",
+                                    "environment": "production",
+                                    "service": "payment-processor"
+                                }
+                            },
+                            "routing_key": "DYNAMIC",
+                            "dedup_key": "web-api-oom",
+                            "event_action": "trigger",
+                            "client": "Prometheus",
+                            "client_url": "https://prometheus.example.com/alerts",
+                            "links": [],
+                            "images": []
+                        }
+                    },
+                    {
+                        title: "Service Endpoints Not Ready",
+                        description: "No healthy endpoints for web-api service",
+                        category: "Kubernetes Scenario",
+                        payload: {
+                            "payload": {
+                                "summary": "[ERROR] Kubernetes Service has no ready endpoints - web-api",
+                                "timestamp": "2024-09-14T15:21:00Z",
+                                "severity": "error",
+                                "source": "web-api-service",
+                                "component": "web-api-service",
+                                "group": "kubernetes",
+                                "class": "networking",
+                                "custom_details": {
+                                    "service_name": "web-api-service",
+                                    "namespace": "production",
+                                    "deployment": "web-api",
+                                    "ready_endpoints": 0,
+                                    "total_endpoints": 3,
+                                    "selector": "app=web-api,version=1.25",
+                                    "rollout_status": "RollingUpdate in progress",
+                                    "maxUnavailable": 1,
+                                    "maxSurge": 1,
+                                    "environment": "production",
+                                    "load_balancer": "alb.us-west-2.elb.amazonaws.com",
+                                    "service": "payment-reconciliation"
+                                }
+                            },
+                            "routing_key": "DYNAMIC",
+                            "dedup_key": "web-api-endpoints",
+                            "event_action": "trigger",
+                            "client": "Prometheus",
+                            "client_url": "https://prometheus.example.com/alerts",
+                            "links": [],
+                            "images": []
+                        }
                     }
-                },
-                "routing_key": "DYNAMIC",
-                "dedup_key": "web-api-crashloop",
-                "event_action": "trigger",
-                "client": "Prometheus",
-                "client_url": "https://prometheus.example.com/alerts",
-                "links": [],
-                "images": []
-            }
-        },
-        {
-            title: "ImagePullBackOff Error",
-            description: "Unable to pull nginx:1.25-alpine image",
-            category: "Kubernetes Scenario",
-            payload: {
-                "payload": {
-                    "summary": "[ERROR] Kubernetes ImagePullBackOff - web-api deployment",
-                    "timestamp": "2024-09-14T15:21:00Z",
-                    "severity": "error",
-                    "source": "web-api-deployment",
-                    "component": "web-api",
-                    "group": "kubernetes",
-                    "class": "deployment",
-                    "custom_details": {
-                        "deployment": "web-api",
-                        "namespace": "production",
-                        "image": "nginx:1.25-alpine",
-                        "error": "Failed to pull image",
-                        "pod_name": "web-api-deployment-xj2kl",
-                        "environment": "production"
-                    }
-                },
-                "routing_key": "DYNAMIC",
-                "dedup_key": "web-api-imagepull",
-                "event_action": "trigger",
-                "client": "Prometheus",
-                "client_url": "https://prometheus.example.com/alerts",
-                "links": [],
-                "images": []
-            }
-        },
-        {
-            title: "Liveness Probe Failed",
-            description: "Health check failing on new pods",
-            category: "Kubernetes Scenario",
-            payload: {
-                "payload": {
-                    "summary": "[WARNING] Kubernetes Liveness Probe Failed - web-api",
-                    "timestamp": "2024-09-14T15:21:00Z",
-                    "severity": "warning",
-                    "source": "web-api-health",
-                    "component": "web-api",
-                    "group": "kubernetes",
-                    "class": "health",
-                    "custom_details": {
-                        "deployment": "web-api",
-                        "namespace": "production",
-                        "pod": "web-api-deployment-7d9f8c6b5-m8n9p",
-                        "probe_type": "liveness",
-                        "failure_threshold": 3,
-                        "consecutive_failures": 5,
-                        "error": "Get http://10.2.14.37:8080/health: dial tcp 10.2.14.37:8080: connect: connection refused",
-                        "environment": "production"
-                    }
-                },
-                "routing_key": "DYNAMIC",
-                "dedup_key": "web-api-liveness",
-                "event_action": "trigger",
-                "client": "Prometheus",
-                "client_url": "https://prometheus.example.com/alerts",
-                "links": [],
-                "images": []
-            }
-        },
-        {
-            title: "OOMKilled - Memory Limit",
-            description: "Pods terminated due to memory limits",
-            category: "Kubernetes Scenario",
-            payload: {
-                "payload": {
-                    "summary": "[CRITICAL] Kubernetes Pod OOMKilled - web-api exceeding memory limits",
-                    "timestamp": "2024-09-14T15:21:00Z",
-                    "severity": "critical",
-                    "source": "web-api-pod",
-                    "component": "web-api",
-                    "group": "kubernetes",
-                    "class": "resources",
-                    "custom_details": {
-                        "deployment": "web-api",
-                        "namespace": "production",
-                        "pod": "web-api-deployment-k3j4h",
-                        "container": "nginx",
-                        "memory_limit": "512Mi",
-                        "memory_used": "768Mi",
-                        "exit_code": "137",
-                        "reason": "OOMKilled",
-                        "environment": "production"
-                    }
-                },
-                "routing_key": "DYNAMIC",
-                "dedup_key": "web-api-oom",
-                "event_action": "trigger",
-                "client": "Prometheus",
-                "client_url": "https://prometheus.example.com/alerts",
-                "links": [],
-                "images": []
-            }
-        },
-        {
-            title: "Service Endpoints Not Ready",
-            description: "No healthy endpoints for web-api service",
-            category: "Kubernetes Scenario",
-            payload: {
-                "payload": {
-                    "summary": "[ERROR] Kubernetes Service has no ready endpoints - web-api",
-                    "timestamp": "2024-09-14T15:21:00Z",
-                    "severity": "error",
-                    "source": "web-api-service",
-                    "component": "web-api-service",
-                    "group": "kubernetes",
-                    "class": "networking",
-                    "custom_details": {
-                        "service": "web-api-service",
-                        "namespace": "production",
-                        "deployment": "web-api",
-                        "ready_endpoints": 0,
-                        "total_endpoints": 3,
-                        "selector": "app=web-api,version=1.25",
-                        "rollout_status": "RollingUpdate in progress",
-                        "maxUnavailable": 1,
-                        "maxSurge": 1,
-                        "environment": "production",
-                        "load_balancer": "alb.us-west-2.elb.amazonaws.com"
-                    }
-                },
-                "routing_key": "DYNAMIC",
-                "dedup_key": "web-api-endpoints",
-                "event_action": "trigger",
-                "client": "Prometheus",
-                "client_url": "https://prometheus.example.com/alerts",
-                "links": [],
-                "images": []
-            }
-        }
-    ]
-
+                ]
             };
         
             const categoriesList = document.getElementById('categories');
@@ -2447,8 +2462,6 @@
                 }, index * 2000);
             });
         };
-    
-        // Removed the findItemByTitle function since it's no longer needed
     
         toggleRoutingKeyBtn.onclick = () => {
             if (routingKeyInput.type === "password") {
