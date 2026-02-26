@@ -1,0 +1,2490 @@
+<html><head><base href="">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+        <meta http-equiv="Pragma" content="no-cache">
+        <meta http-equiv="Expires" content="0">
+        <title>TriggerIncident.com</title>
+        <!-- Import Google Material Icons and Materialize CSS -->
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+        
+        <!-- CodeMirror CSS -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/codemirror.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/theme/material-darker.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/addon/lint/lint.min.css">
+    
+        <style>
+            /* Using system fonts for professional appearance */
+    
+            :root {
+                --primary-color: #1e1e1e;
+                --primary-light: #2d2d2d;
+                --accent-color: #4a90e2;
+                --danger-color: #dc3545;
+                --success-color: #28a745;
+                --warning-color: #ffc107;
+                --bg-dark: #121212;
+                --bg-card: #1e1e1e;
+                --bg-sidebar: #161616;
+                --text-primary: #e0e0e0;
+                --text-secondary: #9e9e9e;
+                --border-radius: 8px;
+                --transition-speed: 0.2s;
+                --card-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                --hover-shadow: 0 4px 8px rgba(0,0,0,0.3);
+                --border-color: #333333;
+            }
+    
+            * {
+                box-sizing: border-box;
+                transition: all var(--transition-speed) ease;
+            }
+    
+            body {
+                font-family: 'Space Grotesk', sans-serif;
+                background-color: var(--bg-dark);
+                color: var(--text-primary);
+                line-height: 1.5;
+                min-height: 100vh;
+                position: relative;
+                overflow-x: hidden;
+            }
+    
+            .sidenav {
+                width: 280px;
+                background-color: var(--bg-sidebar);
+                padding-top: 20px;
+                box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+                border-right: 1px solid rgba(255,255,255,0.05);
+            }
+    
+            .sidenav .user-view {
+                background: var(--primary-light);
+                padding: 20px 15px;
+                margin-bottom: 15px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                position: relative;
+                border-bottom: 1px solid var(--border-color);
+                overflow: hidden;
+            }
+            
+            .sidenav .user-view::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 100%;
+                display: none;
+            }
+    
+            .sidenav .user-view a.brand-logo {
+                display: block;
+                color: white;
+                text-align: center;
+                text-shadow: none;
+                position: relative;
+            }
+
+            .logo-wrapper {
+                position: relative;
+                display: inline-block;
+                margin-bottom: 8px;
+            }
+
+            .sidenav .user-view a.brand-logo i.logo-icon {
+                font-size: 48px;
+                margin-bottom: 0;
+                color: var(--accent-color);
+                position: relative;
+                z-index: 2;
+            }
+
+            .sidenav .user-view a.brand-logo span.logo-text {
+                font-size: 13px;
+                font-weight: 600;
+                display: block;
+                color: white;
+                letter-spacing: 0.5px;
+                text-transform: uppercase;
+                margin-top: 4px;
+                position: relative;
+                animation: logoShine 3s ease-in-out infinite;
+            }
+
+            @keyframes logoGlow {
+                from {
+                    text-shadow: 0 0 20px var(--accent-color), 0 0 30px var(--accent-color), 0 0 40px var(--accent-color);
+                }
+                to {
+                    text-shadow: 0 0 10px var(--accent-color), 0 0 20px var(--accent-color), 0 0 30px var(--accent-color);
+                }
+            }
+
+            @keyframes logoShine {
+                0%, 100% { opacity: 0.8; }
+                50% { opacity: 1; }
+            }
+    
+            .sidenav .user-view .help-icon {
+                position: absolute;
+                top: 15px;
+                right: 15px;
+                cursor: pointer;
+                font-size: 22px;
+                color: rgba(255,255,255,0.9);
+                background-color: rgba(0,0,0,0.3);
+                border-radius: 50%;
+                padding: 5px;
+                width: 36px;
+                height: 36px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                border: 1px solid rgba(255,255,255,0.1);
+            }
+            
+            .sidenav .user-view .help-icon:hover {
+                background-color: rgba(0,0,0,0.3);
+                transform: scale(1.1);
+            }
+    
+            .categories {
+                list-style-type: none;
+                margin: 0 10px 60px 10px;
+                padding: 0;
+            }
+    
+            .categories li a {
+                color: rgba(255, 255, 255, 0.8);
+                display: block;
+                padding: 8px 14px;
+                cursor: pointer;
+                font-size: 13px;
+                border-radius: 8px;
+                margin-bottom: 2px;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                background: rgba(255, 255, 255, 0.05);
+                border-left: 3px solid transparent;
+                backdrop-filter: blur(10px);
+                transition: all 0.3s ease;
+                position: relative;
+                overflow: hidden;
+            }
+    
+            .categories li a:hover {
+                background: linear-gradient(90deg, rgba(138, 43, 226, 0.3), rgba(255, 107, 157, 0.2));
+                color: white;
+                border-left: 3px solid var(--accent-color);
+                transform: translateX(5px);
+                box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);
+            }
+
+            .categories li a:hover::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+                animation: slideEffect 0.5s ease;
+            }
+
+            @keyframes slideEffect {
+                0% { left: -100%; }
+                100% { left: 100%; }
+            }
+            
+            .categories li a.active {
+                background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+                color: white;
+                border-left: 3px solid var(--accent-color);
+                box-shadow: 0 4px 20px rgba(138, 43, 226, 0.4);
+                font-weight: 700;
+            }
+    
+            .routing-key-container {
+                display: flex;
+                align-items: center;
+                padding: 0 20px;
+                margin-bottom: 20px;
+            }
+    
+            .routing-key-container input {
+                flex: 1;
+                padding: 14px 16px;
+                background-color: rgba(255,255,255,0.03);
+                border: 1px solid rgba(255,255,255,0.08);
+                border-radius: var(--border-radius);
+                color: var(--text-primary);
+                font-size: 14px;
+                box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+                backdrop-filter: blur(5px);
+            }
+            
+            .routing-key-container input:focus {
+                border-color: var(--accent-color);
+                outline: none;
+                box-shadow: 0 0 0 2px rgba(123, 104, 238, 0.2), inset 0 2px 4px rgba(0,0,0,0.1);
+            }
+    
+            .routing-key-container a {
+                margin-left: 10px;
+                color: var(--text-secondary);
+                cursor: pointer;
+                background-color: rgba(255,255,255,0.05);
+                border-radius: 50%;
+                width: 42px;
+                height: 42px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                border: 1px solid rgba(255,255,255,0.05);
+                transition: all 0.2s ease;
+            }
+            
+            .routing-key-container a:hover {
+                background-color: rgba(123, 104, 238, 0.15);
+                color: var(--accent-color);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(123, 104, 238, 0.3);
+            }
+    
+            .trigger-button-container {
+                text-align: center;
+                padding: 0 20px 20px 20px;
+            }
+            
+            .trigger-button-container .btn {
+                background: linear-gradient(135deg, #ff416c, #ff4b2b);
+                border-radius: 12px;
+                box-shadow: 
+                    0 6px 20px rgba(255, 65, 108, 0.4),
+                    inset 0 1px 0 rgba(255,255,255,0.2);
+                padding: 14px 32px;
+                font-weight: 600;
+                letter-spacing: 1.2px;
+                text-transform: uppercase;
+                transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                font-size: 14px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border: 2px solid rgba(255, 65, 108, 0.3);
+                position: relative;
+                overflow: hidden;
+                transform-style: preserve-3d;
+                font-family: 'Space Grotesk', sans-serif;
+            }
+            
+            .trigger-button-container .btn::before {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 0;
+                height: 0;
+                border-radius: 50%;
+                background: rgba(255,255,255,0.3);
+                transform: translate(-50%, -50%);
+                transition: width 0.6s, height 0.6s;
+            }
+            
+            .trigger-button-container .btn:hover::before {
+                width: 300px;
+                height: 300px;
+            }
+            
+            .trigger-button-container .btn:hover {
+                transform: translateY(-4px) rotateX(10deg);
+                box-shadow: 
+                    0 12px 40px rgba(255, 65, 108, 0.6),
+                    0 0 80px rgba(255, 65, 108, 0.3),
+                    inset 0 1px 0 rgba(255,255,255,0.3);
+                background: linear-gradient(135deg, #ff4b2b, #ff416c);
+            }
+            
+            .trigger-button-container .btn:active {
+                transform: translateY(0) rotateX(0);
+                box-shadow: 
+                    0 4px 20px rgba(255, 65, 108, 0.4),
+                    inset 0 2px 4px rgba(0,0,0,0.2);
+            }
+            
+            .trigger-button-container .btn i {
+                margin-right: 10px;
+                font-size: 18px;
+                animation: fireFlicker 2s ease infinite;
+            }
+            
+            @keyframes fireFlicker {
+                0%, 100% { transform: scale(1) rotate(0deg); }
+                25% { transform: scale(1.1) rotate(-3deg); }
+                50% { transform: scale(0.95) rotate(3deg); }
+                75% { transform: scale(1.05) rotate(-2deg); }
+            }
+    
+            main {
+                margin-left: 280px;
+                padding: 20px 15px;
+            }
+    
+            .card {
+                background: linear-gradient(145deg, rgba(22, 33, 62, 0.9) 0%, rgba(16, 24, 44, 0.9) 100%);
+                border-radius: var(--border-radius);
+                overflow: hidden;
+                box-shadow: var(--card-shadow), inset 0 1px 0 rgba(255,255,255,0.05);
+                transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                border: 1px solid rgba(123, 104, 238, 0.15);
+                height: 100%;
+                max-height: 180px;
+                position: relative;
+                backdrop-filter: blur(20px);
+                transform-style: preserve-3d;
+            }
+            
+            .card:hover {
+                transform: translateY(-8px) rotateX(2deg);
+                box-shadow: 
+                    0 20px 40px rgba(123, 104, 238, 0.3),
+                    0 0 60px rgba(123, 104, 238, 0.1),
+                    inset 0 1px 0 rgba(255,255,255,0.1);
+                border-color: rgba(123, 104, 238, 0.4);
+            }
+            
+            .card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 5px;
+                background: linear-gradient(90deg, 
+                    var(--accent-color) 0%, 
+                    var(--danger-color) 50%, 
+                    var(--success-color) 100%);
+                animation: gradientShift 4s ease infinite;
+            }
+            
+            .card::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, 
+                    transparent, 
+                    rgba(255,255,255,0.05), 
+                    transparent);
+                transition: left 0.6s ease;
+            }
+            
+            .card:hover::after {
+                left: 100%;
+            }
+    
+            .card-content {
+                padding: 12px 14px;
+            }
+    
+            .card-content .card-title {
+                font-weight: 500;
+                color: white;
+                margin-bottom: 6px;
+                font-size: 14px;
+                display: flex;
+                align-items: center;
+            }
+            
+            .card-content .card-title span:first-child {
+                margin-right: 8px;
+                font-size: 16px;
+            }
+    
+            .card .card-content p {
+                color: var(--text-secondary);
+                font-size: 11px;
+                margin-bottom: 0;
+                line-height: 1.3;
+                max-height: 42px;
+                overflow: hidden;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+            }
+    
+            .card .card-action {
+                border-top: 1px solid rgba(255,255,255,0.05);
+                padding: 8px 14px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+    
+            .card .card-action label {
+                display: flex;
+                align-items: center;
+            }
+            
+            .card .card-action label input[type="checkbox"] + span {
+                color: var(--text-primary);
+                font-weight: 500;
+                padding-left: 25px;
+                font-size: 12px;
+                display: flex;
+                align-items: center;
+            }
+            
+            .card .card-action label input[type="checkbox"]:checked + span:before {
+                border-right-color: var(--primary-color);
+                border-bottom-color: var(--primary-color);
+            }
+    
+            .modal {
+                background-color: var(--bg-card);
+                background-image: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0) 100%);
+                border-radius: 16px;
+                box-shadow: 0 25px 50px rgba(0,0,0,0.4);
+                border: 1px solid rgba(123, 104, 238, 0.1);
+                max-height: 85%;
+                z-index: 1003;
+                backdrop-filter: blur(10px);
+            }
+    
+            .modal .modal-content {
+                color: var(--text-primary);
+                padding: 32px 32px 24px 32px;
+                max-height: calc(85vh - 140px);
+                overflow-y: auto;
+            }
+
+            .modal .modal-content h4 {
+                font-weight: 500;
+                margin-bottom: 24px;
+                color: white;
+                font-size: 20px;
+                letter-spacing: 0.5px;
+            }
+
+            .modal .modal-footer {
+                background-color: rgba(0,0,0,0.1);
+                padding: 20px 32px 24px 32px;
+                border-top: 1px solid rgba(255,255,255,0.05);
+                position: sticky;
+                bottom: 0;
+                z-index: 1004;
+                display: flex;
+                justify-content: flex-end;
+                align-items: center;
+                gap: 12px;
+            }
+
+            .modal .modal-footer .btn {
+                border-radius: 8px;
+                font-weight: 500;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                padding: 10px 20px;
+                margin: 0;
+                font-size: 12px;
+                position: relative;
+                z-index: 1005;
+                transition: all 0.3s ease;
+            }
+
+            .modal .modal-footer .btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+            }
+    
+            .CodeMirror {
+                background-color: rgba(0,0,0,0.3);
+                color: var(--text-primary);
+                height: auto !important;
+                min-height: 350px;
+                max-height: calc(70vh - 180px);
+                border-radius: 8px;
+                border: 1px solid rgba(123, 104, 238, 0.2);
+                font-family: 'JetBrains Mono', monospace;
+                font-size: 13px;
+                line-height: 1.5;
+                padding: 4px;
+                box-shadow: inset 0 2px 8px rgba(0,0,0,0.3);
+                box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
+            }
+            
+            .CodeMirror-scroll {
+                min-height: 300px;
+                max-height: calc(70vh - 180px);
+            }
+    
+            .toast {
+                border-radius: 10px;
+                font-weight: 500;
+                box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+                padding: 14px 22px;
+                font-size: 13px;
+                letter-spacing: 0.5px;
+                display: flex;
+                align-items: center;
+                backdrop-filter: blur(10px);
+                border-left: 4px solid transparent;
+            }
+            
+            .toast.green {
+                background-color: rgba(6, 214, 160, 0.9);
+                border-left: 4px solid #059669;
+            }
+            
+            .toast.red {
+                background-color: rgba(233, 69, 96, 0.9);
+                border-left: 4px solid #be123c;
+            }
+            
+            .toast.blue {
+                background-color: rgba(26, 26, 46, 0.9);
+                border-left: 4px solid var(--accent-color);
+            }
+            
+            .toast::before {
+                font-family: 'Material Icons';
+                margin-right: 10px;
+                font-size: 20px;
+            }
+            
+            .toast.green::before {
+                content: 'check_circle';
+            }
+            
+            .toast.red::before {
+                content: 'error';
+            }
+            
+            .toast.blue::before {
+                content: 'info';
+            }
+    
+            .help-icon {
+                cursor: pointer;
+                font-size: 20px;
+                margin-left: 10px;
+            }
+            
+            .help-popup {
+                display: none;
+                position: fixed;
+                top: 70px;
+                left: 290px;
+                background-color: var(--bg-card);
+                background-image: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0) 100%);
+                border-radius: 12px;
+                padding: 18px;
+                width: 280px;
+                box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+                z-index: 1000;
+                border: 1px solid rgba(123, 104, 238, 0.1);
+                animation: fadeIn 0.3s ease;
+                backdrop-filter: blur(10px);
+            }
+    
+            .help-popup p {
+                color: var(--text-secondary);
+                font-size: 12px;
+                line-height: 1.5;
+                margin-bottom: 10px;
+            }
+            
+            .help-popup .card-title {
+                font-weight: 500;
+                margin-bottom: 10px;
+                color: white;
+                font-size: 14px;
+            }
+    
+            .help-popup.show {
+                display: block;
+            }
+            
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(-10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            
+            @keyframes slideIn {
+                from { transform: translateX(-20px); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            
+            @keyframes glow {
+                0% { box-shadow: 0 0 5px rgba(123, 104, 238, 0.3); }
+                50% { box-shadow: 0 0 20px rgba(123, 104, 238, 0.6); }
+                100% { box-shadow: 0 0 5px rgba(123, 104, 238, 0.3); }
+            }
+            
+            @keyframes pulse {
+                0% { opacity: 0.8; }
+                50% { opacity: 1; }
+                100% { opacity: 0.8; }
+            }
+            
+            .categories li a {
+                transition: all 0.3s ease;
+                position: relative;
+            }
+            
+            .categories li a::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 0;
+                height: 2px;
+                background-color: var(--accent-color);
+                transition: width 0.3s ease;
+            }
+
+            .categories li a:hover::after {
+                width: 100%;
+            }
+
+            /* Ensure Material Icons display properly in sidebar */
+            .categories li a i.material-icons {
+                font-family: 'Material Icons' !important;
+                font-weight: normal;
+                font-style: normal;
+                font-size: 20px !important;
+                line-height: 1;
+                letter-spacing: 0.5px;
+                text-transform: none;
+                display: inline-block !important;
+                white-space: nowrap;
+                word-wrap: normal;
+                direction: ltr;
+                -webkit-font-feature-settings: 'liga';
+                -webkit-font-smoothing: antialiased;
+                vertical-align: middle !important;
+                margin-right: 12px !important;
+                color: var(--accent-color) !important;
+            }
+            
+            .categories li:nth-child(1) a { animation: slideIn 0.3s ease 0.1s both; }
+            .categories li:nth-child(2) a { animation: slideIn 0.3s ease 0.2s both; }
+            .categories li:nth-child(3) a { animation: slideIn 0.3s ease 0.3s both; }
+            .categories li:nth-child(4) a { animation: slideIn 0.3s ease 0.4s both; }
+            .categories li:nth-child(5) a { animation: slideIn 0.3s ease 0.5s both; }
+            .categories li:nth-child(6) a { animation: slideIn 0.3s ease 0.6s both; }
+            .categories li:nth-child(7) a { animation: slideIn 0.3s ease 0.7s both; }
+            .categories li:nth-child(8) a { animation: slideIn 0.3s ease 0.8s both; }
+            
+            .loading-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(15, 15, 26, 0.85);
+                backdrop-filter: blur(5px);
+                z-index: 9999;
+                justify-content: center;
+                align-items: center;
+                flex-direction: column;
+            }
+            
+            .loading-spinner {
+                width: 50px;
+                height: 50px;
+                border: 3px solid rgba(255,255,255,0.1);
+                border-radius: 50%;
+                border-top-color: var(--primary-color);
+                animation: spin 1s ease-in-out infinite;
+                margin-bottom: 20px;
+            }
+            
+            .loading-text {
+                color: white;
+                font-size: 16px;
+                font-weight: 500;
+                letter-spacing: 1px;
+            }
+            
+            @keyframes spin {
+                to { transform: rotate(360deg); }
+            }
+            
+            /* Timeline Animation Styles */
+            .timeline-container {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: 10000;
+                display: none;
+                align-items: center;
+                justify-content: center;
+                background: rgba(0, 0, 0, 0.85);
+                backdrop-filter: blur(10px);
+                animation: fadeIn 0.3s ease;
+            }
+
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+
+            .timeline-letterbox {
+                width: 90%;
+                max-width: 1200px;
+                max-height: 70vh;
+                background: linear-gradient(135deg, #0f0f1e 0%, #1a1a3e 100%);
+                border-radius: 20px;
+                box-shadow:
+                    0 50px 100px rgba(0,0,0,0.9),
+                    0 0 100px rgba(123, 104, 238, 0.3),
+                    inset 0 1px 0 rgba(255,255,255,0.1);
+                border: 1px solid rgba(123, 104, 238, 0.4);
+                position: relative;
+                overflow: hidden;
+                animation: slideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            }
+
+            @keyframes slideUp {
+                from {
+                    transform: translateY(100px) scale(0.9);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateY(0) scale(1);
+                    opacity: 1;
+                }
+            }
+
+            .timeline-inner {
+                padding: 40px;
+                height: 100%;
+                overflow-y: auto;
+                overflow-x: hidden;
+                position: relative;
+            }
+
+            .timeline-inner::-webkit-scrollbar {
+                width: 8px;
+            }
+
+            .timeline-inner::-webkit-scrollbar-track {
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 4px;
+            }
+
+            .timeline-inner::-webkit-scrollbar-thumb {
+                background: rgba(123, 104, 238, 0.5);
+                border-radius: 4px;
+            }
+
+            .timeline-inner::-webkit-scrollbar-thumb:hover {
+                background: rgba(123, 104, 238, 0.7);
+            }
+            
+            .timeline-header {
+                font-size: 28px;
+                font-weight: 600;
+                color: white;
+                margin-bottom: 30px;
+                text-transform: uppercase;
+                letter-spacing: 3px;
+                text-align: center;
+                background: linear-gradient(90deg, #7b68ee, #e94560, #06d6a0);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                animation: gradientShift 3s ease infinite;
+                position: relative;
+                padding-bottom: 20px;
+            }
+
+            .timeline-header::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 100px;
+                height: 2px;
+                background: linear-gradient(90deg, transparent, #7b68ee, transparent);
+                animation: pulse 2s ease infinite;
+            }
+            
+            @keyframes gradientShift {
+                0%, 100% { filter: hue-rotate(0deg); }
+                50% { filter: hue-rotate(30deg); }
+            }
+            
+            .timeline-track {
+                position: relative;
+                width: 100%;
+                height: 6px;
+                background: linear-gradient(90deg,
+                    rgba(123, 104, 238, 0.1) 0%,
+                    rgba(123, 104, 238, 0.4) 50%,
+                    rgba(123, 104, 238, 0.1) 100%);
+                border-radius: 3px;
+                margin: 30px 0;
+                overflow: visible;
+                box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+            }
+
+            .timeline-track::before {
+                content: '';
+                position: absolute;
+                top: -1px;
+                left: 0;
+                height: 8px;
+                width: 0;
+                background: linear-gradient(90deg, #7b68ee, #e94560, #06d6a0);
+                border-radius: 4px;
+                animation: fillTrack 3s ease-out forwards;
+                box-shadow:
+                    0 0 30px rgba(123, 104, 238, 0.8),
+                    0 4px 12px rgba(123, 104, 238, 0.4);
+            }
+
+            @keyframes fillTrack {
+                0% {
+                    width: 0%;
+                    filter: hue-rotate(0deg);
+                }
+                50% {
+                    width: 50%;
+                    filter: hue-rotate(60deg);
+                }
+                100% {
+                    width: 100%;
+                    filter: hue-rotate(120deg);
+                }
+            }
+            
+            .timeline-events {
+                position: relative;
+                width: 100%;
+                display: flex;
+                flex-direction: row;
+                gap: 30px;
+                margin-top: 40px;
+                padding: 20px 0;
+                overflow-x: auto;
+                overflow-y: hidden;
+                min-height: 280px;
+                align-items: center;
+            }
+
+            .timeline-events::-webkit-scrollbar {
+                height: 8px;
+            }
+
+            .timeline-events::-webkit-scrollbar-track {
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 4px;
+            }
+
+            .timeline-events::-webkit-scrollbar-thumb {
+                background: rgba(123, 104, 238, 0.5);
+                border-radius: 4px;
+            }
+            
+            .timeline-event {
+                opacity: 0;
+                transform: translateY(50px) scale(0.8);
+                min-width: 250px;
+                max-width: 250px;
+                height: 200px;
+                padding: 20px;
+                background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%);
+                border-radius: 16px;
+                border: 1px solid rgba(123, 104, 238, 0.2);
+                box-shadow:
+                    0 20px 40px rgba(0,0,0,0.4),
+                    inset 0 1px 0 rgba(255,255,255,0.1);
+                position: relative;
+                overflow: hidden;
+                backdrop-filter: blur(10px);
+                transition: all 0.3s ease;
+                display: flex;
+                flex-direction: column;
+                flex-shrink: 0;
+            }
+
+            .timeline-event::before {
+                content: '';
+                position: absolute;
+                top: -2px;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: linear-gradient(90deg, #7b68ee, #e94560);
+                border-radius: 16px 16px 0 0;
+                animation: shimmer 2s ease infinite;
+            }
+
+            @keyframes shimmer {
+                0%, 100% { opacity: 0.8; }
+                50% { opacity: 1; }
+            }
+
+            .timeline-event::after {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 0;
+                height: 0;
+                background: radial-gradient(circle, rgba(123, 104, 238, 0.6), transparent);
+                border-radius: 50%;
+                transform: translate(-50%, -50%);
+                animation: rippleExpand 0.8s ease forwards;
+                animation-delay: inherit;
+                pointer-events: none;
+            }
+
+            @keyframes rippleExpand {
+                0% {
+                    width: 0;
+                    height: 0;
+                    opacity: 0.8;
+                }
+                50% {
+                    width: 300px;
+                    height: 300px;
+                    opacity: 0.4;
+                }
+                100% {
+                    width: 400px;
+                    height: 400px;
+                    opacity: 0;
+                }
+            }
+
+            .timeline-event:hover {
+                transform: translateY(-10px) scale(1.05);
+                box-shadow:
+                    0 30px 60px rgba(0,0,0,0.5),
+                    0 0 50px rgba(123, 104, 238, 0.4),
+                    inset 0 1px 0 rgba(255,255,255,0.15);
+                border-color: rgba(123, 104, 238, 0.4);
+            }
+            
+            .timeline-event.show {
+                animation: slideInFromBottom 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            }
+
+            @keyframes slideInFromBottom {
+                0% {
+                    opacity: 0;
+                    transform: translateY(50px) scale(0.8) rotateX(20deg);
+                }
+                50% {
+                    opacity: 1;
+                    transform: translateY(-5px) scale(1.02) rotateX(0deg);
+                }
+                100% {
+                    opacity: 1;
+                    transform: translateY(0) scale(1) rotateX(0deg);
+                }
+            }
+
+            .timeline-connector {
+                position: absolute;
+                top: 50%;
+                left: 0;
+                right: 0;
+                height: 2px;
+                background: linear-gradient(90deg,
+                    transparent 0%,
+                    rgba(123, 104, 238, 0.2) 10%,
+                    rgba(123, 104, 238, 0.2) 90%,
+                    transparent 100%);
+                z-index: -1;
+                transform: translateY(-50%);
+            }
+
+            .timeline-connector::before {
+                content: '';
+                position: absolute;
+                top: -1px;
+                left: 0;
+                height: 4px;
+                width: 0;
+                background: linear-gradient(90deg, #7b68ee, #e94560);
+                box-shadow: 0 0 20px rgba(123, 104, 238, 0.8);
+                animation: fillConnector 4s linear forwards;
+            }
+
+            @keyframes fillConnector {
+                to { width: 100%; }
+            }
+            
+            .timeline-event-header {
+                display: flex;
+                align-items: flex-start;
+                gap: 12px;
+                margin-bottom: 12px;
+            }
+
+            .timeline-event-icon {
+                font-size: 32px;
+                filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+                flex-shrink: 0;
+                margin-top: 2px;
+            }
+
+            .timeline-event-title {
+                font-size: 16px;
+                font-weight: 500;
+                color: white;
+                letter-spacing: 0.5px;
+                line-height: 1.2;
+                flex: 1;
+            }
+
+            .timeline-event-description {
+                color: var(--text-secondary);
+                font-size: 13px;
+                line-height: 1.5;
+                flex: 1;
+                overflow: hidden;
+                display: -webkit-box;
+                -webkit-line-clamp: 4;
+                -webkit-box-orient: vertical;
+            }
+            
+            .timeline-event-status {
+                position: absolute;
+                bottom: 16px;
+                left: 20px;
+                right: 20px;
+                padding: 6px 12px;
+                background: linear-gradient(135deg, #06d6a0, rgba(6, 214, 160, 0.9));
+                color: white;
+                font-size: 11px;
+                font-weight: 500;
+                border-radius: 20px;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                box-shadow:
+                    0 4px 12px rgba(6, 214, 160, 0.5),
+                    inset 0 1px 0 rgba(255,255,255,0.3);
+                animation: statusPulse 2s infinite;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 4px;
+            }
+
+            @keyframes statusPulse {
+                0%, 100% {
+                    transform: scale(1);
+                    box-shadow:
+                        0 4px 12px rgba(6, 214, 160, 0.5),
+                        inset 0 1px 0 rgba(255,255,255,0.3);
+                }
+                50% {
+                    transform: scale(1.05);
+                    box-shadow:
+                        0 6px 20px rgba(6, 214, 160, 0.7),
+                        0 0 30px rgba(6, 214, 160, 0.4),
+                        inset 0 1px 0 rgba(255,255,255,0.3);
+                }
+            }
+            
+            .timeline-close {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                width: 44px;
+                height: 44px;
+                background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+                border: 1px solid rgba(255,255,255,0.2);
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                z-index: 10001;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            }
+
+            .timeline-close:hover {
+                background: linear-gradient(135deg, rgba(233, 69, 96, 0.3), rgba(233, 69, 96, 0.2));
+                border-color: #e94560;
+                transform: rotate(90deg) scale(1.1);
+                box-shadow: 0 6px 20px rgba(233, 69, 96, 0.4);
+            }
+
+            .timeline-close i {
+                color: #ffffff;
+                font-size: 22px;
+                transition: transform 0.3s ease;
+            }
+            
+            .timeline-progress {
+                display: flex;
+                justify-content: center;
+                gap: 12px;
+                margin-top: 30px;
+                padding: 20px;
+            }
+
+            .timeline-dot {
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                background: rgba(255,255,255,0.15);
+                border: 2px solid rgba(255,255,255,0.2);
+                transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+                position: relative;
+            }
+
+            .timeline-dot.active {
+                background: linear-gradient(135deg, #7b68ee, #e94560);
+                border-color: #7b68ee;
+                box-shadow:
+                    0 0 20px rgba(123, 104, 238, 0.8),
+                    0 0 40px rgba(123, 104, 238, 0.4);
+                transform: scale(1.6);
+                animation: dotPulse 1s ease;
+            }
+
+            @keyframes dotPulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(2); }
+                100% { transform: scale(1.6); }
+            }
+
+            .timeline-dot.active::after {
+                content: '';
+                position: absolute;
+                inset: -8px;
+                border-radius: 50%;
+                background: radial-gradient(circle, rgba(123, 104, 238, 0.3), transparent);
+                animation: ripple 1s ease;
+            }
+
+            @keyframes ripple {
+                from {
+                    transform: scale(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: scale(1);
+                    opacity: 0;
+                }
+            }
+            
+            @keyframes spin {
+                to { transform: rotate(360deg); }
+            }
+            
+            /* Responsive adjustments */
+            @media (max-width: 992px) {
+                main {
+                    margin-left: 0;
+                }
+                
+                .sidenav {
+                    transform: translateX(-100%);
+                }
+                
+                .sidenav.open {
+                    transform: translateX(0);
+                }
+                
+                .help-popup {
+                    left: 20px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <ul id="slide-out" class="sidenav sidenav-fixed">
+            <li>
+                <div class="user-view center-align">
+                    <a href="#!" class="brand-logo center">
+                        <div class="logo-wrapper">
+                            <div class="logo-glow"></div>
+                            <i class="material-icons logo-icon">flash_on</i>
+                        </div>
+                        <span class="logo-text">TriggerIncident</span>
+                    </a>
+                    <i class="material-icons help-icon" id="helpIcon">info_outline</i>
+                </div>
+            </li>
+            <!-- Categories -->
+            <li>
+                <ul class="categories" id="categories"></ul>
+            </li>
+            <!-- Configuration -->
+            <li>
+                <div class="config">
+                    <div class="routing-key-container">
+                        <input type="password" id="routingKey" placeholder="Enter your routing key">
+                        <a href="#!" id="toggleRoutingKey"><i class="material-icons">visibility</i></a>
+                    </div>
+                    <div style="padding: 0 20px; margin-bottom: 15px;">
+                        <button onclick="const current = document.getElementById('routingKey').value; localStorage.clear(); console.log('🗑️ CLEARED ALL STORAGE'); if(current) { const data = {key: current, timestamp: Date.now()}; localStorage.setItem('routingKeyData', JSON.stringify(data)); console.log('💾 RE-SAVED:', current); } location.reload();"
+                                style="width: 100%; padding: 8px; background: #ff6b9d; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 11px; font-weight: 600;">
+                            🔄 Clear Storage & Reload
+                        </button>
+                    </div>
+                    <div class="trigger-button-container center-align">
+                        <a class="btn waves-effect waves-light" id="triggerBtn" style="display: flex; align-items: center; justify-content: center;">
+                            <i class="material-icons" style="margin-right: 8px;">whatshot</i><span>Trigger</span>
+                        </a>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    
+        <!-- Help Popup -->
+        <div class="help-popup card" id="helpPopup">
+            <div class="card-content">
+                <span class="card-title">Help</span>
+                <p>This tool allows you to generate and trigger PagerDuty events. Select a category, choose your events, and click the "Trigger" button to send them to PagerDuty.</p>
+                <p>Don't forget to set your Routing Key in the configuration section!</p>
+            </div>
+        </div>
+    
+        <main>
+            <div class="row" id="cardContainer">
+                <!-- Cards will be injected here -->
+            </div>
+        </main>
+    
+        <!-- Edit Modal Structure -->
+        <div id="editModal" class="modal">
+            <div class="modal-content">
+                <h4>Edit JSON Payload</h4>
+                <textarea id="jsonEditor" class="materialize-textarea"></textarea>
+            </div>
+            <div class="modal-footer">
+                <a href="#!" class="modal-close btn grey darken-3" id="cancelJson">Cancel</a>
+                <a href="#!" class="btn amber darken-2" id="resetJson">Reset</a>
+                <a href="#!" class="modal-close btn light-green darken-1" id="saveJson">Save Changes</a>
+            </div>
+        </div>
+    
+        <!-- Timeline Container -->
+        <div class="timeline-container" id="timelineContainer">
+            <div class="timeline-letterbox">
+                <div class="timeline-close" onclick="closeTimeline()">
+                    <i class="material-icons">close</i>
+                </div>
+                <div class="timeline-inner">
+                    <div class="timeline-header">Triggering Incidents</div>
+                    <div class="timeline-track"></div>
+                    <div class="timeline-events" id="timelineEvents">
+                        <div class="timeline-connector"></div>
+                    </div>
+                    <div class="timeline-progress" id="timelineProgress"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Scripts -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js" ></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+        
+        <!-- CodeMirror JS -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/codemirror.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/mode/javascript/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/addon/edit/closebrackets.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/addon/lint/json-lint.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/addon/lint/lint.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jsonlint/1.6.0/jsonlint.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/addon/display/autorefresh.min.js"></script>
+        
+        <script>
+            const categories = [
+                { name: "Alert Storm", icon: "storm" },
+                { name: "AWS:Reinvent", icon: "cloud" },
+                { name: "Datadog", icon: "pets" },
+                { name: "New Relic", icon: "search" },
+                { name: "Prometheus", icon: "local_fire_department" },
+                { name: "SolarWinds", icon: "wb_sunny" },
+                { name: "CrowdStrike", icon: "security" },
+                { name: "Customer Sentiment", icon: "sentiment_satisfied" },
+                { name: "Kubernetes Scenario", icon: "hub" }
+            ];
+        
+            const payloads = {
+                "Datadog": [
+                    { 
+                        title: "High CPU Usage", 
+                        description: "CPU usage exceeds 90%", 
+                        category: "Datadog",
+                        payload: { 
+                            "payload": {
+                                "summary": "High CPU usage detected on web-server-1",
+                                "timestamp": "2023-07-24T14:07:00Z",
+                                "severity": "critical",
+                                "source": "web-server-1",
+                                "component": "CPU",
+                                "group": "backend",
+                                "class": "performance",
+                                "custom_details": {
+                                    "cpu_percent": "95.2%",
+                                    "environment": "production",
+                                    "team": "backend",
+                                    "service": "payment-processor"
+                                }
+                            },
+                            "routing_key": "DYNAMIC",
+                            "dedup_key": "web-server-1-cpu",
+                            "event_action": "trigger",
+                            "client": "Datadog",
+                            "client_url": "https://www.datadoghq.com",
+                            "links": [],
+                            "images": []
+                        }
+                    },
+                    { 
+                        title: "Memory Leak", 
+                        description: "Memory usage steadily increasing", 
+                        category: "Datadog",
+                        payload: { 
+                            "payload": {
+                                "summary": "Potential memory leak detected on app-server-2",
+                                "timestamp": "2023-07-24T14:15:00Z",
+                                "severity": "warning",
+                                "source": "app-server-2",
+                                "component": "Memory",
+                                "group": "backend",
+                                "class": "performance",
+                                "custom_details": {
+                                    "memory_percent": "80.5%",
+                                    "environment": "staging",
+                                    "team": "backend",
+                                    "service": "payment-api"
+                                }
+                            },
+                            "routing_key": "DYNAMIC",
+                            "dedup_key": "app-server-2-memory",
+                            "event_action": "trigger",
+                            "client": "Datadog",
+                            "client_url": "https://www.datadoghq.com",
+                            "links": [],
+                            "images": []
+                        }
+                    }
+                ],
+                "New Relic": [
+                    { 
+                        title: "Slow Transaction", 
+                        description: "Transaction response time > 5s", 
+                        category: "New Relic",
+                        payload: { 
+                            "payload": {
+                                "summary": "Slow transaction detected in checkout-service",
+                                "timestamp": "2023-07-24T14:20:00Z",
+                                "severity": "warning",
+                                "source": "checkout-service",
+                                "component": "Transaction",
+                                "group": "frontend",
+                                "class": "performance",
+                                "custom_details": {
+                                    "transaction_time_ms": "5100",
+                                    "environment": "production",
+                                    "team": "frontend",
+                                    "service": "payment-api"
+                                }
+                            },
+                            "routing_key": "DYNAMIC",
+                            "dedup_key": "checkout-service-transaction",
+                            "event_action": "trigger",
+                            "client": "New Relic",
+                            "client_url": "https://www.newrelic.com",
+                            "links": [],
+                            "images": []
+                        }
+                    },
+                    { 
+                        title: "Error Rate Spike", 
+                        description: "Error rate increased by 200%", 
+                        category: "New Relic",
+                        payload: { 
+                            "payload": {
+                                "summary": "Error rate spike detected in user-service",
+                                "timestamp": "2023-07-24T14:25:00Z",
+                                "severity": "critical",
+                                "source": "user-service",
+                                "component": "API",
+                                "group": "backend",
+                                "class": "performance",
+                                "custom_details": {
+                                    "error_rate": "0.05",
+                                    "environment": "production",
+                                    "team": "api",
+                                    "service": "payment-processor"
+                                }
+                            },
+                            "routing_key": "DYNAMIC",
+                            "dedup_key": "user-service-error-rate",
+                            "event_action": "trigger",
+                            "client": "New Relic",
+                            "client_url": "https://www.newrelic.com",
+                            "links": [],
+                            "images": []
+                        }
+                    }
+                ],
+                "Prometheus": [
+                    { 
+                        title: "High Latency", 
+                        description: "API latency exceeds SLA", 
+                        category: "Prometheus",
+                        payload: { 
+                            "payload": {
+                                "summary": "High API latency detected on /v1/orders",
+                                "timestamp": "2023-07-24T14:30:00Z",
+                                "severity": "critical",
+                                "source": "/v1/orders",
+                                "component": "API",
+                                "group": "backend",
+                                "class": "performance",
+                                "custom_details": {
+                                    "latency_ms": "1200",
+                                    "environment": "production",
+                                    "team": "api",
+                                    "service": "payment-api"
+                                }
+                            },
+                            "routing_key": "DYNAMIC",
+                            "dedup_key": "v1-orders-latency",
+                            "event_action": "trigger",
+                            "client": "Prometheus",
+                            "client_url": "https://prometheus.io",
+                            "links": [],
+                            "images": []
+                        }
+                    },
+                    { 
+                        title: "Disk Space Low", 
+                        description: "Disk usage above 85%", 
+                        category: "Prometheus",
+                        payload: { 
+                            "payload": {
+                                "summary": "Low disk space on db-server-3",
+                                "timestamp": "2023-07-24T14:35:00Z",
+                                "severity": "warning",
+                                "source": "db-server-3",
+                                "component": "Disk",
+                                "group": "infrastructure",
+                                "class": "capacity",
+                                "custom_details": {
+                                    "disk_percent": "87.3%",
+                                    "environment": "production",
+                                    "team": "infrastructure",
+                                    "service": "payment-reconciliation"
+                                }
+                            },
+                            "routing_key": "DYNAMIC",
+                            "dedup_key": "db-server-3-disk",
+                            "event_action": "trigger",
+                            "client": "Prometheus",
+                            "client_url": "https://prometheus.io",
+                            "links": [],
+                            "images": []
+                        }
+                    }
+                ],
+                "SolarWinds": [
+                    { 
+                        title: "Network Outage", 
+                        description: "Network switch down", 
+                        category: "SolarWinds",
+                        payload: { 
+                            "payload": {
+                                "summary": "Network switch outage detected at datacenter-1",
+                                "timestamp": "2023-07-24T14:40:00Z",
+                                "severity": "critical",
+                                "source": "switch-5",
+                                "component": "Network",
+                                "group": "network",
+                                "class": "outage",
+                                "custom_details": {
+                                    "device": "switch-5",
+                                    "location": "datacenter-1",
+                                    "environment": "datacenter",
+                                    "team": "network",
+                                    "service": "payment-processor"
+                                }
+                            },
+                            "routing_key": "DYNAMIC",
+                            "dedup_key": "switch-5-outage",
+                            "event_action": "trigger",
+                            "client": "SolarWinds",
+                            "client_url": "https://www.solarwinds.com",
+                            "links": [],
+                            "images": []
+                        }
+                    },
+                    { 
+                        title: "Bandwidth Saturation", 
+                        description: "Network bandwidth at 95%", 
+                        category: "SolarWinds",
+                        payload: { 
+                            "payload": {
+                                "summary": "High bandwidth usage detected on router-3",
+                                "timestamp": "2023-07-24T14:45:00Z",
+                                "severity": "warning",
+                                "source": "router-3",
+                                "component": "Network",
+                                "group": "network",
+                                "class": "capacity",
+                                "custom_details": {
+                                    "bandwidth_percent": "95.5%",
+                                    "environment": "datacenter",
+                                    "team": "network",
+                                    "service": "payment-reconciliation"
+                                }
+                            },
+                            "routing_key": "DYNAMIC",
+                            "dedup_key": "router-3-bandwidth",
+                            "event_action": "trigger",
+                            "client": "SolarWinds",
+                            "client_url": "https://www.solarwinds.com",
+                            "links": [],
+                            "images": []
+                        }
+                    }
+                ],
+                "CrowdStrike": [
+                    { 
+                        title: "Malware Detected", 
+                        description: "Malware found on endpoint", 
+                        category: "CrowdStrike",
+                        payload: { 
+                            "payload": {
+                                "summary": "Malware detected on laptop-4",
+                                "timestamp": "2023-07-24T14:50:00Z",
+                                "severity": "critical",
+                                "source": "laptop-4",
+                                "component": "Endpoint",
+                                "group": "security",
+                                "class": "threat",
+                                "custom_details": {
+                                    "malware_name": "Trojan.Generic",
+                                    "environment": "corporate",
+                                    "team": "security",
+                                    "service": "payment-api"
+                                }
+                            },
+                            "routing_key": "DYNAMIC",
+                            "dedup_key": "laptop-4-malware",
+                            "event_action": "trigger",
+                            "client": "CrowdStrike",
+                            "client_url": "https://www.crowdstrike.com",
+                            "links": [],
+                            "images": []
+                        }
+                    },
+                    { 
+                        title: "Suspicious Activity", 
+                        description: "Unusual process behavior detected", 
+                        category: "CrowdStrike",
+                        payload: { 
+                            "payload": {
+                                "summary": "Suspicious process activity on desktop-7",
+                                "timestamp": "2023-07-24T14:55:00Z",
+                                "severity": "warning",
+                                "source": "desktop-7",
+                                "component": "Endpoint",
+                                "group": "security",
+                                "class": "threat",
+                                "custom_details": {
+                                    "process_name": "unknown.exe",
+                                    "environment": "corporate",
+                                    "team": "security",
+                                    "service": "payment-reconciliation"
+                                }
+                            },
+                            "routing_key": "DYNAMIC",
+                            "dedup_key": "desktop-7-suspicious",
+                            "event_action": "trigger",
+                            "client": "CrowdStrike",
+                            "client_url": "https://www.crowdstrike.com",
+                            "links": [],
+                            "images": []
+                        }
+                    }
+                ],
+                "Customer Sentiment": [
+                    { 
+                        title: "Negative Feedback Spike", 
+                        description: "Sudden increase in negative reviews", 
+                        category: "Customer Sentiment",
+                        payload: { 
+                            "payload": {
+                                "summary": "Spike in negative customer feedback on web",
+                                "timestamp": "2023-07-24T15:00:00Z",
+                                "severity": "critical",
+                                "source": "web",
+                                "component": "Feedback",
+                                "group": "support",
+                                "class": "customer",
+                                "custom_details": {
+                                    "negative_feedback_percent": "80.1%",
+                                    "environment": "production",
+                                    "team": "support",
+                                    "service": "payment-api"
+                                }
+                            },
+                            "routing_key": "DYNAMIC",
+                            "dedup_key": "web-feedback",
+                            "event_action": "trigger",
+                            "client": "Sentiment Analysis",
+                            "client_url": "https://example.com",
+                            "links": [],
+                            "images": []
+                        }
+                    },
+                    { 
+                        title: "Customer Churn Risk", 
+                        description: "High-value customer showing churn signals", 
+                        category: "Customer Sentiment",
+                        payload: { 
+                            "payload": {
+                                "summary": "Customer at risk of churning",
+                                "timestamp": "2023-07-24T15:05:00Z",
+                                "severity": "warning",
+                                "source": "Sentiment Analysis",
+                                "component": "Customer",
+                                "group": "marketing",
+                                "class": "risk",
+                                "custom_details": {
+                                    "churn_score": "0.85",
+                                    "environment": "production",
+                                    "team": "marketing",
+                                    "customer_id": "12345",
+                                    "service": "payment-reconciliation"
+                                }
+                            },
+                            "routing_key": "DYNAMIC",
+                            "dedup_key": "customer-churn",
+                            "event_action": "trigger",
+                            "client": "Sentiment Analysis",
+                            "client_url": "https://example.com",
+                            "links": [],
+                            "images": []
+                        }
+                    }
+                ],
+                "AWS:Reinvent": [
+                    { 
+                        title: "DB Upgrade", 
+                        description: "Bad code update", 
+                        category: "AWS:Reinvent",
+                        payload: { 
+                            "payload":  {
+                                "summary": "Database upgrade failure",
+                                "timestamp": "2023-07-24T15:10:00Z",
+                                "severity": "error",
+                                "source": "Bugsnag",
+                                "class": "AttributeError",
+                                "component": "Database",
+                                "group": "core-database",
+                                "custom_details": {
+                                    "message": "Database upgrade failure",
+                                    "handled": false,
+                                    "project": "core-database",
+                                    "releaseStage": "production",
+                                    "stackTrace": "app.clients.data_fetcher.DataFetcherError: DataFetcherClient request failure: GET: /v1/incident/Q3S5XEGJVJ921R/context Message: False",
+                                    "url": "https://app.bugsnag.com/pagerduty-1/pd-ui-container/errors/abcdefghijklmnop",
+                                    "service": "payment-processor"
+                                }
+                            },
+                            "routing_key": "DYNAMIC",
+                            "dedup_key": "database-upgrade-failure",
+                            "event_action": "trigger",
+                            "client": "Bugsnag",
+                            "client_url": "https://app.bugsnag.com/pagerduty-1/pd-ui-container/errors/abcdefghijklmnop",
+                            "links": [],
+                            "images": []
+                        }
+                    }
+                ],
+                "Kubernetes Scenario": [
+                    {
+                        title: "Pod CrashLoopBackOff",
+                        description: "web-api pods failing to start after deployment",
+                        category: "Kubernetes Scenario",
+                        payload: {
+                            "payload": {
+                                "summary": "[CRITICAL] Kubernetes Pod CrashLoopBackOff - web-api deployment",
+                                "timestamp": "2024-09-14T15:21:00Z",
+                                "severity": "critical",
+                                "source": "web-api-cluster",
+                                "component": "web-api",
+                                "group": "kubernetes",
+                                "class": "deployment",
+                                "custom_details": {
+                                    "deployment": "web-api",
+                                    "namespace": "production",
+                                    "image": "nginx:1.25-alpine",
+                                    "replicas_desired": 3,
+                                    "replicas_ready": 0,
+                                    "error": "container web-api is waiting to start: CrashLoopBackOff",
+                                    "restart_count": 12,
+                                    "environment": "production",
+                                    "cluster": "us-west-2a",
+                                    "service": "payment-api"
+                                }
+                            },
+                            "routing_key": "DYNAMIC",
+                            "dedup_key": "web-api-crashloop",
+                            "event_action": "trigger",
+                            "client": "Prometheus",
+                            "client_url": "https://prometheus.example.com/alerts",
+                            "links": [],
+                            "images": []
+                        }
+                    },
+                    {
+                        title: "ImagePullBackOff Error",
+                        description: "Unable to pull nginx:1.25-alpine image",
+                        category: "Kubernetes Scenario",
+                        payload: {
+                            "payload": {
+                                "summary": "[ERROR] Kubernetes ImagePullBackOff - web-api deployment",
+                                "timestamp": "2024-09-14T15:21:00Z",
+                                "severity": "error",
+                                "source": "web-api-deployment",
+                                "component": "web-api",
+                                "group": "kubernetes",
+                                "class": "deployment",
+                                "custom_details": {
+                                    "deployment": "web-api",
+                                    "namespace": "production",
+                                    "image": "nginx:1.25-alpine",
+                                    "error": "Failed to pull image",
+                                    "pod_name": "web-api-deployment-xj2kl",
+                                    "environment": "production",
+                                    "service": "payment-api"
+                                }
+                            },
+                            "routing_key": "DYNAMIC",
+                            "dedup_key": "web-api-imagepull",
+                            "event_action": "trigger",
+                            "client": "Prometheus",
+                            "client_url": "https://prometheus.example.com/alerts",
+                            "links": [],
+                            "images": []
+                        }
+                    },
+                    {
+                        title: "Liveness Probe Failed",
+                        description: "Health check failing on new pods",
+                        category: "Kubernetes Scenario",
+                        payload: {
+                            "payload": {
+                                "summary": "[WARNING] Kubernetes Liveness Probe Failed - web-api",
+                                "timestamp": "2024-09-14T15:21:00Z",
+                                "severity": "warning",
+                                "source": "web-api-health",
+                                "component": "web-api",
+                                "group": "kubernetes",
+                                "class": "health",
+                                "custom_details": {
+                                    "deployment": "web-api",
+                                    "namespace": "production",
+                                    "pod": "web-api-deployment-7d9f8c6b5-m8n9p",
+                                    "probe_type": "liveness",
+                                    "failure_threshold": 3,
+                                    "consecutive_failures": 5,
+                                    "error": "Get http://10.2.14.37:8080/health: dial tcp 10.2.14.37:8080: connect: connection refused",
+                                    "environment": "production",
+                                    "service": "payment-processor"
+                                }
+                            },
+                            "routing_key": "DYNAMIC",
+                            "dedup_key": "web-api-liveness",
+                            "event_action": "trigger",
+                            "client": "Prometheus",
+                            "client_url": "https://prometheus.example.com/alerts",
+                            "links": [],
+                            "images": []
+                        }
+                    },
+                    {
+                        title: "OOMKilled - Memory Limit",
+                        description: "Pods terminated due to memory limits",
+                        category: "Kubernetes Scenario",
+                        payload: {
+                            "payload": {
+                                "summary": "[CRITICAL] Kubernetes Pod OOMKilled - web-api exceeding memory limits",
+                                "timestamp": "2024-09-14T15:21:00Z",
+                                "severity": "critical",
+                                "source": "web-api-pod",
+                                "component": "web-api",
+                                "group": "kubernetes",
+                                "class": "resources",
+                                "custom_details": {
+                                    "deployment": "web-api",
+                                    "namespace": "production",
+                                    "pod": "web-api-deployment-k3j4h",
+                                    "container": "nginx",
+                                    "memory_limit": "512Mi",
+                                    "memory_used": "768Mi",
+                                    "exit_code": "137",
+                                    "reason": "OOMKilled",
+                                    "environment": "production",
+                                    "service": "payment-processor"
+                                }
+                            },
+                            "routing_key": "DYNAMIC",
+                            "dedup_key": "web-api-oom",
+                            "event_action": "trigger",
+                            "client": "Prometheus",
+                            "client_url": "https://prometheus.example.com/alerts",
+                            "links": [],
+                            "images": []
+                        }
+                    },
+                    {
+                        title: "Service Endpoints Not Ready",
+                        description: "No healthy endpoints for web-api service",
+                        category: "Kubernetes Scenario",
+                        payload: {
+                            "payload": {
+                                "summary": "[ERROR] Kubernetes Service has no ready endpoints - web-api",
+                                "timestamp": "2024-09-14T15:21:00Z",
+                                "severity": "error",
+                                "source": "web-api-service",
+                                "component": "web-api-service",
+                                "group": "kubernetes",
+                                "class": "networking",
+                                "custom_details": {
+                                    "service_name": "web-api-service",
+                                    "namespace": "production",
+                                    "deployment": "web-api",
+                                    "ready_endpoints": 0,
+                                    "total_endpoints": 3,
+                                    "selector": "app=web-api,version=1.25",
+                                    "rollout_status": "RollingUpdate in progress",
+                                    "maxUnavailable": 1,
+                                    "maxSurge": 1,
+                                    "environment": "production",
+                                    "load_balancer": "alb.us-west-2.elb.amazonaws.com",
+                                    "service": "payment-reconciliation"
+                                }
+                            },
+                            "routing_key": "DYNAMIC",
+                            "dedup_key": "web-api-endpoints",
+                            "event_action": "trigger",
+                            "client": "Prometheus",
+                            "client_url": "https://prometheus.example.com/alerts",
+                            "links": [],
+                            "images": []
+                        }
+                    }
+                ]
+            };
+        
+            const categoriesList = document.getElementById('categories');
+        const cardContainer = document.getElementById('cardContainer');
+        const routingKeyInput = document.getElementById('routingKey');
+        const toggleRoutingKeyBtn = document.getElementById('toggleRoutingKey');
+        const triggerBtn = document.getElementById('triggerBtn');
+        const modal = document.getElementById('editModal');
+        const saveJsonBtn = document.getElementById('saveJson');
+        const helpIcon = document.getElementById('helpIcon');
+        const helpPopup = document.getElementById('helpPopup');
+        const resetJsonBtn = document.getElementById('resetJson');
+        const cancelJsonBtn = document.getElementById('cancelJson');
+    
+        let editor = null;
+    
+        let currentCategory = "AWS:Reinvent";
+        let currentEditingCard = null;
+    
+        // Initialize Materialize components and CodeMirror
+        document.addEventListener('DOMContentLoaded', function() {
+            M.AutoInit();
+            populateCategories();
+            renderCards();
+
+            // Load saved routing key on page load - ALWAYS USE LATEST TIMESTAMP
+            console.log('🔵 PAGE LOAD STARTING');
+            console.log('🔵 All localStorage keys:', Object.keys(localStorage));
+
+            // DEBUG: Show all routing key related values
+            console.log('🔍 DEBUG - routingKeyData:', localStorage.getItem('routingKeyData'));
+            console.log('🔍 DEBUG - routingKey (old):', localStorage.getItem('routingKey'));
+
+            setTimeout(() => {
+                try {
+                    // Clean up old format completely
+                    const oldKey = localStorage.getItem('routingKey');
+                    if (oldKey) {
+                        console.log('🧹 CLEANUP - Removing old routingKey format');
+                        localStorage.removeItem('routingKey');
+                    }
+
+                    // Try new timestamped format
+                    const dataStr = localStorage.getItem('routingKeyData');
+                    let savedRoutingKey = '';
+
+                    if (dataStr) {
+                        const data = JSON.parse(dataStr);
+                        savedRoutingKey = data.key;
+                        console.log('🔵 PAGE LOAD - Retrieved key:', savedRoutingKey);
+                        console.log('🔵 PAGE LOAD - Saved at:', new Date(data.timestamp).toISOString());
+                    } else {
+                        console.log('🔵 NO KEY FOUND in localStorage');
+                    }
+
+                    if (savedRoutingKey && savedRoutingKey.trim() !== '') {
+                        routingKeyInput.value = savedRoutingKey;
+                        routingKeyInput.type = "password";
+                        console.log('🔵 SUCCESS - Key loaded into input');
+                    } else {
+                        console.log('🔵 NO KEY FOUND in localStorage');
+                    }
+                } catch (e) {
+                    console.error('🔴 PAGE LOAD ERROR:', e);
+                }
+            }, 100);
+
+            // Setup event listeners for saving - CRITICAL SAVE FUNCTION WITH TIMESTAMP
+            const saveKey = (val) => {
+                try {
+                    const timestamp = Date.now();
+                    const data = {
+                        key: val,
+                        timestamp: timestamp
+                    };
+                    localStorage.setItem('routingKeyData', JSON.stringify(data));
+                    console.log('✅ SAVED:', val, 'at', new Date(timestamp).toISOString());
+                } catch (e) {
+                    console.error('❌ SAVE ERROR:', e);
+                }
+            };
+
+            routingKeyInput.addEventListener('input', function(e) {
+                saveKey(e.target.value);
+            });
+
+            routingKeyInput.addEventListener('change', function(e) {
+                saveKey(e.target.value);
+            });
+
+            routingKeyInput.addEventListener('blur', function(e) {
+                saveKey(e.target.value);
+            });
+
+            routingKeyInput.addEventListener('keyup', function(e) {
+                saveKey(e.target.value);
+            });
+
+            // Listen for storage changes from other tabs - SYNC ACROSS TABS
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'routingKeyData' && e.newValue) {
+                    try {
+                        const data = JSON.parse(e.newValue);
+                        const currentValue = routingKeyInput.value;
+
+                        if (data.key !== currentValue) {
+                            routingKeyInput.value = data.key;
+                            console.log('🔄 SYNCED from another tab:', data.key);
+                            console.log('🔄 Updated at:', new Date(data.timestamp).toISOString());
+                        }
+                    } catch (err) {
+                        console.error('🔴 Storage sync error:', err);
+                    }
+                }
+            });
+
+            // Periodic check for updates (backup for same-tab updates)
+            setInterval(() => {
+                try {
+                    const dataStr = localStorage.getItem('routingKeyData');
+                    if (dataStr) {
+                        const data = JSON.parse(dataStr);
+                        const currentValue = routingKeyInput.value;
+
+                        // Only update if value is different and we're not focused on the input
+                        if (data.key !== currentValue && document.activeElement !== routingKeyInput) {
+                            routingKeyInput.value = data.key;
+                            console.log('🔄 AUTO-SYNCED:', data.key);
+                        }
+                    }
+                } catch (err) {
+                    // Silent fail for periodic check
+                }
+            }, 2000); // Check every 2 seconds
+
+            // Add pulse animation style
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes pulse {
+                    0% { box-shadow: 0 0 0 0 rgba(45, 52, 54, 0.4); }
+                    70% { box-shadow: 0 0 0 10px rgba(45, 52, 54, 0); }
+                    100% { box-shadow: 0 0 0 0 rgba(45, 52, 54, 0); }
+                }
+                .pulse-on-hover:hover {
+                    animation: pulse 1.5s infinite;
+                }
+            `;
+            document.head.appendChild(style);
+    
+            editor = CodeMirror.fromTextArea(document.getElementById('jsonEditor'), {
+                mode: { name: "javascript", json: true },
+                theme: "material-darker",
+                lineNumbers: true,
+                autoCloseBrackets: true,
+                matchBrackets: true,
+                gutters: ["CodeMirror-lint-markers"],
+                lint: true,
+                autoRefresh: true,
+                lineWrapping: true,
+                viewportMargin: Infinity
+            });
+            editor.setSize("100%", "auto");
+        });
+    
+        function populateCategories() {
+            categoriesList.innerHTML = '';
+            categories.forEach((category, index) => {
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.href = '#!';
+                a.innerHTML = `<i class="material-icons" style="font-size: 18px; vertical-align: middle; margin-right: 10px; display: inline-block; color: var(--accent-color);">${category.icon}</i><span style="vertical-align: middle;">${category.name}</span>`;
+                a.onclick = () => switchCategory(category.name);
+                if (currentCategory === category.name) a.classList.add('active');
+                li.appendChild(a);
+                categoriesList.appendChild(li);
+            });
+        }
+    
+        function switchCategory(categoryName) {
+            currentCategory = categoryName;
+            populateCategories();
+            renderCards();
+        }
+    
+        function renderCards() {
+            cardContainer.innerHTML = '';
+            let itemsToRender = [];
+            if (currentCategory === 'Alert Storm') {
+                categories.forEach(category => {
+                    if (payloads[category.name] && category.name !== 'All') {
+                        payloads[category.name].forEach((item, idx) => {
+                            itemsToRender.push({ ...item, category: category.name, index: idx });
+                        });
+                    }
+                });
+            } else {
+                itemsToRender = (payloads[currentCategory] || []).map((item, idx) => ({ ...item, category: currentCategory, index: idx }));
+            }
+    
+            itemsToRender.forEach((item) => {
+                const cardCol = document.createElement('div');
+                cardCol.className = 'col s12 m4 l3';
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'card hoverable pulse-on-hover';
+                cardDiv.style.position = 'relative';
+                
+                // Add a subtle gradient overlay to cards
+                const gradientOverlay = document.createElement('div');
+                gradientOverlay.style.position = 'absolute';
+                gradientOverlay.style.top = '0';
+                gradientOverlay.style.left = '0';
+                gradientOverlay.style.right = '0';
+                gradientOverlay.style.height = '60px';
+                gradientOverlay.style.background = 'linear-gradient(to bottom, rgba(123, 104, 238, 0.1), transparent)';
+                gradientOverlay.style.borderRadius = 'var(--border-radius) var(--border-radius) 0 0';
+                gradientOverlay.style.pointerEvents = 'none';
+                cardDiv.appendChild(gradientOverlay);
+                cardDiv.onclick = (e) => {
+                    if (e.target.type !== 'checkbox') {
+                        openModal(item);
+                    }
+                };
+                cardDiv.dataset.category = item.category;
+                cardDiv.dataset.index = item.index;
+    
+                const cardContent = document.createElement('div');
+                cardContent.className = 'card-content';
+    
+                const cardIcon = document.createElement('span');
+                cardIcon.className = 'card-title';
+    
+                const iconSpan = document.createElement('i');
+                iconSpan.className = 'material-icons';
+                iconSpan.style.cssText = 'font-size: 24px; vertical-align: middle; margin-right: 8px; color: var(--accent-color);';
+                iconSpan.textContent = categories.find(c => c.name === item.category).icon;
+    
+                const titleSpan = document.createElement('span');
+                titleSpan.textContent = item.title;
+    
+                cardIcon.appendChild(iconSpan);
+                cardIcon.appendChild(titleSpan);
+    
+                const cardDesc = document.createElement('p');
+                cardDesc.textContent = item.description;
+    
+                cardContent.appendChild(cardIcon);
+                cardContent.appendChild(cardDesc);
+    
+                const cardAction = document.createElement('div');
+                cardAction.className = 'card-action';
+                // Create container for checkbox
+                const checkboxContainer = document.createElement('label');
+                checkboxContainer.innerHTML = '<input type="checkbox" class="filled-in" checked="checked" /><span><i class="material-icons" style="font-size: 14px; vertical-align: middle; color: var(--success-color);">check_circle</i></span>';
+                cardAction.appendChild(checkboxContainer);
+                
+                // Create container for edit icon
+                const editContainer = document.createElement('div');
+                editContainer.style.display = 'flex';
+                editContainer.style.alignItems = 'center';
+                
+                // Add edit icon
+                const editIcon = document.createElement('a');
+                editIcon.className = 'edit-icon';
+                editIcon.innerHTML = '<i class="material-icons" style="font-size: 14px;">edit</i>';
+                editIcon.style.color = 'var(--accent-color)';
+                editIcon.style.padding = '6px 10px';
+                editIcon.style.borderRadius = '6px';
+                editIcon.style.backgroundColor = 'rgba(123, 104, 238, 0.1)';
+                editIcon.style.boxShadow = '0 2px 6px rgba(0,0,0,0.2)';
+                editIcon.style.transition = 'all 0.2s ease';
+                editIcon.onclick = (e) => {
+                    e.stopPropagation();
+                    editIcon.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        editIcon.style.transform = 'scale(1)';
+                        openModal(item);
+                    }, 100);
+                };
+                
+                editIcon.onmouseover = () => {
+                    editIcon.style.backgroundColor = 'rgba(123, 104, 238, 0.2)';
+                    editIcon.style.transform = 'translateY(-2px)';
+                    editIcon.style.boxShadow = '0 4px 8px rgba(0,0,0,0.3)';
+                };
+                
+                editIcon.onmouseout = () => {
+                    editIcon.style.backgroundColor = 'rgba(123, 104, 238, 0.1)';
+                    editIcon.style.transform = 'translateY(0)';
+                    editIcon.style.boxShadow = '0 2px 6px rgba(0,0,0,0.2)';
+                };
+                
+                editContainer.appendChild(editIcon);
+                cardAction.appendChild(editContainer);
+    
+                cardDiv.appendChild(cardContent);
+                cardDiv.appendChild(cardAction);
+                cardCol.appendChild(cardDiv);
+                cardContainer.appendChild(cardCol);
+            });
+        }
+    
+        function openModal(item) {
+            currentEditingCard = item;
+            editor.setValue(JSON.stringify(item.payload, null, 2));
+            
+            // Ensure modal is properly positioned
+            modal.style.maxHeight = '85vh';
+            modal.style.height = 'auto';
+            modal.style.overflow = 'visible';
+            
+            const instance = M.Modal.getInstance(modal);
+            instance.open();
+            
+            // Ensure buttons are visible
+            document.querySelector('.modal-footer').style.position = 'sticky';
+            document.querySelector('.modal-footer').style.bottom = '0';
+            document.querySelector('.modal-footer').style.zIndex = '1004';
+            
+            // Refresh CodeMirror after modal is open
+            setTimeout(() => {
+                editor.refresh();
+            }, 100);
+        }
+    
+        saveJsonBtn.onclick = () => {
+            try {
+                const updatedPayload = JSON.parse(editor.getValue());
+                payloads[currentEditingCard.category][currentEditingCard.index].payload = updatedPayload;
+                const instance = M.Modal.getInstance(modal);
+                instance.close();
+                M.toast({html: 'Payload updated successfully!', classes: 'green'});
+            } catch (error) {
+                M.toast({html: 'Invalid JSON. Please check your input.', classes: 'red'});
+            }
+        };
+    
+        resetJsonBtn.onclick = () => {
+            editor.setValue(JSON.stringify(currentEditingCard.payload, null, 2));
+            M.toast({html: 'JSON payload reset to original.', classes: 'blue'});
+        };
+    
+        cancelJsonBtn.onclick = () => {
+            const instance = M.Modal.getInstance(modal);
+            instance.close();
+        };
+    
+        // Create loading overlay
+        const loadingOverlay = document.createElement('div');
+        loadingOverlay.className = 'loading-overlay';
+        loadingOverlay.innerHTML = `
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Triggering events...</div>
+        `;
+        document.body.appendChild(loadingOverlay);
+        
+        function closeTimeline() {
+            const timelineContainer = document.getElementById('timelineContainer');
+            const letterbox = timelineContainer.querySelector('.timeline-letterbox');
+
+            // Animate out
+            letterbox.style.animation = 'slideDown 0.4s ease forwards';
+            timelineContainer.style.animation = 'fadeOut 0.4s ease forwards';
+
+            setTimeout(() => {
+                timelineContainer.style.display = 'none';
+                // Clear timeline events
+                document.getElementById('timelineEvents').innerHTML = '';
+                document.getElementById('timelineProgress').innerHTML = '';
+                // Reset animations
+                letterbox.style.animation = '';
+                timelineContainer.style.animation = '';
+            }, 400);
+        }
+
+        // Add the slideDown and fadeOut animations
+        const animationStyles = document.createElement('style');
+        animationStyles.textContent = `
+            @keyframes slideDown {
+                to {
+                    transform: translateY(100px) scale(0.9);
+                    opacity: 0;
+                }
+            }
+            @keyframes fadeOut {
+                to { opacity: 0; }
+            }
+        `;
+        document.head.appendChild(animationStyles);
+
+        function showTimeline(events) {
+            const timelineContainer = document.getElementById('timelineContainer');
+            const timelineEvents = document.getElementById('timelineEvents');
+            const timelineProgress = document.getElementById('timelineProgress');
+
+            // Clear previous content
+            timelineEvents.innerHTML = '';
+            timelineProgress.innerHTML = '';
+
+            // Show container with flexbox for centering
+            timelineContainer.style.display = 'flex';
+
+            // Create progress dots
+            events.forEach((_, index) => {
+                const dot = document.createElement('div');
+                dot.className = 'timeline-dot';
+                timelineProgress.appendChild(dot);
+            });
+
+            // Batch create all event elements first
+            const eventElements = events.map((event, index) => {
+                const eventDiv = document.createElement('div');
+                eventDiv.className = 'timeline-event';
+
+                const category = categories.find(c => c.name === event.category);
+
+                // Create a more visually appealing horizontal event card
+                eventDiv.innerHTML = `
+                    <div class="timeline-event-header">
+                        <i class="material-icons timeline-event-icon">${category ? category.icon : 'notifications'}</i>
+                        <div>
+                            <div class="timeline-event-title">${event.title}</div>
+                        </div>
+                    </div>
+                    <div class="timeline-event-description">${event.description}</div>
+                    <span class="timeline-event-status">
+                        <i class="material-icons" style="font-size: 12px; vertical-align: middle; margin-right: 4px;">check_circle</i>
+                        Triggered
+                    </span>
+                `;
+
+                timelineEvents.appendChild(eventDiv);
+                return eventDiv;
+            });
+
+            // Animate events sequentially from left to right
+            let delay = 500; // Initial delay
+            eventElements.forEach((eventDiv, index) => {
+                setTimeout(() => {
+                    eventDiv.classList.add('show');
+                    eventDiv.style.animationDelay = `${index * 0.3}s`;
+
+                    // Activate progress dot
+                    const dots = timelineProgress.querySelectorAll('.timeline-dot');
+                    if (dots[index]) {
+                        dots[index].classList.add('active');
+                    }
+
+                    // Enhanced visual feedback with glow effect and ripple
+                    eventDiv.style.boxShadow = '0 0 60px rgba(123, 104, 238, 0.9), 0 30px 60px rgba(0,0,0,0.5)';
+
+                    // Trigger the ripple effect
+                    eventDiv.style.setProperty('--ripple-delay', `${index * 0.2}s`);
+
+                    setTimeout(() => {
+                        eventDiv.style.boxShadow = '0 20px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)';
+                    }, 600);
+
+                    // Smooth horizontal scroll to show the latest event
+                    const timelineEventsContainer = document.getElementById('timelineEvents');
+                    if (timelineEventsContainer && index > 2) { // Start scrolling after 3 events
+                        const scrollPosition = (index - 2) * 280; // 250px width + 30px gap
+                        timelineEventsContainer.scrollTo({
+                            left: scrollPosition,
+                            behavior: 'smooth'
+                        });
+                    }
+                }, delay);
+
+                delay += 1000; // 1 second delay between events for cinematic effect
+            });
+
+            // Auto-close timeline after all events are shown + 2.5 seconds
+            setTimeout(() => {
+                closeTimeline();
+            }, delay + 2500);
+        }
+        
+        triggerBtn.onclick = () => {
+            console.log('=== TRIGGER BUTTON CLICKED ===');
+            const routingKey = routingKeyInput.value.trim();
+            console.log('Routing key:', routingKey);
+
+            if (!routingKey) {
+                M.toast({html: 'Please enter a routing key', classes: 'red'});
+                return;
+            }
+
+            const selectedCards = Array.from(document.querySelectorAll('.card'))
+                .filter(card => {
+                    const checkbox = card.querySelector('input[type="checkbox"]');
+                    return checkbox && checkbox.checked;
+                });
+
+            console.log('Number of selected cards:', selectedCards.length);
+
+            if (selectedCards.length === 0) {
+                M.toast({html: 'Please select at least one event to trigger.', classes: 'red'});
+                return;
+            }
+            
+            // Prepare event data for timeline
+            const selectedEvents = selectedCards.map(card => {
+                const category = card.dataset.category;
+                const index = card.dataset.index;
+                const item = payloads[category][index];
+                return {
+                    title: item.title,
+                    description: item.description,
+                    category: item.category
+                };
+            });
+            
+            // Show timeline animation
+            showTimeline(selectedEvents);
+            
+            // Prepare payloads
+            const selectedPayloads = selectedCards.map(card => {
+                const category = card.dataset.category;
+                const index = card.dataset.index;
+                const item = payloads[category][index];
+                const payloadClone = JSON.parse(JSON.stringify(item.payload));
+                payloadClone.routing_key = routingKey;
+                // Generate unique dedup_key with timestamp to ensure new incidents
+                const timestamp = Date.now();
+                const randomId = Math.random().toString(36).substring(2, 15);
+                payloadClone.dedup_key = `${payloadClone.dedup_key}_${timestamp}_${randomId}`;
+                return payloadClone;
+            });
+
+            // Send events with 2-second delay between each
+            console.log('Payloads to send:', selectedPayloads);
+
+            selectedPayloads.forEach((payload, index) => {
+                setTimeout(() => {
+                    console.log(`Sending event ${index + 1}/${selectedPayloads.length}:`, payload);
+                    console.log('Payload JSON:', JSON.stringify(payload, null, 2));
+
+                    fetch('https://events.pagerduty.com/v2/enqueue', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    })
+                    .then(response => {
+                        console.log(`Response ${index + 1}: Status ${response.status}`);
+                        if (response.ok) {
+                            return response.json().then(data => {
+                                console.log(`Success ${index + 1}:`, data);
+                                M.toast({html: `✓ Event ${index + 1} sent`, classes: 'green'});
+                            });
+                        } else {
+                            return response.text().then(text => {
+                                console.error(`Error response ${index + 1}:`, text);
+                                throw new Error(text || 'Unknown error occurred');
+                            });
+                        }
+                    })
+                    .catch((error) => {
+                        console.error(`Error ${index + 1}:`, error);
+                        M.toast({html: `✗ Event ${index + 1}: ${error.message}`, classes: 'red'});
+                    });
+                }, index * 2000);
+            });
+        };
+    
+        toggleRoutingKeyBtn.onclick = () => {
+            if (routingKeyInput.type === "password") {
+                routingKeyInput.type = "text";
+                toggleRoutingKeyBtn.innerHTML = '<i class="material-icons">visibility_off</i>';
+            } else {
+                routingKeyInput.type = "password";
+                toggleRoutingKeyBtn.innerHTML = '<i class="material-icons">visibility</i>';
+            }
+        };
+    
+        helpIcon.onclick = () => {
+            if (!helpPopup.classList.contains('show')) {
+                helpPopup.style.animation = 'fadeIn 0.3s ease forwards';
+            }
+            helpPopup.classList.toggle('show');
+        };
+    
+        window.onclick = (event) => {
+            if (!event.target.matches('.help-icon') && !event.target.closest('.help-popup')) {
+                helpPopup.classList.remove('show');
+            }
+        };
+    </script>
+</body>
+</html>
